@@ -1,0 +1,4 @@
+- Look up [[Intensity filter]]
+- Look up [[Sobel filter]]
+- Complete [[WoodPixel]]
+- Create [[Timeline]]

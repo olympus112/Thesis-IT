@@ -1,0 +1,18 @@
+Binnen computer graphics wordt ook onderzoek gedaan naar meer niche onderwerpen zoals het hercreëren van 2D vormen met sinaasappelschillen of het automatisch breien van een omhulsel voor een 3D object. Dit onderzoek baseert zich op zo’n onderwerp waarbij aan de hand van de aanwezige textuur en kleur in platen hout een verzameling puzzelstukjes wordt gezocht om een gegeven afbeelding te hercreëren [1]. 
+
+Zulke afbeeldingen realistisch benaderen is in het echt significant moeilijker aangezien je geen automagische computeroperaties kan toepassen op het echte hout om de kleuren juist te krijgen. Dit onderzoek tracht zo’n methode te implementeren en te verrijken met enkele heuristieken. Op het einde van de masterthesis kan de student ook zo’n afbeelding creëren in het echt om zijn of haar bevindingen in de praktijk toe te passen.
+
+Voor vragen of een gesprek over dit onderwerp kan je mailen naar arno.coomans@kuleuven.be 
+
+Mogelijke onderzoeksvragen:
+Welke heuristieken kan je toevoegen aan de techniek in [1] om deze te verbeteren? In welke omstandigheden werkt je heuristiek goed?
+Kan deze techniek uitgebreid worden naar andere materiaalkeuzes? Werken de voorgestelde heuristieken dan nog?
+Zien de creaties die je gemaakt hebt in het echt er hetzelfde uit als in je simulatie? Kunnen we dit verschil tussen de werkelijkheid en de simulatie integreren in het programma?
+
+Verwachte voorkennis:
+Fundamenten van Computergrafiek, bij voorkeur ook reeds Computergrafiek 2.
+Interesse in en/of ervaring met fabrication tools (b.v. via FabLab).
+
+
+References:
+[1] Iseringhausen, J., Weinmann, M., Huang, W., & Hullin, M. B. (2019). Computational Parquetry: Fabricated Style Transfer with Wood Pixels. arXiv preprint arXiv:1904.04769. paper link
