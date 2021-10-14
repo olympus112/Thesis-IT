@@ -2,3 +2,4 @@
 - Look up [[Sobel filter]]
 - Complete [[WoodPixel]]
 - Create [[Timeline]]
+- Look for grid papers
