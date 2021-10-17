@@ -2,4 +2,4 @@
 - Look up [[Sobel filter]]
 - Complete [[WoodPixel]]
 - Create [[Timeline]]
-- Look for grid papers
+- Look for grid/texture generation/stylised fabrication papers/escherization

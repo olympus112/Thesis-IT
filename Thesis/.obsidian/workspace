@@ -6,10 +6,11 @@
       {
         "id": "a4963fee308bffd8",
         "type": "leaf",
+        "dimension": 51.19565217391304,
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Timeline.md",
+            "file": "Meetings/14-10-2021.md",
             "mode": "source"
           }
         },
@@ -18,10 +19,11 @@
       {
         "id": "f93a7fe73af52fc2",
         "type": "leaf",
+        "dimension": 48.80434782608696,
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Timeline.md",
+            "file": "Meetings/14-10-2021.md",
             "mode": "preview"
           }
         },
@@ -89,7 +91,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Timeline.md",
+                "file": "Meetings/14-10-2021.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -117,7 +119,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Timeline.md"
+                "file": "Meetings/14-10-2021.md"
               }
             }
           }
@@ -130,15 +132,15 @@
   },
   "active": "a4963fee308bffd8",
   "lastOpenFiles": [
-    "Timeline.md",
+    "Meetings/14-10-2021.md",
     "Todo.md",
+    "14-10-2021.md",
     "WoodPixel.md",
+    "Timeline.md",
+    "Untitled.md",
     "Intensity filter.md",
     "Sobel filter.md",
     "TODO.md",
-    "www.i.com.md",
-    "Sobel.md",
-    "www.one.com.md",
-    "Untitled.md"
+    "www.i.com.md"
   ]
 }
