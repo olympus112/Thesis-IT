@@ -15,5 +15,6 @@
 | Week 3         | Beschrijving                                     | Uren |
 | -------------- | ------------------------------------------------ | ---- |
 | [[2021-10-12]] | Siggraph papers verzameld voor literatuurstudie  | 1    |
-| [[2021-10-13]] | Algemene thesis setup: Github, folders, md files | 1    | 
-| Totaal         |                                                  | 2    |
+| [[2021-10-13]] | Algemene thesis setup: Github, folders, md files | 1    |
+| [[2021-10-14]] | Meeting                                          | 1    |
+| [[2021-10-17]] |                                                  |      |
