@@ -18,7 +18,7 @@
 | 2021-10-13 | Algemene thesis setup: Github, folders, md files | 1    |
 | 2021-10-14 | Meeting                                          | 1    |
 | 2021-10-17 | Stylised fabrication papers gelezen              | 3    |
-| Total      |                                                  | 6    | 
+| Totaal     |                                                  | 6    |
 
 | Week 4     | Beschrijving  | Uren |
 | ---------- | ------------- | ---- |

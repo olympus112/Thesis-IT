@@ -10,7 +10,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Management/Timeline.md",
+            "file": "Notes/Ideas.md",
             "mode": "source"
           }
         },
@@ -23,7 +23,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Management/Timeline.md",
+            "file": "Notes/Ideas.md",
             "mode": "preview"
           }
         },
@@ -91,7 +91,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Management/Timeline.md",
+                "file": "Notes/Ideas.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -119,7 +119,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Management/Timeline.md"
+                "file": "Notes/Ideas.md"
               }
             }
           },
@@ -140,12 +140,12 @@
   },
   "active": "35d6e4ffdaa21cbb",
   "lastOpenFiles": [
+    "Notes/Ideas.md",
+    "Notes/Stylised fabrication.md",
     "Management/Timeline.md",
     "Links/Papers.md",
     "Meetings/14-10-2021.md",
-    "Notes/Ideas.md",
     "Notes/WoodPixel.md",
-    "Notes/Stylised fabrication.md",
     "Notes/Sobel filter.md",
     "Notes/Intensity filter.md",
     "Links/Miscellaneous.md",

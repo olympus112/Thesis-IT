@@ -6,7 +6,7 @@
 	- cutting niet mogelijk, bakstenen zijn bros
 
 - 3D
-	- Using textured strips to fill 3D model $\approx$ 3D Woodpixel, perhaps cut ribbons out of textured plane
+	- Using textured strips to represent textured 3D model $\approx$ 3D Woodpixel, perhaps cut ribbons out of textured plane -> combine 3D weaving, foldable patches, texture mapping, ...
 		-  [3D Weaving with Curved Ribbons](https://lgg.epfl.ch/publications/2021/Weaving/index.php)
 		- [The Design Space of Plane Elastic Curves](http://visualcomputing.ist.ac.at/publications/2021/TDSOPEC/)
 
