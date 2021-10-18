@@ -1,0 +1,154 @@
+{
+  "main": {
+    "id": "771f6866997dc0c2",
+    "type": "split",
+    "children": [
+      {
+        "id": "35d6e4ffdaa21cbb",
+        "type": "leaf",
+        "dimension": 50,
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "Management/Timeline.md",
+            "mode": "source"
+          }
+        },
+        "group": "ffb4c0a0802659ac"
+      },
+      {
+        "id": "3b26247d878bddff",
+        "type": "leaf",
+        "dimension": 50,
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "Management/Timeline.md",
+            "mode": "preview"
+          }
+        },
+        "group": "ffb4c0a0802659ac"
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "6baa376a49ada462",
+    "type": "split",
+    "children": [
+      {
+        "id": "b25fde639241ecf2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ac51a881f6d61acf",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "bb5e25381c26ce07",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "cde02a0c92083c0b",
+            "type": "leaf",
+            "state": {
+              "type": "starred",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "ece90af34884dcac",
+    "type": "split",
+    "children": [
+      {
+        "id": "02751110acaf732c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b7d7c04e4986e58f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Management/Timeline.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "af66fdc3c1c9bada",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "9518656a4595c570",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Management/Timeline.md"
+              }
+            }
+          },
+          {
+            "id": "2debf8a17f6e7acf",
+            "type": "leaf",
+            "state": {
+              "type": "advanced-tables-toolbar",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "35d6e4ffdaa21cbb",
+  "lastOpenFiles": [
+    "Management/Timeline.md",
+    "Links/Papers.md",
+    "Meetings/14-10-2021.md",
+    "Notes/Ideas.md",
+    "Notes/WoodPixel.md",
+    "Notes/Stylised fabrication.md",
+    "Notes/Sobel filter.md",
+    "Notes/Intensity filter.md",
+    "Links/Miscellaneous.md",
+    "kesen.realtimerendering.com.md"
+  ]
+}

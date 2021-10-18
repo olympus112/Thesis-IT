@@ -1,5 +1,0 @@
-- Look up [[Intensity filter]]
-- Look up [[Sobel filter]]
-- Complete [[WoodPixel]]
-- Create [[Timeline]]
-- Look for grid/texture generation/stylised fabrication papers/escherization
