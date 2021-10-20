@@ -20,6 +20,9 @@
 | 2021-10-17 | Stylised fabrication papers gelezen              | 3    |
 | Totaal     |                                                  | 6    |
 
-| Week 4     | Beschrijving  | Uren |
-| ---------- | ------------- | ---- |
-| 2021-10-18 | Siggraph 2021 | 2    | 
+| Week 4     | Beschrijving                | Uren |
+| ---------- | --------------------------- | ---- |
+| 2021-10-18 | Siggraph 2021, 2020         | 2    |
+| 2021-10-19 | Siggraph 2019, 2018, 2017   | 1.5  |
+| 2021-10-19 | EG 2021, 2020               | 1    |
+| 2021-10-10 | Limo search for fabrication | 1.5  | 

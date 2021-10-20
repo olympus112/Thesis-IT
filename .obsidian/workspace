@@ -4,30 +4,28 @@
     "type": "split",
     "children": [
       {
-        "id": "35d6e4ffdaa21cbb",
+        "id": "662460369a405f66",
         "type": "leaf",
-        "dimension": 50,
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Notes/Ideas.md",
+            "file": "Management/Timeline.md",
             "mode": "source"
           }
         },
-        "group": "ffb4c0a0802659ac"
+        "group": "38ccedabd25faa52"
       },
       {
-        "id": "3b26247d878bddff",
+        "id": "e7eb60b3ae8b86a9",
         "type": "leaf",
-        "dimension": 50,
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Notes/Ideas.md",
+            "file": "Management/Timeline.md",
             "mode": "preview"
           }
         },
-        "group": "ffb4c0a0802659ac"
+        "group": "38ccedabd25faa52"
       }
     ],
     "direction": "vertical"
@@ -91,7 +89,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Notes/Ideas.md",
+                "file": "Management/Timeline.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -119,7 +117,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Notes/Ideas.md"
+                "file": "Management/Timeline.md"
               }
             }
           },
@@ -138,17 +136,17 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "35d6e4ffdaa21cbb",
+  "active": "662460369a405f66",
   "lastOpenFiles": [
-    "Notes/Ideas.md",
-    "Notes/Stylised fabrication.md",
     "Management/Timeline.md",
+    "Notes/Ideas.md",
+    "Images/Watercolor splash.png",
     "Links/Papers.md",
-    "Meetings/14-10-2021.md",
     "Notes/WoodPixel.md",
-    "Notes/Sobel filter.md",
-    "Notes/Intensity filter.md",
+    "Papers/Curved ribbons.pdf",
     "Links/Miscellaneous.md",
-    "kesen.realtimerendering.com.md"
+    "Papers/Zippable ribbons.pdf",
+    "Images/Cubism.png",
+    "Images/Mondriaan.png"
   ]
 }
