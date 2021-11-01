@@ -7,7 +7,7 @@
 
 - 3D
 	- Using textured strips to represent textured 3D model $\approx$ 3D Woodpixel, perhaps cut ribbons out of textured plane -> combine 3D weaving, foldable patches, texture mapping, ...
-		- [Zippable ribbons](https://arxiv.org/abs/1711.02450)
+		- [[Zippable ribbons.pdf|Zippable ribbons]]
 		- [[Curved ribbons.pdf|3D Weaving with Curved Ribbons]]
 		- [The Design Space of Plane Elastic Curves](http://visualcomputing.ist.ac.at/publications/2021/TDSOPEC/)
 	- [Peeling](http://staff.ustc.edu.cn/~fuxm/projects/Peeling/index.html)
