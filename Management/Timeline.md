@@ -25,4 +25,17 @@
 | 2021-10-18 | Siggraph 2021, 2020         | 2    |
 | 2021-10-19 | Siggraph 2019, 2018, 2017   | 1.5  |
 | 2021-10-19 | EG 2021, 2020               | 1    |
-| 2021-10-10 | Limo search for fabrication | 1.5  | 
+| 2021-10-20 | Limo search for fabrication | 1.5  |
+| 2021-10-21 | Meeting                     | 1    |
+| 2021-10-24 | Brainstorm                  | 0.5  |
+| Totaal     |                             | 7.5  | 
+
+| Week 5     | Beschrijving | Uren |
+| ---------- | ------------ | ---- |
+| 2021-10-25 | Presentatie  | 1    |
+| Totaal     |              | 1    |  
+
+| Week 6     | Beschrijving   | Uren |
+| ---------- | -------------- | ---- |
+| 2021-11-01 | Woodpixel talk | 0.5  |
+| 2021-11-01 | Presentatie    | 1    | 
