@@ -42,11 +42,14 @@
 		- Voronoi [[Voronoi.png]]
 		- Mondriaan -> combine with [stylization](https://ondrejtexler.github.io/patch-based_training/)?
 	- Escherization
+	- Tetronimos
+	- Walpaper groups [[Wallpaper groups.png]]
 
 - Art styles
 	- Mondriaan [[Mondriaan.png]]
 	- Cubism [[Cubism.png]]
 	- [Gilmore leaves](https://www.shadertoy.com/view/MsdSWl)
+	- Vasarely
 
 - Multiple targets
 	- Use a single source to create tiles for multiple target images

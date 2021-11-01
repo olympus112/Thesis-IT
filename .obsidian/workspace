@@ -6,10 +6,11 @@
       {
         "id": "662460369a405f66",
         "type": "leaf",
+        "dimension": 34.375,
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Management/Timeline.md",
+            "file": "Meetings/21-10-2021.md",
             "mode": "source"
           }
         },
@@ -18,10 +19,11 @@
       {
         "id": "e7eb60b3ae8b86a9",
         "type": "leaf",
+        "dimension": 65.625,
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Management/Timeline.md",
+            "file": "Meetings/21-10-2021.md",
             "mode": "preview"
           }
         },
@@ -73,7 +75,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 196
   },
   "right": {
     "id": "ece90af34884dcac",
@@ -89,7 +91,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Management/Timeline.md",
+                "file": "Meetings/21-10-2021.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -117,7 +119,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Management/Timeline.md"
+                "file": "Meetings/21-10-2021.md"
               }
             }
           },
@@ -125,7 +127,7 @@
             "id": "2debf8a17f6e7acf",
             "type": "leaf",
             "state": {
-              "type": "advanced-tables-toolbar",
+              "type": "empty",
               "state": {}
             }
           }
@@ -136,17 +138,17 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "662460369a405f66",
+  "active": "e7eb60b3ae8b86a9",
   "lastOpenFiles": [
-    "Management/Timeline.md",
+    "Meetings/21-10-2021.md",
     "Notes/Ideas.md",
+    "Papers/WoodPixel.pdf",
+    "Meetings/Untitled.md",
+    "Management/Timeline.md",
     "Images/Watercolor splash.png",
     "Links/Papers.md",
     "Notes/WoodPixel.md",
     "Papers/Curved ribbons.pdf",
-    "Links/Miscellaneous.md",
-    "Papers/Zippable ribbons.pdf",
-    "Images/Cubism.png",
-    "Images/Mondriaan.png"
+    "Links/Miscellaneous.md"
   ]
 }
