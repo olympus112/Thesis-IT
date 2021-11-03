@@ -35,7 +35,12 @@
 | 2021-10-25 | Presentatie  | 1    |
 | Totaal     |              | 1    |  
 
-| Week 6     | Beschrijving   | Uren |
-| ---------- | -------------- | ---- |
-| 2021-11-01 | Woodpixel talk | 0.5  |
-| 2021-11-01 | Presentatie    | 1    | 
+| Week 6     | Beschrijving           | Uren |
+| ---------- | ---------------------- | ---- |
+| 2021-11-01 | Woodpixel talk         | 0.5  |
+| 2021-11-01 | Presentatie            | 3    |
+| 2021-11-01 | Papers terug bekijken  | 1    |
+| 2021-11-02 | Presentatie + papers   | 3    |
+| 2021-11-03 | Oefenen presenatie     | 1    |
+| 2021-11-04 | Meeting en presentatie | 1    |
+| Totaal     |                        | 9.5  | 

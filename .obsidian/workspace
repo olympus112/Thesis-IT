@@ -6,28 +6,13 @@
       {
         "id": "662460369a405f66",
         "type": "leaf",
-        "dimension": 34.375,
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Meetings/21-10-2021.md",
+            "file": "Management/Timeline.md",
             "mode": "source"
           }
-        },
-        "group": "38ccedabd25faa52"
-      },
-      {
-        "id": "e7eb60b3ae8b86a9",
-        "type": "leaf",
-        "dimension": 65.625,
-        "state": {
-          "type": "markdown",
-          "state": {
-            "file": "Meetings/21-10-2021.md",
-            "mode": "preview"
-          }
-        },
-        "group": "38ccedabd25faa52"
+        }
       }
     ],
     "direction": "vertical"
@@ -91,7 +76,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Meetings/21-10-2021.md",
+                "file": "Management/Timeline.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -119,16 +104,8 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Meetings/21-10-2021.md"
+                "file": "Management/Timeline.md"
               }
-            }
-          },
-          {
-            "id": "2debf8a17f6e7acf",
-            "type": "leaf",
-            "state": {
-              "type": "empty",
-              "state": {}
             }
           }
         ]
@@ -138,17 +115,17 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "e7eb60b3ae8b86a9",
+  "active": "662460369a405f66",
   "lastOpenFiles": [
-    "Meetings/21-10-2021.md",
+    "Management/Timeline.md",
     "Notes/Ideas.md",
+    "Notes/WoodPixel.md",
+    "Papers/Escherization.pdf",
+    "Meetings/21-10-2021.md",
+    "Meetings/14-10-2021.md",
     "Papers/WoodPixel.pdf",
     "Meetings/Untitled.md",
-    "Management/Timeline.md",
     "Images/Watercolor splash.png",
-    "Links/Papers.md",
-    "Notes/WoodPixel.md",
-    "Papers/Curved ribbons.pdf",
-    "Links/Miscellaneous.md"
+    "Links/Papers.md"
   ]
 }
