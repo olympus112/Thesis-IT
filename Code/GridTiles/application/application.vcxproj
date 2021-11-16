@@ -123,6 +123,7 @@
     <ClCompile Include="util\log.cpp" />
     <ClCompile Include="util\stringUtil.cpp" />
     <ClCompile Include="util\terminalColor.cpp" />
+    <ClCompile Include="view\screen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\imgui\imconfig.h" />
@@ -139,9 +140,11 @@
     <ClInclude Include="math\vec.h" />
     <ClInclude Include="util\fileUtils.h" />
     <ClInclude Include="util\log.h" />
+    <ClInclude Include="util\smartPointers.h" />
     <ClInclude Include="util\stringUtil.h" />
     <ClInclude Include="util\terminalColor.h" />
     <ClInclude Include="util\typetraits.h" />
+    <ClInclude Include="view\screen.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

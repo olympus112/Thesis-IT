@@ -7,8 +7,13 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "view/screen.h"
+
 Vec2i dimension;
+
 GLFWwindow* window;
+URef<Screen> screen;
+
 
 bool init() {
 	// GLFW init
@@ -19,14 +24,14 @@ bool init() {
 	}
 
 	// Window
-	window = glfwCreateWindow(1200, 800, "Hello World", nullptr, nullptr);
+	window = glfwCreateWindow(1200, 800, "Grid Tiles", nullptr, nullptr);
 	if (!window) {
 		Log::error("GLFW window creation failed");
 		glfwTerminate();
 
 		return false;
 	}
-	
+
 	glfwMakeContextCurrent(window);
 	glfwSetErrorCallback([](int code, const char* error) { Log::error("%d: %s", code, error); });
 
@@ -47,7 +52,7 @@ bool init() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	(void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	// Setup dark style
 	ImGui::StyleColorsDark();
@@ -56,12 +61,17 @@ bool init() {
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 130");
 
+	screen = std::make_unique<Screen>();
+	screen->init();
+
 	return true;
 }
 
 void update() {
 	// Get events
 	glfwPollEvents();
+
+	screen->update();
 }
 
 void render() {
@@ -70,7 +80,39 @@ void render() {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::ShowDemoWindow();
+	ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+
+	bool fullscreen = true;
+	if (fullscreen) {
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->GetWorkPos());
+		ImGui::SetNextWindowSize(viewport->GetWorkSize());
+		ImGui::SetNextWindowViewport(viewport->ID);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	}
+	else {
+		dockspaceFlags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+	}
+
+	if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
+		windowFlags |= ImGuiWindowFlags_NoBackground;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("DockSpace", nullptr, windowFlags);
+	ImGui::PopStyleVar();
+	if (fullscreen)
+		ImGui::PopStyleVar(2);
+
+	ImGui::DockSpace(ImGui::GetID("DockSpaceID"), ImVec2(0.0f, 0.0f), dockspaceFlags);
+
+	screen->render();
+	
+	ImGui::End();
 
 	// Submit
 	ImGui::Render();
@@ -88,6 +130,7 @@ void close() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+
 
 	glfwDestroyWindow(window);
 	glfwTerminate();

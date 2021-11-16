@@ -51,6 +51,9 @@
     <ClCompile Include="util\terminalColor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="view\screen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -102,6 +105,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="util\terminalColor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="view\screen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util\smartPointers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
