@@ -42,5 +42,15 @@
 | 2021-11-01 | Papers terug bekijken  | 1    |
 | 2021-11-02 | Presentatie + papers   | 3    |
 | 2021-11-03 | Oefenen presenatie     | 1    |
-| 2021-11-04 | Meeting en presentatie | 1    |
-| Totaal     |                        | 9.5  | 
+| 2021-11-04 | Meeting en presentatie | 1.5  |
+| 2021-11-05 | C++ project setup      | 1    |
+| Totaal     |                        | 11   | 
+
+| Week 7     | Beschrijving      | Uren |
+| ---------- | ----------------- | ---- |
+| 2021-11-09 | C++ verdere setup | 2    |
+| Totaal     |                   | 2    |
+
+| Week 8     | Beschrijving | Uren |
+| ---------- | ------------ | ---- |
+| 2021-11-16 | UI maken     | 3    | 
