@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cassert>
 
+#include "imgui/imgui.h"
+
 template <typename T, size_t Size>
 struct Vector {
 	T data[Size];
@@ -142,6 +144,10 @@ struct Vector<T, 2> {
 		}
 		return result;
 	}
+
+	ImVec2 asImVec() {
+		return ImVec2(x, y);
+	}
 };
 
 template <typename T>
@@ -271,6 +277,15 @@ typedef Vector<float, 6> Vec6f;
 typedef Vector<long long, 6> Vec6l;
 typedef Vector<int, 6> Vec6i;
 
+template <typename T1, typename T2, size_t Size>
+constexpr auto operator-(const Vector<T1, Size>& a,
+                         const Vector<T2, Size>& b) noexcept -> Vector<decltype(a[0] - b[0]), Size> {
+	Vector<decltype(a[0] - b[0]), Size> result;
+	for (size_t i = 0; i < Size; i++) {
+		result[i] = a[i] - b[i];
+	}
+	return result;
+}
 
 template <typename T1, typename T2, size_t Size>
 constexpr auto operator*(const Vector<T1, Size>& a,
@@ -299,16 +314,6 @@ constexpr auto operator+(const Vector<T1, Size>& a,
 	Vector<decltype(a[0] + b[0]), Size> result;
 	for (size_t i = 0; i < Size; i++) {
 		result[i] = a[i] + b[i];
-	}
-	return result;
-}
-
-template <typename T1, typename T2, size_t Size>
-constexpr auto operator-(const Vector<T1, Size>& a,
-                         const Vector<T2, Size>& b) noexcept -> Vector<decltype(a[0] - b[0]), Size> {
-	Vector<decltype(a[0] - b[0]), Size> result;
-	for (size_t i = 0; i < Size; i++) {
-		result[i] = a[i] - b[i];
 	}
 	return result;
 }
@@ -712,4 +717,59 @@ constexpr auto angleBetween(const Vector<T, Size>& first,
 template <typename T, size_t Size>
 constexpr Vector<T, Size> bisect(const Vector<T, Size>& first, const Vector<T, Size>& second) noexcept {
 	return first * length(second) + second * length(first);
+}
+
+// ImGui extension
+
+inline auto operator+(const Vector<float, 2>& a,
+                         const ImVec2& b) noexcept -> ImVec2 {
+	ImVec2 result{a.x + b.x, a.y + b.y};
+	return result;
+}
+
+inline auto operator+(const ImVec2& a, const Vector<float, 2>& b) noexcept -> ImVec2 {
+	ImVec2 result{a.x + b.x, a.y + b.y};
+	return result;
+}
+
+inline auto operator+(const ImVec2& a, const ImVec2& b) noexcept -> ImVec2 {
+	ImVec2 result { a.x + b.x, a.y + b.y };
+	return result;
+}
+
+inline auto operator-(const Vector<float, 2>& a,
+                         const ImVec2& b) noexcept -> ImVec2 {
+	ImVec2 result{a.x - b.x, a.y - b.y};
+	return result;
+}
+
+inline auto operator-(const ImVec2& a, const Vector<float, 2>& b) noexcept -> ImVec2 {
+	ImVec2 result{a.x - b.x, a.y - b.y};
+	return result;
+}
+
+inline auto operator-(const ImVec2& a, const ImVec2& b) noexcept -> ImVec2 {
+	ImVec2 result { a.x - b.x, a.y - b.y };
+	return result;
+}
+
+template <typename T>
+constexpr auto operator*(const ImVec2& vec,
+                         const T& factor) noexcept -> ImVec2 {
+	ImVec2 result{vec.x * factor, vec.y * factor};
+	return result;
+}
+
+template <typename T>
+constexpr auto operator*(const T& factor,
+                         const ImVec2& vec) noexcept -> ImVec2 {
+	ImVec2 result{factor * vec.x, factor * vec.y};
+	return result;
+}
+
+template <typename T>
+constexpr auto operator/(const ImVec2& vec,
+	const T& factor) noexcept -> ImVec2 {
+	ImVec2 result { vec.x / factor, vec.y / factor };
+	return result;
 }

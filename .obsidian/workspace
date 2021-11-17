@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Meetings/4-11-2021.md",
+            "file": "Management/Timeline.md",
             "mode": "source"
           }
         }
@@ -76,7 +76,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Meetings/4-11-2021.md",
+                "file": "Management/Timeline.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Meetings/4-11-2021.md"
+                "file": "Management/Timeline.md"
               }
             }
           }
@@ -117,15 +117,15 @@
   },
   "active": "662460369a405f66",
   "lastOpenFiles": [
-    "Meetings/4-11-2021.md",
     "Management/Timeline.md",
     "Meetings/21-10-2021.md",
-    "Notes/Ideas.md",
+    "Meetings/4-11-2021.md",
     "Notes/WoodPixel.md",
+    "Notes/Stylised fabrication.md",
+    "Notes/Sobel filter.md",
+    "Notes/Intensity filter.md",
+    "Notes/Ideas.md",
     "Papers/Escherization.pdf",
-    "Meetings/14-10-2021.md",
-    "Papers/WoodPixel.pdf",
-    "Meetings/Untitled.md",
-    "Images/Watercolor splash.png"
+    "Meetings/14-10-2021.md"
   ]
 }

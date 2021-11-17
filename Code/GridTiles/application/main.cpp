@@ -1,4 +1,5 @@
 #include "core.h"
+#include "main.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -9,11 +10,10 @@
 
 #include "view/screen.h"
 
-Vec2i dimension;
-
 GLFWwindow* window;
-URef<Screen> screen;
 
+Vec2i dimension;
+URef<Screen> screen;
 
 bool init() {
 	// GLFW init
@@ -109,9 +109,19 @@ void render() {
 		ImGui::PopStyleVar(2);
 
 	ImGui::DockSpace(ImGui::GetID("DockSpaceID"), ImVec2(0.0f, 0.0f), dockspaceFlags);
+	if (ImGui::BeginMenuBar()) {
+		if (ImGui::BeginMenu("File")) {
+			if (ImGui::MenuItem("Exit"))
+				glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMenuBar();
+	}
 
 	screen->render();
-	
+
 	ImGui::End();
 
 	// Submit
@@ -136,12 +146,16 @@ void close() {
 	glfwTerminate();
 }
 
+bool shouldClose() {
+	return glfwWindowShouldClose(window) || ImGui::IsKeyDown(GLFW_KEY_ESCAPE);
+}
+
 int main(int, char**) {
 	if (!init())
 		return -1;
 
 	// Main loop
-	while (!glfwWindowShouldClose(window)) {
+	while (!shouldClose()) {
 		update();
 		render();
 	}

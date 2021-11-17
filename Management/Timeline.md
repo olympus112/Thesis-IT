@@ -51,6 +51,12 @@
 | 2021-11-09 | C++ verdere setup | 2    |
 | Totaal     |                   | 2    |
 
-| Week 8     | Beschrijving | Uren |
-| ---------- | ------------ | ---- |
-| 2021-11-16 | UI maken     | 3    | 
+| Week 8     | Beschrijving                             | Uren |
+| ---------- | ---------------------------------------- | ---- |
+| 2021-11-14 | UI maken                                 | 3    |
+| 2021-11-15 | Docking toevoegen                        | 1    |
+| 2021-11-16 | Image loading                            | 1    |
+| 2021-11-17 | Seedpoints editor                        | 1.5  |
+| 2021-11-17 | OpenCV install                           | 1    |
+| 2021-11-17 | OpenCV itensity, histogram, learning API | 5    |
+| Totaal     |                                          | 12.5 | 
