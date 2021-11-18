@@ -11,6 +11,15 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
 
+#include "GLFW/glfw3.h"
+
+struct SeedPoint {
+	ImVec2 source;
+	ImVec2 target;
+};
+
+std::vector<SeedPoint> seedPoints;
+
 URef<Texture> rgbHistogram;
 URef<Texture> grayscale;
 URef<Texture> grayscaleHistogram;
@@ -88,12 +97,12 @@ void Editor::render() {
 	if (ImGui::BeginTabBar("Tabbar")) {
 		bool open = true;
 		if (ImGui::BeginTabItem("Seedpoints", &open)) {
-			seedpoints();
+			renderSeedpoints();
 			ImGui::EndTabItem();
 		}
 
 		if (ImGui::BeginTabItem("Histogram", &open)) {
-			histogram();
+			renderHistogram();
 			ImGui::EndTabItem();
 		}
 
@@ -134,7 +143,7 @@ void Editor::reloadTarget() {
 	equalized->reloadGL();
 }
 
-void Editor::histogram() {
+void Editor::renderHistogram() {
 	Render::Image("Source", screen->settings->sourceTexture->asImTexture(), Globals::imageSize);
 	ImGui::SameLine();
 	Render::arrow();
@@ -163,10 +172,69 @@ void Editor::histogram() {
 	Render::Image("Equalized hist", equalizedHistogram->asImTexture(), Globals::imageSize);
 }
 
-void Editor::seedpoints() {
-	float size = 350;
-	Render::Image("Source", screen->settings->sourceTexture->asImTexture(), ImVec2(size, size));
+void Editor::renderSeedpoints() {
+	ImVec2 canvasSize = ImVec2(350, 350);
+
+	// Source image
+	Render::Image("Source", screen->settings->sourceTexture->asImTexture(), canvasSize);
+	ImRect sourceBox(ImGui::GetItemRectMin(), ImGui::GetItemRectMin() + canvasSize);
+
 	ImGui::SameLine();
-	Render::Image("Targer", screen->settings->targetTexture->asImTexture(), ImVec2(size, size));
-	ImGui::SameLine();
+
+	// Target image
+	Render::Image("Target", screen->settings->targetTexture->asImTexture(), canvasSize);
+	ImRect targetBox(ImGui::GetItemRectMin(), ImGui::GetItemRectMin() + canvasSize);
+	
+	// Hover
+	bool sourceHover = false;
+	if (ImGui::IsMouseHoveringRect(sourceBox.Min, sourceBox.Max))
+		sourceHover = true;
+	bool targetHover = false;
+	if (ImGui::IsMouseHoveringRect(targetBox.Min, targetBox.Max))
+		targetHover = true;
+
+	// Bounding boxes
+	ImGui::GetWindowDrawList()->AddRect(sourceBox.Min, sourceBox.Max, Colors::WHITE.u32(), 0, ImDrawCornerFlags_All, 2);
+	ImGui::GetWindowDrawList()->AddRect(targetBox.Min, targetBox.Max, Colors::WHITE.u32(), 0, ImDrawCornerFlags_All, 2);
+
+	// Cursor
+	if (sourceHover || targetHover) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+		float size = 7;
+		float thickness = 3;
+		ImVec2 cursor = ImGui::GetMousePos();
+		ImGui::GetWindowDrawList()->AddLine(cursor - ImVec2(size, 0), cursor + ImVec2(size, 0), Colors::WHITE.u32(), thickness);
+		ImGui::GetWindowDrawList()->AddLine(cursor - ImVec2(0, size), cursor + ImVec2(0, size), Colors::WHITE.u32(), thickness);
+
+		if (sourceHover) {
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(sourceBox.Min.x, cursor.y), ImVec2(sourceBox.Min.x + size, cursor.y), Colors::WHITE.u32(), thickness);
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(sourceBox.Max.x, cursor.y), ImVec2(sourceBox.Max.x - size, cursor.y), Colors::WHITE.u32(), thickness);
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, sourceBox.Min.y), ImVec2(cursor.x, sourceBox.Min.y + size), Colors::WHITE.u32(), thickness);
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, sourceBox.Max.y), ImVec2(cursor.x, sourceBox.Max.y - size), Colors::WHITE.u32(), thickness);
+		}
+
+		if (targetHover) {
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(targetBox.Min.x, cursor.y), ImVec2(targetBox.Min.x + size, cursor.y), Colors::WHITE.u32(), thickness);
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(targetBox.Max.x, cursor.y), ImVec2(targetBox.Max.x - size, cursor.y), Colors::WHITE.u32(), thickness);
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, targetBox.Min.y), ImVec2(cursor.x, targetBox.Min.y + size), Colors::WHITE.u32(), thickness);
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, targetBox.Max.y), ImVec2(cursor.x, targetBox.Max.y - size), Colors::WHITE.u32(), thickness);
+		}
+	}
+
+	// Place seedPoints
+	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && (sourceHover || targetHover)) {
+		ImVec2 offset = ImGui::GetMousePos() - (sourceHover ? sourceBox : targetBox).Min;
+		seedPoints.push_back({
+			offset,
+			offset
+		});
+	}
+
+	// Render seedPoints
+	for (const auto& seedPoint : seedPoints) {
+		ImVec2 size(5, 5);
+		ImGui::GetWindowDrawList()->AddRectFilled(sourceBox.Min + seedPoint.source - size, sourceBox.Min + seedPoint.source + size, Colors::RED.u32(), 0, ImDrawCornerFlags_All);
+		ImGui::GetWindowDrawList()->AddRectFilled(targetBox.Min + seedPoint.target - size, targetBox.Min + seedPoint.target + size, Colors::RED.u32(), 0, ImDrawCornerFlags_All);
+	}
 }

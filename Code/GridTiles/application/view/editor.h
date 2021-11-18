@@ -12,6 +12,6 @@ public:
 	void reloadSource();
 	void reloadTarget();
 private:
-	void histogram();
-	void seedpoints();
+	void renderHistogram();
+	void renderSeedpoints();
 };
