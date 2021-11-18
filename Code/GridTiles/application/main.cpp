@@ -20,7 +20,7 @@ bool init() {
 	}
 
 	// Window
-	window = glfwCreateWindow(1200, 800, "Grid Tiles", nullptr, nullptr);
+	window = glfwCreateWindow(1920, 1080, "Grid Tiles", glfwGetPrimaryMonitor(), nullptr);
 	if (!window) {
 		Log::error("GLFW window creation failed");
 		glfwTerminate();
