@@ -117,6 +117,8 @@ struct Vector<T, 2> {
 	constexpr Vector(T x, T y) noexcept : data{x, y} {
 	}
 
+	constexpr Vector(const ImVec2& v) noexcept : data { v.x, v.y } {}
+
 	template <typename OtherT>
 	constexpr operator Vector<OtherT, 2>() const noexcept {
 		return Vector<OtherT, 2>(static_cast<OtherT>(this->data[0]), static_cast<OtherT>(this->data[1]));
@@ -145,7 +147,7 @@ struct Vector<T, 2> {
 		return result;
 	}
 
-	ImVec2 asImVec() {
+	ImVec2 asImVec() const {
 		return ImVec2(x, y);
 	}
 };

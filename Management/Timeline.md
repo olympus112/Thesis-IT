@@ -59,4 +59,11 @@
 | 2021-11-17 | Seedpoints editor                        | 1.5  |
 | 2021-11-17 | OpenCV install                           | 1    |
 | 2021-11-17 | OpenCV itensity, histogram, learning API | 5    |
-| Totaal     |                                          | 12.5 | 
+| 2021-11-18 | Meeting                                  | 1    |
+| Totaal     |                                          | 13.5 | 
+
+| Week 9     | Beschrijving                    | Uren |
+| ---------- | ------------------------------- | ---- |
+| 2021-11-22 | Refactoring                     | 2    |
+| 2021-11-26 | Seedpoints drag, select, editor | 4    | 
+

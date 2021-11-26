@@ -125,6 +125,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="util\globals.cpp" />
+    <ClCompile Include="view\pipeline.cpp" />
+    <ClCompile Include="view\seedpoints.cpp" />
     <ClCompile Include="view\settings.cpp" />
     <ClCompile Include="view\editor.cpp" />
     <ClCompile Include="graphics\bindable.cpp" />
@@ -151,6 +153,9 @@
     <ClInclude Include="core.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="util\globals.h" />
+    <ClInclude Include="util\imageUtils.h" />
+    <ClInclude Include="view\pipeline.h" />
+    <ClInclude Include="view\seedpoints.h" />
     <ClInclude Include="view\settings.h" />
     <ClInclude Include="view\editor.h" />
     <ClInclude Include="graphics\bindable.h" />

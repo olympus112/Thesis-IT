@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "screen.h"
+#include "util/stringUtil.h"
 
 Settings::Settings() = default;
 
@@ -11,10 +12,9 @@ void Settings::init() {
 	targetTexture = std::make_unique<ImGui::TexturePicker>("Target texture");
 
 	sourceTexture->load("../res/uv.jpg");
-	screen->editor->reloadSource();
-
 	targetTexture->load("../res/uv.jpg");
-	screen->editor->reloadTarget();
+
+	screen->editor->pipelineTab->reload();
 }
 
 void Settings::update() {
@@ -23,12 +23,23 @@ void Settings::update() {
 void Settings::render() {
 	ImGui::Begin("Settings");
 
+	ImGui::Text("Source hover: %s", screen->editor->seedPointsTab->sourceHover ? "Yes" : "No");
+	ImGui::Text("Source drag: %s", screen->editor->seedPointsTab->sourceDrag ? "Yes" : "No");
+	ImGui::Text("Target hover: %s", screen->editor->seedPointsTab->targetHover ? "Yes" : "No");
+	ImGui::Text("Target drag: %s", screen->editor->seedPointsTab->targetDrag ? "Yes" : "No");
+
+	ImGui::Spacing();
+
+	ImGui::Text("Intersected index: %d", screen->editor->seedPointsTab->intersectedIndex);
+	ImGui::Text("Intersected point: %s", Util::str(screen->editor->seedPointsTab->intersectedPoint).c_str());
+	ImGui::Text("Selected index: %d", screen->editor->seedPointsTab->intersectedIndex);
+	ImGui::Text("Selected point: %s", Util::str(screen->editor->seedPointsTab->selectedPoint).c_str());
+
 	if (sourceTexture->render())
-		screen->editor->reloadSource();
+		screen->editor->pipelineTab->reload();
 
 	if (targetTexture->render())
-		screen->editor->reloadTarget();
-	
+		screen->editor->pipelineTab->reload();	
 
 	ImGui::End();
 }

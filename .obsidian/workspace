@@ -4,7 +4,7 @@
     "type": "split",
     "children": [
       {
-        "id": "662460369a405f66",
+        "id": "d9cdb68d77591d7c",
         "type": "leaf",
         "state": {
           "type": "markdown",
@@ -39,7 +39,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:#OpenVX-based",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -60,7 +60,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 196
+    "width": 230
   },
   "right": {
     "id": "ece90af34884dcac",
@@ -107,25 +107,33 @@
                 "file": "Management/Timeline.md"
               }
             }
+          },
+          {
+            "id": "8488f4199c9cb1c7",
+            "type": "leaf",
+            "state": {
+              "type": "advanced-tables-toolbar",
+              "state": {}
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
-  "active": "662460369a405f66",
+  "active": "d9cdb68d77591d7c",
   "lastOpenFiles": [
     "Management/Timeline.md",
-    "Meetings/21-10-2021.md",
-    "Meetings/4-11-2021.md",
+    "Management/Todo.md",
+    "Code/OpenCV/sources/3rdparty/openvx/hal/README.md",
     "Notes/WoodPixel.md",
     "Notes/Stylised fabrication.md",
     "Notes/Sobel filter.md",
     "Notes/Intensity filter.md",
-    "Notes/Ideas.md",
-    "Papers/Escherization.pdf",
-    "Meetings/14-10-2021.md"
+    "Meetings/14-10-2021.md",
+    "Meetings/4-11-2021.md",
+    "Meetings/21-10-2021.md"
   ]
 }
