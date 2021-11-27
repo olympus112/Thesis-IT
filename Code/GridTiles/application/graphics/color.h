@@ -1,5 +1,6 @@
 #pragma once
 #include "imgui/imgui.h"
+#include "opencv2/core.hpp"
 
 template <typename T>
 struct ColorTemplate {
@@ -49,6 +50,10 @@ struct ColorTemplate {
 
 	constexpr ImU32 u32() const noexcept {
 		return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
+	}
+
+	constexpr cv::Scalar cv() const noexcept {
+		return cv::Scalar(cvRound(b * 255), cvRound(g * 255), cvRound(r * 255));
 	}
 
 	// format: 0xRRGGBBAA

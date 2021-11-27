@@ -6,61 +6,72 @@
 
 namespace ImageUtils {
 
-	inline cv::Mat computeHistogram(int size, cv::Mat source, bool rgb = false) {
-		int histSize = 256;
-		float range[] = {0, 256};
-		const float* histRange[] = {range};
-		int width = size;
-		int height = size;
-		cv::Mat result(width, height, CV_8UC3, cv::Scalar(0, 0, 0));
-		int bin_w = cvRound(static_cast<double>(width) / histSize);
+	inline std::vector<cv::Mat>	computeHistograms(const std::vector<cv::Mat>& planes, int size = 500, int histogramSize = 256) {
+		float range[] = { 0, histogramSize };
+		const float* histogramRange[] = { range };
 
-		if (rgb) {
-			std::vector<cv::Mat> bgr_planes;
-			cv::split(source, bgr_planes);
-
-			cv::Mat b_hist, g_hist, r_hist;
-			calcHist(&bgr_planes[0], 1, 0, cv::Mat(), b_hist, 1, &histSize, histRange, true, false);
-			calcHist(&bgr_planes[1], 1, 0, cv::Mat(), g_hist, 1, &histSize, histRange, true, false);
-			calcHist(&bgr_planes[2], 1, 0, cv::Mat(), r_hist, 1, &histSize, histRange, true, false);
-
-			normalize(b_hist, b_hist, 0, result.rows, cv::NORM_MINMAX, -1, cv::Mat());
-			normalize(g_hist, g_hist, 0, result.rows, cv::NORM_MINMAX, -1, cv::Mat());
-			normalize(r_hist, r_hist, 0, result.rows, cv::NORM_MINMAX, -1, cv::Mat());
-
-			for (int i = 1; i < histSize; i++) {
-				cv::line(result, cv::Point(bin_w * (i - 1), height - cvRound(b_hist.at<float>(i - 1))),
-				         cv::Point(bin_w * (i), height - cvRound(b_hist.at<float>(i))),
-				         cv::Scalar(255, 0, 0), 2, 8, 0);
-				cv::line(result, cv::Point(bin_w * (i - 1), height - cvRound(g_hist.at<float>(i - 1))),
-				         cv::Point(bin_w * (i), height - cvRound(g_hist.at<float>(i))),
-				         cv::Scalar(0, 255, 0), 2, 8, 0);
-				cv::line(result, cv::Point(bin_w * (i - 1), height - cvRound(r_hist.at<float>(i - 1))),
-				         cv::Point(bin_w * (i), height - cvRound(r_hist.at<float>(i))),
-				         cv::Scalar(0, 0, 255), 2, 8, 0);
-			}
-
+		std::vector<cv::Mat> histograms(planes.size());
+		for (int i = 0; i < planes.size(); i++) {
+			cv::calcHist(&planes[i], 1, nullptr, cv::Mat(), histograms[i], 1, &histogramSize, histogramRange, true, false);
+			cv::normalize(histograms[i], histograms[i], 0, size, cv::NORM_MINMAX, -1, cv::Mat());
 		}
-		else {
-			cv::Mat histogram;
-			cv::calcHist(&source, 1, 0, cv::Mat(), histogram, 1, &histSize, histRange, true, false);
 
-			normalize(histogram, histogram, 0, width, cv::NORM_MINMAX, -1, cv::Mat());
-			for (int i = 1; i < histSize; i++) {
-				line(result, cv::Point(bin_w * (i - 1), height - cvRound(histogram.at<float>(i - 1))),
-				     cv::Point(bin_w * (i), height - cvRound(histogram.at<float>(i))),
-				     cv::Scalar(255, 255, 255), 2, 8, 0);
+		return histograms;
+	}
+
+	inline cv::Mat renderHistograms(const std::vector<cv::Mat>& histograms, const std::vector<Color>& colors, int size = 500, int histogramSize = 256) {
+		cv::Mat result(size, size, CV_8UC3, cv::Scalar(0, 0, 0));
+		int binWidth = cvRound(static_cast<double>(size) / histogramSize);
+
+		for (int i = 1; i < histogramSize; i++) {
+			for (int histogram = 0; histogram < histograms.size(); histogram++) {
+				cv::line(
+					result,
+					cv::Point(binWidth * (i - 1), size - cvRound(histograms[histogram].at<float>(i - 1))),
+					cv::Point(binWidth * (i), size - cvRound(histograms[histogram].at<float>(i))),
+					colors[histogram].cv(), 
+					2, 8, 0);
 			}
-
 		}
 
 		return result;
 	}
 
-	inline void computeHistogram(Texture* source, Texture* destination, bool rgb = true, int size = 500) {
+	inline std::vector<cv::Mat> computeCDF(const std::vector<cv::Mat>& histograms, int size = 500, int histogramSize = 256) {
+		std::vector<cv::Mat> cdf;
+		for (int histogram = 0; histogram < histograms.size(); histogram++) {
+			cdf.push_back(histograms[histogram].clone());
+			for (int i = 1; i < histogramSize; i++) {
+				cdf[histogram].at<float>(i) += cdf[histogram].at<float>(i - 1);
+			}
+
+			cv::normalize(cdf[histogram], cdf[histogram], 0, size, cv::NORM_MINMAX, -1, cv::Mat());
+		}
+
+		return cdf;
+	}
+
+	inline void renderHistogram(Texture* source, Texture* destination, bool rgb = true, int size = 500) {
+		auto colors = rgb ? std::vector { Colors::RGB_R, Colors::RGB_G, Colors::RGB_B } : std::vector { Colors::WHITE };
+
+		std::vector<cv::Mat> planes;
+		cv::split(source->data, planes);
+
 		destination->width = size;
 		destination->height = size;
-		destination->data = computeHistogram(size, source->data, rgb);
+		destination->data = renderHistograms(computeHistograms(planes), colors);
+		destination->reloadGL();
+	}
+
+	inline void renderCDF(Texture* source, Texture* destination, bool rgb = true, int size = 500) {
+		auto colors = rgb ? std::vector { Colors::RGB_R, Colors::RGB_G, Colors::RGB_B } : std::vector { Colors::WHITE };
+
+		std::vector<cv::Mat> planes;
+		cv::split(source->data, planes);
+
+		destination->width = size;
+		destination->height = size;
+		destination->data = renderHistograms(computeCDF(computeHistograms(planes)), colors);
 		destination->reloadGL();
 	}
 
@@ -69,8 +80,49 @@ namespace ImageUtils {
 		destination->reloadGL();
 	}
 
-	inline void computeEqualization(Texture* source, Texture* target, Texture* destination) {
-		cv::equalizeHist(source->data, destination->data);
+	inline std::vector<std::vector<int>> computeEqualizationTables(const std::vector<cv::Mat>& sourceCDFs, const std::vector<cv::Mat>& referenceCDFs) {
+		std::vector<std::vector<int>> tables;
+
+		int pixel = 0;
+		for (int cdf = 0; cdf < sourceCDFs.size(); cdf++) {
+			tables.push_back(std::vector<int>(sourceCDFs[cdf].rows));
+			for (int sourcePixel = 0; sourcePixel < sourceCDFs[cdf].rows; sourcePixel++) {
+				pixel = sourcePixel;
+				for (int referencePixel = 0; referencePixel < referenceCDFs[cdf].rows; referencePixel++) {
+					if (referenceCDFs[cdf].at<float>(referencePixel) >= sourceCDFs[cdf].at<float>(sourcePixel)) {
+						pixel = referencePixel;
+						break;
+					}
+				}
+
+				tables[cdf][sourcePixel] = pixel;
+			}
+		}
+
+		return tables;
+	}
+		
+	inline void renderEqualization(Texture* source, Texture* target, Texture* destination) {
+		std::vector<cv::Mat> sourcePlanes;
+		cv::split(source->data, sourcePlanes);
+		auto sourceCDF = computeCDF(computeHistograms(sourcePlanes));
+
+		std::vector<cv::Mat> targetPlanes;
+		cv::split(target->data, targetPlanes);
+		auto targetCDF = computeCDF(computeHistograms(targetPlanes));
+
+		auto tables = computeEqualizationTables(sourceCDF, targetCDF);
+
+		std::vector<cv::Mat> output(sourcePlanes.size());
+		for (int plane = 0; plane < sourcePlanes.size(); plane++) {
+			cv::LUT(sourcePlanes[plane], tables[plane], output[plane]);
+		}
+
+		cv::merge(output.data(), output.size(), destination->data);
+		cv::convertScaleAbs(destination->data, destination->data);
+		destination->width = 500;
+		destination->height = 500;
+
 		destination->reloadGL();
 	}
 }

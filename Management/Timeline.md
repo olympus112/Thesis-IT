@@ -65,5 +65,6 @@
 | Week 9     | Beschrijving                    | Uren |
 | ---------- | ------------------------------- | ---- |
 | 2021-11-22 | Refactoring                     | 2    |
-| 2021-11-26 | Seedpoints drag, select, editor | 4    | 
+| 2021-11-26 | Seedpoints drag, select, editor | 4    |
+| 2021-11-27 | Finished cdf equalization       | 3    | 
 
