@@ -66,5 +66,8 @@
 | ---------- | ------------------------------- | ---- |
 | 2021-11-22 | Refactoring                     | 2    |
 | 2021-11-26 | Seedpoints drag, select, editor | 4    |
-| 2021-11-27 | Finished cdf equalization       | 3    | 
+| 2021-11-27 | Finished cdf equalization       | 3    |
+| 2021-11-28 | Refactoring                     | 1.5  |
+| 2021-11-28 | Sobel, Blur, Canny              | 2    |
+|            |                                 |      |
 

@@ -4,7 +4,7 @@
 #include "main.h"
 #include "screen.h"
 #include "graphics/color.h"
-#include "graphics/renderer.h"
+#include "graphics/imgui/widgets.h"
 
 //! -------------
 //! SeedPointsTab
@@ -26,8 +26,10 @@ void SeedPointsTab::update() {
 		for (int index = 0; index < seedPointPairs.size(); index++) {
 			const auto& [source, target] = seedPointPairs[index];
 
-			if (source.bounds().contains(intersectedPoint) ||
-				target.bounds().contains(intersectedPoint))
+			if (source.bounds().contains(intersectedPoint) && sourceHover)
+				intersectedIndex = index;
+				
+			if (target.bounds().contains(intersectedPoint) && targetHover)
 				intersectedIndex = index;
 		}
 	}
@@ -78,14 +80,14 @@ void SeedPointsTab::render() {
 	ImVec2 canvasSize = ImVec2(350, 350);
 
 	// Source image
-	Render::Image("Source", screen->settings->sourceTexture->asImTexture(), canvasSize);
+	ImGui::image("Source", screen->settings->sourceTexture->asImTexture(), canvasSize);
 	sourceBox = {ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMin() + canvasSize)};
 	sourceHover = ImGui::IsItemHovered();
 
 	ImGui::SameLine(0, 20);
 
 	// Target image
-	Render::Image("Target", screen->settings->targetTexture->asImTexture(), canvasSize);
+	ImGui::image("Target", screen->settings->targetTexture->asImTexture(), canvasSize);
 	targetBox = {ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMin() + canvasSize)};
 	targetHover = ImGui::IsItemHovered();
 

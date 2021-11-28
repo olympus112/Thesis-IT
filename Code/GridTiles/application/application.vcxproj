@@ -120,18 +120,26 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="graphics\opencv\canny.cpp" />
+    <ClCompile Include="graphics\opencv\blur.cpp" />
+    <ClCompile Include="graphics\opencv\draw.cpp" />
+    <ClCompile Include="graphics\opencv\equalization.cpp" />
+    <ClCompile Include="graphics\opencv\cdf.cpp" />
     <ClCompile Include="core.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="graphics\opencv\histogram.cpp" />
+    <ClCompile Include="graphics\opencv\sobel.cpp" />
+    <ClCompile Include="graphics\opencv\grayscale.cpp" />
     <ClCompile Include="util\globals.cpp" />
     <ClCompile Include="view\pipeline.cpp" />
     <ClCompile Include="view\seedpoints.cpp" />
     <ClCompile Include="view\settings.cpp" />
     <ClCompile Include="view\editor.cpp" />
-    <ClCompile Include="graphics\bindable.cpp" />
+    <ClCompile Include="graphics\opengl\bindable.cpp" />
     <ClCompile Include="graphics\imgui\texturepicker.cpp" />
-    <ClCompile Include="graphics\renderer.cpp" />
+    <ClCompile Include="graphics\imgui\widgets.cpp" />
     <ClCompile Include="graphics\texture.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="util\fileUtils.cpp" />
@@ -150,18 +158,26 @@
     <ClInclude Include="..\include\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="graphics\opencv\canny.h" />
+    <ClInclude Include="graphics\opencv\blur.h" />
+    <ClInclude Include="graphics\opencv\draw.h" />
+    <ClInclude Include="graphics\opencv\equalization.h" />
+    <ClInclude Include="graphics\opencv\cdf.h" />
     <ClInclude Include="core.h" />
+    <ClInclude Include="graphics\opencv\histogram.h" />
+    <ClInclude Include="graphics\opencv\grayscale.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="graphics\opencv\sobel.h" />
     <ClInclude Include="util\globals.h" />
     <ClInclude Include="util\imageUtils.h" />
     <ClInclude Include="view\pipeline.h" />
     <ClInclude Include="view\seedpoints.h" />
     <ClInclude Include="view\settings.h" />
     <ClInclude Include="view\editor.h" />
-    <ClInclude Include="graphics\bindable.h" />
+    <ClInclude Include="graphics\opengl\bindable.h" />
     <ClInclude Include="graphics\color.h" />
     <ClInclude Include="graphics\imgui\texturepicker.h" />
-    <ClInclude Include="graphics\renderer.h" />
+    <ClInclude Include="graphics\imgui\widgets.h" />
     <ClInclude Include="graphics\texture.h" />
     <ClInclude Include="math\mat.h" />
     <ClInclude Include="math\quat.h" />

@@ -60,13 +60,13 @@
     <ClCompile Include="graphics\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graphics\bindable.cpp">
+    <ClCompile Include="graphics\opengl\bindable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graphics\imgui\texturepicker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graphics\renderer.cpp">
+    <ClCompile Include="graphics\imgui\widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="view\editor.cpp">
@@ -82,6 +82,30 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="view\seedpoints.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\histogram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\cdf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\equalization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\sobel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\grayscale.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\blur.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\canny.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -149,13 +173,13 @@
     <ClInclude Include="graphics\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\bindable.h">
+    <ClInclude Include="graphics\opengl\bindable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphics\imgui\texturepicker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\renderer.h">
+    <ClInclude Include="graphics\imgui\widgets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphics\color.h">
@@ -183,6 +207,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="view\pipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opencv\histogram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opencv\cdf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opencv\equalization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opencv\draw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opencv\sobel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opencv\grayscale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opencv\blur.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opencv\canny.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

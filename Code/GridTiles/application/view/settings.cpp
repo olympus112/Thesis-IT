@@ -11,8 +11,8 @@ void Settings::init() {
 	sourceTexture = std::make_unique<ImGui::TexturePicker>("Source texture");
 	targetTexture = std::make_unique<ImGui::TexturePicker>("Target texture");
 
-	sourceTexture->load("../res/uv.jpg");
-	targetTexture->load("../res/uv.jpg");
+	sourceTexture->load("../res/wood_sphere.jpg");
+	targetTexture->load("../res/cliff_sphere.jpg");
 
 	screen->editor->pipelineTab->reload();
 }
