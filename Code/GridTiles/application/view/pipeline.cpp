@@ -12,6 +12,8 @@ static std::vector pipelines = {"Default", "Histogram", "CDF", "Blur"};
 PipelineTab::PipelineTab() = default;
 
 void PipelineTab::init() {
+	rotatedSource = std::make_unique<Texture>();
+	
 	sourceHistogram = std::make_unique<Texture>();
 	sourceCDF = std::make_unique<Texture>();
 
@@ -30,6 +32,10 @@ void PipelineTab::init() {
 	equalizedHistogram = std::make_unique<Texture>();
 	equalizedCDF = std::make_unique<Texture>();
 
+	wequalized = std::make_unique<Texture>();
+	wequalizedHistogram = std::make_unique<Texture>();
+	wequalizedCDF = std::make_unique<Texture>();
+	
 	blur = std::make_unique<Texture>();
 	sobelX = std::make_unique<Texture>();
 	sobelY = std::make_unique<Texture>();
@@ -58,8 +64,12 @@ void PipelineTab::render() {
 		ImGui::arrow();
 		ImGui::SameLine();
 		ImGui::image("Equalized", equalized->asImTexture());
+		ImGui::SameLine();
+		ImGui::arrow();
+		ImGui::SameLine();
+		ImGui::image("Weighted equalization", wequalized->asImTexture());
 		ImGui::NewLine();
-		ImGui::image("Source", screen->settings->sourceTexture->asImTexture());
+		ImGui::image("Source", rotatedSource->asImTexture());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
@@ -79,6 +89,10 @@ void PipelineTab::render() {
 		ImGui::arrow();
 		ImGui::SameLine();
 		ImGui::image("Equalized hist", equalizedHistogram->asImTexture());
+		ImGui::SameLine();
+		ImGui::arrow();
+		ImGui::SameLine();
+		ImGui::image("Weighted hist", wequalizedHistogram->asImTexture());
 		ImGui::NewLine();
 		ImGui::image("Source hist", sourceHistogram->asImTexture());
 		ImGui::SameLine();
@@ -100,6 +114,10 @@ void PipelineTab::render() {
 		ImGui::arrow();
 		ImGui::SameLine();
 		ImGui::image("Equalized cdf", equalizedCDF->asImTexture());
+		ImGui::SameLine();
+		ImGui::arrow();
+		ImGui::SameLine();
+		ImGui::image("Weighted cdf", wequalizedCDF->asImTexture());
 		ImGui::NewLine();
 		ImGui::image("Source cdf", sourceCDF->asImTexture());
 		ImGui::SameLine();
@@ -112,7 +130,7 @@ void PipelineTab::render() {
 
 	// Edge
 	if (pipeline == 3) {
-		ImGui::image("Equalized", equalized->asImTexture());
+		ImGui::image("Equalized", wequalized->asImTexture());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
@@ -144,33 +162,71 @@ void PipelineTab::render() {
 }
 
 void PipelineTab::reload() {
-	// Source histogram
-	ImageUtils::renderHistogram(screen->settings->sourceTexture->texture.get(), sourceHistogram.get());
-	ImageUtils::renderCDF(screen->settings->sourceTexture->texture.get(), sourceCDF.get());
+	onSourceChanged(false);
+	onTargetChanged(false);
+	onSourceOrTargetChanged(false);
+	onEqualizationWeightChanged(false);
+}
 
-	// Target histogram
+void PipelineTab::onSourceRotationChanged(bool propagate) {
+	// Source
+	auto size = screen->settings->sourceTexture->texture->data.size;
+	cv::Mat rotation = cv::getRotationMatrix2D(cv::Point2f(size[0] / 2.0f, size[1] / 2.0f), screen->settings->sourceRotation, 1.0f);
+	cv::warpAffine(screen->settings->sourceTexture->texture->data, rotatedSource->data, rotation, cv::Size(size[0], size[1]));
+	rotatedSource->reloadGL();
+
+	ImageUtils::computeGrayscale(rotatedSource.get(), sourceGrayscale.get());
+}
+
+void PipelineTab::onSourceChanged(bool propagate) {
+	// Source
+	onSourceRotationChanged(false);
+	
+	ImageUtils::renderHistogram(rotatedSource.get(), sourceHistogram.get());
+	ImageUtils::renderCDF(rotatedSource.get(), sourceCDF.get());
+
+	// Source grayscale
+	ImageUtils::renderHistogram(sourceGrayscale.get(), sourceGrayscaleHistogram.get());
+	ImageUtils::renderCDF(sourceGrayscale.get(), sourceGrayscaleCDF.get());
+
+	if (propagate)
+		onSourceOrTargetChanged(propagate);
+}
+
+void PipelineTab::onTargetChanged(bool propagate) {
+	// Target
 	ImageUtils::renderHistogram(screen->settings->targetTexture->texture.get(), targetHistogram.get());
 	ImageUtils::renderCDF(screen->settings->targetTexture->texture.get(), targetCDF.get());
 
-	// Grayscale
-	ImageUtils::computeGrayscale(screen->settings->sourceTexture->texture.get(), sourceGrayscale.get());
+	// Target grayscale
 	ImageUtils::computeGrayscale(screen->settings->targetTexture->texture.get(), targetGrayscale.get());
-
-	// Calculate grayscale histogram
-	ImageUtils::renderHistogram(sourceGrayscale.get(), sourceGrayscaleHistogram.get());
 	ImageUtils::renderHistogram(targetGrayscale.get(), targetGrayscaleHistogram.get());
-	ImageUtils::renderCDF(sourceGrayscale.get(), sourceGrayscaleCDF.get());
 	ImageUtils::renderCDF(targetGrayscale.get(), targetGrayscaleCDF.get());
 
+	if (propagate)
+		onSourceOrTargetChanged(propagate);
+}
+
+void PipelineTab::onSourceOrTargetChanged(bool propagate) {
 	// Calculate equalization
 	ImageUtils::renderEqualization(targetGrayscale.get(), sourceGrayscale.get(), equalized.get());
-
-	// Calculate equalization histogram
 	ImageUtils::renderHistogram(equalized.get(), equalizedHistogram.get());
 	ImageUtils::renderCDF(equalized.get(), equalizedCDF.get());
 
+	if (propagate)
+		onEqualizationWeightChanged(propagate);
+}
+
+
+void PipelineTab::onEqualizationWeightChanged(bool propagate) {
+	// Weighted equalization
+	cv::addWeighted(targetGrayscale->data, 1.0f - screen->settings->equalizationWeight, equalized->data, screen->settings->equalizationWeight, 0.0, wequalized->data);
+	wequalized->reloadGL();
+	ImageUtils::renderHistogram(wequalized.get(), wequalizedHistogram.get());
+	ImageUtils::renderCDF(wequalized.get(), wequalizedCDF.get());
+
 	// Blur
-	ImageUtils::renderBlur(equalized.get(), blur.get());
+	ImageUtils::renderBlur(wequalized.get(), blur.get());
 
 	// Sobel
 	ImageUtils::renderSobel(blur.get(), sobelX.get(), SobelType::X);

@@ -23,14 +23,32 @@ void SeedPointsTab::update() {
 		intersectedIndex = -1;
 		intersectedPoint = offset;
 
+		bool tooltip = false;
 		for (int index = 0; index < seedPointPairs.size(); index++) {
 			const auto& [source, target] = seedPointPairs[index];
 
-			if (source.bounds().contains(intersectedPoint) && sourceHover)
+			if (source.bounds().contains(intersectedPoint) && sourceHover) {
 				intersectedIndex = index;
+				tooltip = true;
+				break;
+			}
 				
-			if (target.bounds().contains(intersectedPoint) && targetHover)
+			if (target.bounds().contains(intersectedPoint) && targetHover) {
 				intersectedIndex = index;
+				tooltip = true;
+				break;
+			}
+		}
+
+		if (tooltip) {
+			auto pos = ImGui::GetCursorPos();
+			ImGui::SetCursorPos(ImGui::GetMousePos());
+			ImGui::BeginTooltip();
+			ImGui::Text("X: %f", 2.1f);
+			ImGui::Text("Y: %f", 4.2f);
+			ImGui::Text("Size: %f", 3.3);
+			ImGui::EndTooltip();
+			ImGui::SetCursorPos(pos);
 		}
 	}
 	else {

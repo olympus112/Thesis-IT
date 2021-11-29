@@ -3,6 +3,8 @@
 
 class PipelineTab {
 public:
+	URef<Texture> rotatedSource;
+	
 	URef<Texture> sourceHistogram;
 	URef<Texture> sourceCDF;
 
@@ -21,6 +23,10 @@ public:
 	URef<Texture> equalizedHistogram;
 	URef<Texture> equalizedCDF;
 
+	URef<Texture> wequalized;
+	URef<Texture> wequalizedHistogram;
+	URef<Texture> wequalizedCDF;
+
 	URef<Texture> blur;
 	URef<Texture> sobelX;
 	URef<Texture> sobelY;
@@ -34,4 +40,10 @@ public:
 	void render();
 
 	void reload();
+	
+	void onSourceChanged(bool propagate);
+	void onTargetChanged(bool propagate);
+	void onSourceOrTargetChanged(bool propagate);
+	void onSourceRotationChanged(bool propagate);
+	void onEqualizationWeightChanged(bool propagate);
 };

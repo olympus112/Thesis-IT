@@ -11,6 +11,10 @@ void Settings::init() {
 	sourceTexture = std::make_unique<ImGui::TexturePicker>("Source texture");
 	targetTexture = std::make_unique<ImGui::TexturePicker>("Target texture");
 
+	edgeWeight = 0.5f;
+	intensityWeight = 0.5f;
+	equalizationWeight = 0.5f;
+
 	sourceTexture->load("../res/wood_sphere.jpg");
 	targetTexture->load("../res/cliff_sphere.jpg");
 
@@ -29,17 +33,39 @@ void Settings::render() {
 	ImGui::Text("Target drag: %s", screen->editor->seedPointsTab->targetDrag ? "Yes" : "No");
 
 	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
 
 	ImGui::Text("Intersected index: %d", screen->editor->seedPointsTab->intersectedIndex);
 	ImGui::Text("Intersected point: %s", Util::str(screen->editor->seedPointsTab->intersectedPoint).c_str());
 	ImGui::Text("Selected index: %d", screen->editor->seedPointsTab->intersectedIndex);
 	ImGui::Text("Selected point: %s", Util::str(screen->editor->seedPointsTab->selectedPoint).c_str());
 
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+
+	if (ImGui::SliderFloat("Source rotation", &sourceRotation, 0.0f, 360.0f))
+		screen->editor->pipelineTab->onSourceRotationChanged(true);
+	
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+	
+	ImGui::SliderFloat("Intensity weight", &intensityWeight, 0.0f, 1.0f);
+	ImGui::SliderFloat("Intensity weight", &edgeWeight, 0.0f, 1.0f);
+	if (ImGui::SliderFloat("Equalization weight", &equalizationWeight, 0.0f, 1.0f))
+		screen->editor->pipelineTab->onEqualizationWeightChanged(true);
+	
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+
 	if (sourceTexture->render())
-		screen->editor->pipelineTab->reload();
+		screen->editor->pipelineTab->onSourceChanged(true);
 
 	if (targetTexture->render())
-		screen->editor->pipelineTab->reload();	
+		screen->editor->pipelineTab->onTargetChanged(true);	
 
 	ImGui::End();
 }

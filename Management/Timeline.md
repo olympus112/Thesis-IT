@@ -69,5 +69,8 @@
 | 2021-11-27 | Finished cdf equalization       | 3    |
 | 2021-11-28 | Refactoring                     | 1.5  |
 | 2021-11-28 | Sobel, Blur, Canny              | 2    |
-|            |                                 |      |
+| Totaal     |                                 | 12.5 |
 
+| Week 10    | Beschrijving | Uren |
+| ---------- | ------------ | ---- |
+| 2021-11-29 |              |      |

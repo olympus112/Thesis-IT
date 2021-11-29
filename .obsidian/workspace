@@ -7,10 +7,9 @@
         "id": "d9cdb68d77591d7c",
         "type": "leaf",
         "state": {
-          "type": "markdown",
+          "type": "pdf",
           "state": {
-            "file": "Management/Timeline.md",
-            "mode": "source"
+            "file": "Papers/WoodPixel.pdf"
           }
         }
       }
@@ -76,7 +75,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Management/Timeline.md",
+                "file": "Papers/WoodPixel.pdf",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +103,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Management/Timeline.md"
+                "file": "Papers/WoodPixel.pdf"
               }
             }
           },
@@ -121,10 +120,12 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "active": "d9cdb68d77591d7c",
   "lastOpenFiles": [
+    "Papers/WoodPixel.pdf",
     "Management/Timeline.md",
     "Management/Todo.md",
     "Code/OpenCV/sources/3rdparty/openvx/hal/README.md",
@@ -133,7 +134,6 @@
     "Notes/Sobel filter.md",
     "Notes/Intensity filter.md",
     "Meetings/14-10-2021.md",
-    "Meetings/4-11-2021.md",
-    "Meetings/21-10-2021.md"
+    "Meetings/4-11-2021.md"
   ]
 }
