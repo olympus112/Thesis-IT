@@ -47,6 +47,8 @@ void PipelineTab::update() {
 }
 
 void PipelineTab::render() {
+	ImGui::Begin("Pipeline");
+
 	for (int index = 0; index < pipelines.size(); index++)
 		if (ImGui::RadioButton(pipelines[index], index == pipeline))
 			pipeline = index;
@@ -157,8 +159,10 @@ void PipelineTab::render() {
 		ImGui::arrow();
 		ImGui::SameLine();
 		ImGui::image("Canny", canny->asImTexture());
-
 	}
+
+	ImGui::End();
+
 }
 
 void PipelineTab::reload() {

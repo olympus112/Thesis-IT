@@ -8,9 +8,8 @@ public:
 	URef<ImGui::TexturePicker> targetTexture;
 
 	float sourceRotation;
+	float imageSize;
 
-	float patchSize;
-	
 	float intensityWeight;	
 	float edgeWeight;
 	float equalizationWeight;

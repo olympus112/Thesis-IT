@@ -1,5 +1,6 @@
 #include <core.h>
 #include "seedpoints.h"
+#include <format>
 
 #include "main.h"
 #include "screen.h"
@@ -16,6 +17,7 @@ void SeedPointsTab::init() {
 }
 
 void SeedPointsTab::update() {
+
 	ImVec2 offset = ImGui::GetMousePos() - (sourceHover ? sourceBox : targetBox).min();
 
 	// Mouse move
@@ -23,9 +25,8 @@ void SeedPointsTab::update() {
 		intersectedIndex = -1;
 		intersectedPoint = offset;
 
-		bool tooltip = false;
 		for (int index = 0; index < seedPointPairs.size(); index++) {
-			const auto& [source, target, patchSize] = seedPointPairs[index];
+			const auto& [source, target, patchSize, matching] = seedPointPairs[index];
 
 			if (source.bounds().contains(intersectedPoint) && sourceHover) {
 				intersectedIndex = index;
@@ -58,23 +59,30 @@ void SeedPointsTab::update() {
 	}
 
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-		seedPointPairs.push_back({
+		SeedPointPair pair = {
 		{offset},
 		{offset},
 			10,
-		});
+		};
+
+		Bounds bounds(Vec2f(offset.x, offset.y) / screen->settings->imageSize * screen->editor->pipelineTab->rotatedSource->data.size[0], 10);
+		pair.calculateMatch(screen->editor->pipelineTab->rotatedSource->data, screen->settings->targetTexture->texture->data, bounds, bounds);
+		seedPointPairs.push_back(pair);
 	}
 
 	// Mouse drag
 	if ((sourceDrag || targetDrag) && selectedIndex != -1) {
 		Vec2f delta = offset - selectedPoint;
-		if (sourceDrag)
+		if (sourceDrag) 
 			seedPointPairs[selectedIndex].source.position += delta;
 
 		if (targetDrag)
 			seedPointPairs[selectedIndex].target.position += delta;
 
 		selectedPoint += delta;
+		Bounds sourceBounds(seedPointPairs[selectedIndex].source.position / screen->settings->imageSize * screen->editor->pipelineTab->rotatedSource->data.size[0], seedPointPairs[selectedIndex].size);
+		Bounds targetBounds(seedPointPairs[selectedIndex].target.position / screen->settings->imageSize * screen->editor->pipelineTab->rotatedSource->data.size[0], seedPointPairs[selectedIndex].size);
+		seedPointPairs[selectedIndex].calculateMatch(screen->editor->pipelineTab->rotatedSource->data, screen->settings->targetTexture->texture->data, sourceBounds, targetBounds);
 	}
 
 	// Mouse release
@@ -85,10 +93,12 @@ void SeedPointsTab::update() {
 }
 
 void SeedPointsTab::render() {
-	ImVec2 canvasSize = ImVec2(350, 350);
+	ImGui::Begin("SeedPoints");
+
+	ImVec2 canvasSize = ImVec2(screen->settings->imageSize, screen->settings->imageSize);
 
 	// Source image
-	ImGui::image("Source", screen->settings->sourceTexture->asImTexture(), canvasSize);
+	ImGui::image("Source", screen->editor->pipelineTab->rotatedSource->asImTexture(), canvasSize);
 	sourceBox = {ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMin() + canvasSize)};
 	sourceHover = ImGui::IsItemHovered();
 
@@ -148,12 +158,13 @@ void SeedPointsTab::render() {
 		}
 	}
 
+	// Tooltip
 	if (intersectedIndex != -1 || selectedIndex != -1) {
 		const auto& seedPointPair = seedPointPairs[intersectedIndex != -1 ? intersectedIndex : selectedIndex];
 		auto tooltiptPosition = intersectedIndex != -1 ? ImGui::GetCursorPos() : sourceBox.min() + seedPointPair.source.position;
 
-		Bounds sourcePatch(Vec2f(sourceBox.minX() + seedPointPair.source.position.x, sourceBox.minY() + seedPointPair.source.position.y), screen->settings->patchSize);
-		Bounds targetPatch(Vec2f(targetBox.minX() + seedPointPair.target.position.x, targetBox.minY() + seedPointPair.target.position.y), screen->settings->patchSize);
+		Bounds sourcePatch(Vec2f(sourceBox.minX() + seedPointPair.source.position.x, sourceBox.minY() + seedPointPair.source.position.y), seedPointPair.size);
+		Bounds targetPatch(Vec2f(targetBox.minX() + seedPointPair.target.position.x, targetBox.minY() + seedPointPair.target.position.y), seedPointPair.size);
 		Bounds sourceUV = sourceBox.subBoundsUV(sourcePatch);
 		Bounds targetUV = targetBox.subBoundsUV(targetPatch);
 
@@ -164,20 +175,20 @@ void SeedPointsTab::render() {
 
 		ImGui::TextColored(Colors::BLUE.iv4(), "General");
 		ImGui::Separator();
-		ImGui::Text("Patch size: %.2f", screen->settings->patchSize);
+		ImGui::Text("Patch size: %.2f", seedPointPair.size);
 		ImGui::Text("Matching: %.2f", seedPointPair.matching);
 		ImGui::Separator();
 
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(-1, 95);
-		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
+		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
 		ImGui::Text("X: %.0f", seedPointPair.source.position.x);
 		ImGui::Text("Y: %.0f", seedPointPair.source.position.y);
-		ImGui::image("Source", screen->settings->sourceTexture->texture->asImTexture(), ImVec2(80, 80), sourceUV.min(), sourceUV.max());
+		ImGui::image("Source", screen->editor->pipelineTab->rotatedSource->asImTexture(), ImVec2(80, 80), sourceUV.min(), sourceUV.max());
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, 95);
-		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
+		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
 		ImGui::Text("X: %.0f", seedPointPair.target.position.x);
 		ImGui::Text("Y: %.0f", seedPointPair.target.position.y);
 		ImGui::image("Target", screen->settings->targetTexture->texture->asImTexture(), ImVec2(80, 80), targetUV.min(), targetUV.max());
@@ -191,6 +202,47 @@ void SeedPointsTab::render() {
 	for (int index = 0; index < seedPointPairs.size(); index++) {
 		seedPointPairs[index].render(sourceBox, targetBox, intersectedIndex == index, selectedIndex == index);
 	}
+
+	ImGui::End();
+
+	// Seedpoint vieuwer
+	ImGui::Begin("Seedpoint viewer");
+	for (int index = 0; index < seedPointPairs.size(); index++) {
+		auto& seedPointPair = seedPointPairs[index];
+		Bounds sourcePatch(Vec2f(sourceBox.minX() + seedPointPair.source.position.x, sourceBox.minY() + seedPointPair.source.position.y), seedPointPair.size);
+		Bounds targetPatch(Vec2f(targetBox.minX() + seedPointPair.target.position.x, targetBox.minY() + seedPointPair.target.position.y), seedPointPair.size);
+		Bounds sourceUV = sourceBox.subBoundsUV(sourcePatch);
+		Bounds targetUV = targetBox.subBoundsUV(targetPatch);
+
+		float size = 80.0f;
+		ImGui::TextColored(Colors::BLUE.iv4(), "Patch #%d", index + 1);
+		ImGui::SliderFloat(std::format("Patch size##{}", index).c_str(), &seedPointPair.size, 1.0, 50.0);
+
+		ImGui::Columns(4, 0, false);
+		ImGui::SetColumnWidth(-1, size + 10);
+		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
+		ImGui::Image(screen->editor->pipelineTab->rotatedSource->asImTexture(), ImVec2(size, size), sourceUV.min(), sourceUV.max());
+		ImGui::NextColumn();
+		ImGui::Text("");
+		ImGui::Text("X: %.0f", seedPointPair.source.position.x);
+		ImGui::Text("Y: %.0f", seedPointPair.source.position.y);
+
+		ImGui::NextColumn();
+		ImGui::SetColumnWidth(-1, size + 10);
+		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
+		ImGui::Image(screen->settings->targetTexture->texture->asImTexture(), ImVec2(size, size), targetUV.min(), targetUV.max());
+		ImGui::NextColumn();
+		ImGui::Text("");
+		ImGui::Text("X: %.0f", seedPointPair.target.position.x);
+		ImGui::Text("Y: %.0f", seedPointPair.target.position.y);
+
+		ImGui::Columns(1);
+
+		ImGui::Text("Matching: %.2f", seedPointPair.matching);
+
+		ImGui::Separator();
+	}
+	ImGui::End();
 }
 
 //! -------------
@@ -201,12 +253,19 @@ void SeedPointPair::render(const Bounds& sourceBox, const Bounds& targetBox, boo
 	source.render(sourceBox.min(), intersected, selected);
 	target.render(targetBox.min(), intersected, selected);
 
-	Bounds(source.position, screen->settings->patchSize).render(sourceBox.min(), Colors::RED);
-	Bounds(target.position, screen->settings->patchSize).render(targetBox.min(), Colors::RED);
+	Bounds(source.position, size).render(sourceBox.min(), Colors::RED);
+	Bounds(target.position, size).render(targetBox.min(), Colors::RED);
 
 	if (intersected || selected)
 		ImGui::GetWindowDrawList()->AddLine(sourceBox.min() + source.position, targetBox.min() + target.position,
 		                                    ImGui::ColorConvertFloat4ToU32(ImVec4(1.0, 1.0, 1.0, 0.5)));
+}
+
+void SeedPointPair::calculateMatch(const cv::Mat& sourceTexture, const cv::Mat& targetTexture, const Bounds& sourceBounds, const Bounds& targetBounds) {
+	source.calculatePatch(sourceTexture, sourceBounds);
+	target.calculatePatch(targetTexture, targetBounds);
+
+	matching = cv::norm(source.patch, target.patch);
 }
 
 //! ---------
@@ -220,6 +279,13 @@ SeedPoint::SeedPoint(const Vec2f& position) {
 
 Bounds SeedPoint::bounds() const {
 	return Bounds(position, 20);
+}
+
+void SeedPoint::calculatePatch(const cv::Mat& texture, const Bounds& bounds) {
+	cv::Range rows(bounds.minY(), bounds.maxY());
+	cv::Range cols(bounds.minX(), bounds.maxX());
+
+	patch = texture(rows, cols);
 }
 
 void SeedPoint::render(const Vec2f& offset, bool intersected, bool selected) const {

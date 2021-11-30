@@ -21,22 +21,6 @@ void Editor::update() {
 }
 
 void Editor::render() {
-	ImGui::Begin("Editor");
-
-	if (ImGui::BeginTabBar("Tabbar")) {
-		bool open = true;
-		if (ImGui::BeginTabItem("Seedpoints", &open)) {
-			seedPointsTab->render();
-			ImGui::EndTabItem();
-		}
-
-		if (ImGui::BeginTabItem("Pipeline", &open)) {
-			pipelineTab->render();
-			ImGui::EndTabItem();
-		}
-
-		ImGui::EndTabBar();
-	}
-
-	ImGui::End();
+	seedPointsTab->render();
+	pipelineTab->render();
 }
