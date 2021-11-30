@@ -71,6 +71,7 @@
 | 2021-11-28 | Sobel, Blur, Canny              | 2    |
 | Totaal     |                                 | 12.5 |
 
-| Week 10    | Beschrijving | Uren |
-| ---------- | ------------ | ---- |
-| 2021-11-29 |              |      |
+| Week 10    | Beschrijving                          | Uren |
+| ---------- | ------------------------------------- | ---- |
+| 2021-11-29 | Image rotation, weighted equalization | 2    |
+| 2021-11-29 | Rectangle patch                       | 2    | 

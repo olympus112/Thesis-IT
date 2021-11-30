@@ -25,30 +25,17 @@ void SeedPointsTab::update() {
 
 		bool tooltip = false;
 		for (int index = 0; index < seedPointPairs.size(); index++) {
-			const auto& [source, target] = seedPointPairs[index];
+			const auto& [source, target, patchSize] = seedPointPairs[index];
 
 			if (source.bounds().contains(intersectedPoint) && sourceHover) {
 				intersectedIndex = index;
-				tooltip = true;
 				break;
 			}
 				
 			if (target.bounds().contains(intersectedPoint) && targetHover) {
 				intersectedIndex = index;
-				tooltip = true;
 				break;
 			}
-		}
-
-		if (tooltip) {
-			auto pos = ImGui::GetCursorPos();
-			ImGui::SetCursorPos(ImGui::GetMousePos());
-			ImGui::BeginTooltip();
-			ImGui::Text("X: %f", 2.1f);
-			ImGui::Text("Y: %f", 4.2f);
-			ImGui::Text("Size: %f", 3.3);
-			ImGui::EndTooltip();
-			ImGui::SetCursorPos(pos);
 		}
 	}
 	else {
@@ -58,20 +45,23 @@ void SeedPointsTab::update() {
 
 	// Mouse press
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-		selectedPoint = intersectedPoint;
-		selectedIndex = intersectedIndex;
+		if (sourceHover || targetHover) {
+			selectedPoint = intersectedPoint;
+			selectedIndex = intersectedIndex;
 
-		if (targetHover)
-			targetDrag = true;
+			if (targetHover)
+				targetDrag = true;
 
-		if (sourceHover)
-			sourceDrag = true;
+			if (sourceHover)
+				sourceDrag = true;
+		}
 	}
 
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
 		seedPointPairs.push_back({
 		{offset},
-		{offset}
+		{offset},
+			10,
 		});
 	}
 
@@ -158,6 +148,45 @@ void SeedPointsTab::render() {
 		}
 	}
 
+	if (intersectedIndex != -1 || selectedIndex != -1) {
+		const auto& seedPointPair = seedPointPairs[intersectedIndex != -1 ? intersectedIndex : selectedIndex];
+		auto tooltiptPosition = intersectedIndex != -1 ? ImGui::GetCursorPos() : sourceBox.min() + seedPointPair.source.position;
+
+		Bounds sourcePatch(Vec2f(sourceBox.minX() + seedPointPair.source.position.x, sourceBox.minY() + seedPointPair.source.position.y), screen->settings->patchSize);
+		Bounds targetPatch(Vec2f(targetBox.minX() + seedPointPair.target.position.x, targetBox.minY() + seedPointPair.target.position.y), screen->settings->patchSize);
+		Bounds sourceUV = sourceBox.subBoundsUV(sourcePatch);
+		Bounds targetUV = targetBox.subBoundsUV(targetPatch);
+
+		ImGui::SetCursorPos(tooltiptPosition);
+
+		ImGui::SetNextWindowSize(ImVec2(190, 0));
+		ImGui::BeginTooltip();
+
+		ImGui::TextColored(Colors::BLUE.iv4(), "General");
+		ImGui::Separator();
+		ImGui::Text("Patch size: %.2f", screen->settings->patchSize);
+		ImGui::Text("Matching: %.2f", seedPointPair.matching);
+		ImGui::Separator();
+
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(-1, 95);
+		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
+		ImGui::Text("X: %.0f", seedPointPair.source.position.x);
+		ImGui::Text("Y: %.0f", seedPointPair.source.position.y);
+		ImGui::image("Source", screen->settings->sourceTexture->texture->asImTexture(), ImVec2(80, 80), sourceUV.min(), sourceUV.max());
+
+		ImGui::NextColumn();
+		ImGui::SetColumnWidth(-1, 95);
+		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
+		ImGui::Text("X: %.0f", seedPointPair.target.position.x);
+		ImGui::Text("Y: %.0f", seedPointPair.target.position.y);
+		ImGui::image("Target", screen->settings->targetTexture->texture->asImTexture(), ImVec2(80, 80), targetUV.min(), targetUV.max());
+
+		ImGui::Columns(1);
+
+		ImGui::EndTooltip();
+	}
+
 	// Render seedPoints
 	for (int index = 0; index < seedPointPairs.size(); index++) {
 		seedPointPairs[index].render(sourceBox, targetBox, intersectedIndex == index, selectedIndex == index);
@@ -171,6 +200,9 @@ void SeedPointsTab::render() {
 void SeedPointPair::render(const Bounds& sourceBox, const Bounds& targetBox, bool intersected, bool selected) const {
 	source.render(sourceBox.min(), intersected, selected);
 	target.render(targetBox.min(), intersected, selected);
+
+	Bounds(source.position, screen->settings->patchSize).render(sourceBox.min(), Colors::RED);
+	Bounds(target.position, screen->settings->patchSize).render(targetBox.min(), Colors::RED);
 
 	if (intersected || selected)
 		ImGui::GetWindowDrawList()->AddLine(sourceBox.min() + source.position, targetBox.min() + target.position,
@@ -217,7 +249,7 @@ Bounds::Bounds(const Vec2f& position, float size) {
 	this->rect = ImRect(position.x - halfSize, position.y - halfSize, position.x + halfSize, position.y + halfSize);
 }
 
-void Bounds::render(const Vec2f& offset) const {
-	ImGui::GetWindowDrawList()->AddRect(offset + min(), offset + max(), Colors::WHITE.u32(), 0,
+void Bounds::render(const Vec2f& offset, const Color& color) const {
+	ImGui::GetWindowDrawList()->AddRect(offset + min(), offset + max(), color.u32(), 0,
 	                                    ImDrawCornerFlags_All);
 }

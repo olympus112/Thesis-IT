@@ -1,4 +1,5 @@
 #pragma once
+#include "graphics/color.h"
 #include "imgui/imgui_internal.h"
 
 struct Bounds {
@@ -8,7 +9,7 @@ struct Bounds {
 	Bounds(const ImRect& rect);
 	Bounds(const Vec2f& position, float size);
 
-	void render(const Vec2f& offset) const;
+	void render(const Vec2f& offset, const Color& color = Colors::WHITE) const;
 
 	bool contains(const Vec2f& point) const {
 		return rect.Contains(point.asImVec());
@@ -37,6 +38,30 @@ struct Bounds {
 	ImVec2 max() const {
 		return rect.Max;
 	}
+
+	float width() const {
+		return maxX() - minX();
+	}
+
+	float height() const {
+		return maxY() - minY();
+	}
+
+	ImRect subBoundsUV(const Bounds& bounds) const {
+		float w = width();
+		float h = height();
+		float xMin = (bounds.minX() - minX()) / w;
+		float xMax = (bounds.maxX() - minX()) / w;
+		float yMin = (bounds.minY() - minY()) / h;
+		float yMax = (bounds.maxY() - minY()) / h;
+
+		return ImRect(
+			xMin,
+			yMin,
+			xMax,
+			yMax
+		);
+	}
 };
 
 struct SeedPoint {
@@ -52,6 +77,8 @@ struct SeedPoint {
 struct SeedPointPair {
 	SeedPoint source;
 	SeedPoint target;
+	float size;
+	float matching = .3f;
 
 	void render(const Bounds& sourceBox, const Bounds& targetBox, bool intersected, bool selected) const;
 };

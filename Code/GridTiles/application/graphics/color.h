@@ -52,6 +52,10 @@ struct ColorTemplate {
 		return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
 	}
 
+	constexpr ImVec4 iv4() const noexcept {
+		return ImVec4(r, g, b, a);
+	}
+
 	constexpr cv::Scalar cv() const noexcept {
 		return cv::Scalar(cvRound(b * 255), cvRound(g * 255), cvRound(r * 255));
 	}

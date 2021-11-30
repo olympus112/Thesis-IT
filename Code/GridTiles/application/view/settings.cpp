@@ -11,6 +11,10 @@ void Settings::init() {
 	sourceTexture = std::make_unique<ImGui::TexturePicker>("Source texture");
 	targetTexture = std::make_unique<ImGui::TexturePicker>("Target texture");
 
+	sourceRotation = 0.0f;
+
+	patchSize = 5.0f;
+	
 	edgeWeight = 0.5f;
 	intensityWeight = 0.5f;
 	equalizationWeight = 0.5f;
@@ -47,6 +51,8 @@ void Settings::render() {
 
 	if (ImGui::SliderFloat("Source rotation", &sourceRotation, 0.0f, 360.0f))
 		screen->editor->pipelineTab->onSourceRotationChanged(true);
+
+	ImGui::SliderFloat("Patch size", &patchSize, 1.0, 50.0);
 	
 	ImGui::Spacing();
 	ImGui::Separator();

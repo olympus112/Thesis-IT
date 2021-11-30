@@ -7,7 +7,9 @@ public:
 	URef<ImGui::TexturePicker> sourceTexture;
 	URef<ImGui::TexturePicker> targetTexture;
 
-	float sourceRotation = 0.0f;
+	float sourceRotation;
+
+	float patchSize;
 	
 	float intensityWeight;	
 	float edgeWeight;
