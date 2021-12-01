@@ -16,7 +16,7 @@ namespace ImageUtils {
 		Histogram histogram(source->data);
 		
 		destination->data = histogram.drawLines();
-		destination->reloadGL();
+		destination->reloadGL(true);
 	}
 
 	inline void renderCDF(Texture* source, Texture* destination) {
@@ -24,28 +24,28 @@ namespace ImageUtils {
 		CDF cdf(histogram);
 		
 		destination->data = cdf.draw();
-		destination->reloadGL();
+		destination->reloadGL(true);
 	}
 
 	inline void computeGrayscale(Texture* source, Texture* destination) {
 		Grayscale grayscale(source->data);
 		
 		destination->data = grayscale.grayscale;
-		destination->reloadGL(false);
+		destination->reloadGL();
 	}
 
 	inline void renderEqualization(Texture* source, Texture* reference, Texture* destination) {
 		Equalization equalization(source->data, reference->data);
 		
 		destination->data = equalization.equalization;
-		destination->reloadGL(false);
+		destination->reloadGL();
 	}
 
 	inline void renderBlur(Texture* source, Texture* destination) {
 		Blur blur(source->data);
 		
 		destination->data = blur.blur;
-		destination->reloadGL(false);
+		destination->reloadGL();
 	}
 
 	inline void renderSobel(Texture* source, Texture* destination) {
@@ -60,6 +60,6 @@ namespace ImageUtils {
 		Canny canny(source->data, screen->settings->cannyThreshold1, screen->settings->cannyThreshold2, screen->settings->cannyAperture, screen->settings->cannyL2gradient);
 		
 		destination->data = canny.canny;
-		destination->reloadGL(false);
+		destination->reloadGL();
 	}
 }

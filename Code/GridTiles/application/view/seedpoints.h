@@ -65,25 +65,22 @@ struct Bounds {
 };
 
 struct SeedPoint {
-	cv::Mat patch;
 	Vec2f position;
 
 	SeedPoint(const Vec2f& position);
-		
-	Bounds bounds() const;
 
-	void calculatePatch(const cv::Mat& texture, const Bounds& bounds);
-	void render(const Vec2f& offset, bool intersected, bool selected) const;
+	cv::Mat calculatePatch(const cv::Mat& texture, int size);
+	void render(const ImVec2& offset, ImVec2 (*transform)(const Vec2f&), bool intersected, bool selected) const;
 };
 
 struct SeedPointPair {
 	SeedPoint source;
 	SeedPoint target;
 	int size;
-	float matching = 0.0f;
+	float matching;
 
-	void render(const Bounds& sourceBox, const Bounds& targetBox, bool intersected, bool selected) const;
-	void calculateMatch(const cv::Mat& sourceTexture, const cv::Mat& targetTexture, const Bounds& sourceBounds, const Bounds& targetBounds);
+	void render(const Bounds& sourceBox, const Bounds& targetBox, bool intersected, bool selected, const Color& color = Colors::RED) const;
+	void calculateMatch(const std::vector<cv::Mat>& sourceTextures, const std::vector<cv::Mat>& targetTextures, const std::vector<float>& distribution);
 };
 
 class SeedPointsTab {
@@ -107,4 +104,6 @@ public:
 	void init();
 	void update();
 	void render();
+
+	void onRecalculateMatching();
 };

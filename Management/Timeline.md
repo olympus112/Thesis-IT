@@ -71,10 +71,11 @@
 | 2021-11-28 | Sobel, Blur, Canny              | 2    |
 | Totaal     |                                 | 12.5 |
 
-| Week 10    | Beschrijving                          | Uren |
-| ---------- | ------------------------------------- | ---- |
-| 2021-11-29 | Image rotation, weighted equalization | 2    |
-| 2021-11-29 | Rectangle patch                       | 2    |
-| 2021-11-30 | Seedpoint viewer, patch size          | 1.5  |
-| 2021-11-30 | Primitive patch distance              | 2    |
-| 2021-12-30 | Blur settings, better UI              | 1    | 
+| Week 10    | Beschrijving                             | Uren |
+| ---------- | ---------------------------------------- | ---- |
+| 2021-11-29 | Image rotation, weighted equalization    | 2    |
+| 2021-11-29 | Rectangle patch                          | 2    |
+| 2021-11-30 | Seedpoint viewer, patch size             | 1.5  |
+| 2021-11-30 | Primitive patch distance                 | 2    |
+| 2021-12-30 | Blur settings, better UI                 | 1    |
+| 2021-12-30 | Matching uses weighted intensity & edges | 2    | 

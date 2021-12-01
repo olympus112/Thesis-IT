@@ -57,17 +57,25 @@ void Settings::render() {
 	ImGui::Separator();
 	ImGui::Spacing();
 
-	if (ImGui::SliderFloat("Source rotation", &sourceRotation, 0.0f, 360.0f))
+	if (ImGui::SliderFloat("Source rotation", &sourceRotation, 0.0f, 360.0f)) {
 		screen->editor->pipelineTab->onSourceRotationChanged(true);
+		screen->editor->seedPointsTab->onRecalculateMatching();
+	}
 
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
 	
-	ImGui::SliderFloat("Intensity weight", &intensityWeight, 0.0f, 1.0f);
-	ImGui::SliderFloat("Edge weight", &edgeWeight, 0.0f, 1.0f);
-	if (ImGui::SliderFloat("Equalization weight", &equalizationWeight, 0.0f, 1.0f))
+	if (ImGui::SliderFloat("Intensity weight", &intensityWeight, 0.0f, 1.0f)) {
+		screen->editor->seedPointsTab->onRecalculateMatching();
+	}
+	if (ImGui::SliderFloat("Edge weight", &edgeWeight, 0.0f, 1.0f)) {
+		screen->editor->seedPointsTab->onRecalculateMatching();
+	}
+	if (ImGui::SliderFloat("Equalization weight", &equalizationWeight, 0.0f, 1.0f)) {
 		screen->editor->pipelineTab->onEqualizationWeightChanged(true);
+		screen->editor->seedPointsTab->onRecalculateMatching();
+	}
 	
 	ImGui::Spacing();
 	ImGui::Separator();
@@ -109,17 +117,22 @@ void Settings::render() {
 	if (blurChanged) {
 		screen->editor->pipelineTab->onTargetBlurChanged(true);
 		screen->editor->pipelineTab->onSourceBlurChanged(true);
+		screen->editor->seedPointsTab->onRecalculateMatching();
 	}
 
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
 
-	if (targetTexture->render())
+	if (targetTexture->render()) {
 		screen->editor->pipelineTab->onTargetChanged(true);
+		screen->editor->seedPointsTab->onRecalculateMatching();
+	}
 
-	if (sourceTexture->render())
+	if (sourceTexture->render()) {
 		screen->editor->pipelineTab->onSourceChanged(true);
+		screen->editor->seedPointsTab->onRecalculateMatching();
+	}
 
 	ImGui::End();
 }

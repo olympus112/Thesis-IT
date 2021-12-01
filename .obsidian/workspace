@@ -1,10 +1,10 @@
 {
   "main": {
-    "id": "771f6866997dc0c2",
+    "id": "fcc27cd062e3e755",
     "type": "split",
     "children": [
       {
-        "id": "d9cdb68d77591d7c",
+        "id": "358bf2a0709db690",
         "type": "leaf",
         "state": {
           "type": "markdown",
@@ -124,17 +124,17 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "d9cdb68d77591d7c",
+  "active": "358bf2a0709db690",
   "lastOpenFiles": [
     "Management/Timeline.md",
     "Papers/WoodPixel.pdf",
+    "requests.md",
+    "Untitled.md",
     "Management/Todo.md",
     "Code/OpenCV/sources/3rdparty/openvx/hal/README.md",
     "Notes/WoodPixel.md",
     "Notes/Stylised fabrication.md",
     "Notes/Sobel filter.md",
-    "Notes/Intensity filter.md",
-    "Meetings/14-10-2021.md",
-    "Meetings/4-11-2021.md"
+    "Notes/Intensity filter.md"
   ]
 }
