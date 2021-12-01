@@ -48,15 +48,16 @@ namespace ImageUtils {
 		destination->reloadGL(false);
 	}
 
-	inline void renderSobel(Texture* source, Texture* destination, const SobelType& type) {
-		Sobel sobel(source->data, type);
+	inline void renderSobel(Texture* source, Texture* destination) {
+		SobelType sobelTypes[] = {SobelType::X, SobelType::Y, SobelType::XY};
+		Sobel sobel(source->data, sobelTypes[screen->settings->sobelType], screen->settings->sobelDerivative, screen->settings->sobelSize);
 		
 		destination->data = sobel.sobel;
 		destination->reloadGL(false);
 	}
 
 	inline void renderCanny(Texture* source, Texture* destination) {
-		Canny canny(source->data);
+		Canny canny(source->data, screen->settings->cannyThreshold1, screen->settings->cannyThreshold2, screen->settings->cannyAperture, screen->settings->cannyL2gradient);
 		
 		destination->data = canny.canny;
 		destination->reloadGL(false);

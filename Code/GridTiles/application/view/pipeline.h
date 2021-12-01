@@ -27,11 +27,13 @@ public:
 	URef<Texture> wequalizedHistogram;
 	URef<Texture> wequalizedCDF;
 
-	URef<Texture> blur;
-	URef<Texture> sobelX;
-	URef<Texture> sobelY;
-	URef<Texture> sobelXY;
-	URef<Texture> canny;
+	URef<Texture> targetBlur;
+	URef<Texture> targetSobel;
+	URef<Texture> targetCanny;
+
+	URef<Texture> sourceBlur;
+	URef<Texture> sourceSobel;
+	URef<Texture> sourceCanny;
 
 	PipelineTab();
 
@@ -46,4 +48,6 @@ public:
 	void onSourceOrTargetChanged(bool propagate);
 	void onSourceRotationChanged(bool propagate);
 	void onEqualizationWeightChanged(bool propagate);
+	void onTargetBlurChanged(bool propagate);
+	void onSourceBlurChanged(bool propagate);
 };

@@ -76,4 +76,5 @@
 | 2021-11-29 | Image rotation, weighted equalization | 2    |
 | 2021-11-29 | Rectangle patch                       | 2    |
 | 2021-11-30 | Seedpoint viewer, patch size          | 1.5  |
-| 2021-11-30 | Primitive patch distance              | 1    | 
+| 2021-11-30 | Primitive patch distance              | 2    |
+| 2021-12-30 | Blur settings, better UI              | 1    | 

@@ -11,7 +11,7 @@ cv::Mat Sobel::computeSobel(const cv::Mat& source, const SobelType& type, int de
 	return result;
 }
 
-Sobel::Sobel(const cv::Mat& texture, const SobelType& type) {
+Sobel::Sobel(const cv::Mat& texture, const SobelType& type, int derivative, int size) {
 	this->type = type;
 	this->sobel = computeSobel(texture, type, 1, 5);
 }

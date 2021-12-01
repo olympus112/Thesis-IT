@@ -80,8 +80,8 @@ void SeedPointsTab::update() {
 			seedPointPairs[selectedIndex].target.position += delta;
 
 		selectedPoint += delta;
-		Bounds sourceBounds(seedPointPairs[selectedIndex].source.position / screen->settings->imageSize * screen->editor->pipelineTab->rotatedSource->data.size[0], seedPointPairs[selectedIndex].size);
-		Bounds targetBounds(seedPointPairs[selectedIndex].target.position / screen->settings->imageSize * screen->editor->pipelineTab->rotatedSource->data.size[0], seedPointPairs[selectedIndex].size);
+		Bounds sourceBounds(Vec2i(seedPointPairs[selectedIndex].source.position / screen->settings->imageSize * screen->editor->pipelineTab->rotatedSource->data.size[0]), seedPointPairs[selectedIndex].size);
+		Bounds targetBounds(Vec2i(seedPointPairs[selectedIndex].target.position / screen->settings->imageSize * screen->editor->pipelineTab->rotatedSource->data.size[0]), seedPointPairs[selectedIndex].size);
 		seedPointPairs[selectedIndex].calculateMatch(screen->editor->pipelineTab->rotatedSource->data, screen->settings->targetTexture->texture->data, sourceBounds, targetBounds);
 	}
 
@@ -205,7 +205,7 @@ void SeedPointsTab::render() {
 
 	ImGui::End();
 
-	// Seedpoint vieuwer
+	// Seedpoint viewer
 	ImGui::Begin("Seedpoint viewer");
 	for (int index = 0; index < seedPointPairs.size(); index++) {
 		auto& seedPointPair = seedPointPairs[index];
@@ -216,11 +216,11 @@ void SeedPointsTab::render() {
 
 		float size = 80.0f;
 		ImGui::TextColored(Colors::BLUE.iv4(), "Patch #%d", index + 1);
-		ImGui::SliderFloat(std::format("Patch size##{}", index).c_str(), &seedPointPair.size, 1.0, 50.0);
+		ImGui::SliderInt(std::format("Patch size##{}", index).c_str(), &seedPointPair.size, 1, 80);
 
 		ImGui::Columns(4, 0, false);
 		ImGui::SetColumnWidth(-1, size + 10);
-		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
+		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
 		ImGui::Image(screen->editor->pipelineTab->rotatedSource->asImTexture(), ImVec2(size, size), sourceUV.min(), sourceUV.max());
 		ImGui::NextColumn();
 		ImGui::Text("");
@@ -229,12 +229,22 @@ void SeedPointsTab::render() {
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
-		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
+		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
 		ImGui::Image(screen->settings->targetTexture->texture->asImTexture(), ImVec2(size, size), targetUV.min(), targetUV.max());
 		ImGui::NextColumn();
 		ImGui::Text("");
 		ImGui::Text("X: %.0f", seedPointPair.target.position.x);
 		ImGui::Text("Y: %.0f", seedPointPair.target.position.y);
+
+		ImGui::NextColumn();
+		ImGui::Image(screen->editor->pipelineTab->sourceGrayscale->asImTexture(), ImVec2(size, size), sourceUV.min(), sourceUV.max());
+		ImGui::NextColumn();
+		ImGui::Image(screen->editor->pipelineTab->sourceSobel->asImTexture(), ImVec2(size, size), sourceUV.min(), sourceUV.max());
+		ImGui::NextColumn();
+		ImGui::Image(screen->editor->pipelineTab->wequalized->asImTexture(), ImVec2(size, size), targetUV.min(), targetUV.max());
+		ImGui::NextColumn();
+		ImGui::Image(screen->editor->pipelineTab->targetSobel->asImTexture(), ImVec2(size, size), targetUV.min(), targetUV.max());
+		ImGui::NextColumn();
 
 		ImGui::Columns(1);
 

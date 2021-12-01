@@ -14,6 +14,15 @@ void Settings::init() {
 	sourceRotation = 0.0f;
 	imageSize = 350.0f;
 
+	sobelDerivative = 1;
+	sobelSize = 5;
+	sobelType = 0;
+
+	cannyThreshold1 = 100;
+	cannyThreshold2 = 200;
+	cannyAperture = 3;
+	cannyL2gradient = false;
+
 	edgeWeight = 0.5f;
 	intensityWeight = 0.5f;
 	equalizationWeight = 0.5f;
@@ -56,7 +65,7 @@ void Settings::render() {
 	ImGui::Spacing();
 	
 	ImGui::SliderFloat("Intensity weight", &intensityWeight, 0.0f, 1.0f);
-	ImGui::SliderFloat("Intensity weight", &edgeWeight, 0.0f, 1.0f);
+	ImGui::SliderFloat("Edge weight", &edgeWeight, 0.0f, 1.0f);
 	if (ImGui::SliderFloat("Equalization weight", &equalizationWeight, 0.0f, 1.0f))
 		screen->editor->pipelineTab->onEqualizationWeightChanged(true);
 	
@@ -64,11 +73,53 @@ void Settings::render() {
 	ImGui::Separator();
 	ImGui::Spacing();
 
-	if (sourceTexture->render())
-		screen->editor->pipelineTab->onSourceChanged(true);
+	bool blurChanged = false;
+	blurChanged |= ImGui::RadioButton("X", &sobelType, 0);
+	ImGui::SameLine();
+	blurChanged |= ImGui::RadioButton("Y", &sobelType, 1);
+	ImGui::SameLine();
+	blurChanged |= ImGui::RadioButton("XY", &sobelType, 2);
+	ImGui::SameLine();
+	ImGui::Text("Sobel type");
+
+	blurChanged |= ImGui::RadioButton("1##sobel", &sobelSize, 1);
+	ImGui::SameLine();
+	blurChanged |= ImGui::RadioButton("3##sobel", &sobelSize, 3);
+	ImGui::SameLine();
+	blurChanged |= ImGui::RadioButton("5##sobel", &sobelSize, 5);
+	ImGui::SameLine();
+	blurChanged |= ImGui::RadioButton("7##sobel", &sobelSize, 7);
+	ImGui::SameLine();
+	ImGui::Text("Sobel size");
+	blurChanged |= ImGui::SliderInt("Sobel derivative", &sobelDerivative, 1, 5);
+
+	ImGui::Separator();
+
+	blurChanged |= ImGui::SliderFloat("Canny T1", &cannyThreshold1, 0, cannyThreshold2);
+	blurChanged |= ImGui::SliderFloat("Canny T2", &cannyThreshold2, cannyThreshold1, 1000);
+	blurChanged |= ImGui::RadioButton("3##canny", &cannyAperture, 3);
+	ImGui::SameLine();
+	blurChanged |= ImGui::RadioButton("5##canny", &cannyAperture, 5);
+	ImGui::SameLine();
+	blurChanged |= ImGui::RadioButton("7##canny", &cannyAperture, 7);
+	ImGui::SameLine();
+	ImGui::Text("Canny aperture");
+	blurChanged |= ImGui::Checkbox("Canny L2 gradient", &cannyL2gradient);
+
+	if (blurChanged) {
+		screen->editor->pipelineTab->onTargetBlurChanged(true);
+		screen->editor->pipelineTab->onSourceBlurChanged(true);
+	}
+
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
 
 	if (targetTexture->render())
-		screen->editor->pipelineTab->onTargetChanged(true);	
+		screen->editor->pipelineTab->onTargetChanged(true);
+
+	if (sourceTexture->render())
+		screen->editor->pipelineTab->onSourceChanged(true);
 
 	ImGui::End();
 }

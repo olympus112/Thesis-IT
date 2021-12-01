@@ -79,7 +79,7 @@ struct SeedPoint {
 struct SeedPointPair {
 	SeedPoint source;
 	SeedPoint target;
-	float size;
+	int size;
 	float matching = 0.0f;
 
 	void render(const Bounds& sourceBox, const Bounds& targetBox, bool intersected, bool selected) const;

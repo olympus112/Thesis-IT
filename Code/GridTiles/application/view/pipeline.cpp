@@ -36,11 +36,13 @@ void PipelineTab::init() {
 	wequalizedHistogram = std::make_unique<Texture>();
 	wequalizedCDF = std::make_unique<Texture>();
 	
-	blur = std::make_unique<Texture>();
-	sobelX = std::make_unique<Texture>();
-	sobelY = std::make_unique<Texture>();
-	sobelXY = std::make_unique<Texture>();
-	canny = std::make_unique<Texture>();
+	targetBlur = std::make_unique<Texture>();
+	targetSobel = std::make_unique<Texture>();
+	targetCanny = std::make_unique<Texture>();
+
+	sourceBlur = std::make_unique<Texture>();
+	sourceSobel = std::make_unique<Texture>();
+	sourceCanny = std::make_unique<Texture>();
 }
 
 void PipelineTab::update() {
@@ -132,33 +134,29 @@ void PipelineTab::render() {
 
 	// Edge
 	if (pipeline == 3) {
-		ImGui::image("Equalized", wequalized->asImTexture());
+		ImGui::image("Weight equalized", wequalized->asImTexture());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Blur", blur->asImTexture());
+		ImGui::image("Target blur", targetBlur->asImTexture());
 		ImGui::SameLine();
-		float x = ImGui::GetCursorPosX();
+		ImGui::arrow();
+		ImGui::SameLine();
+		ImGui::image("Target Sobel", targetSobel->asImTexture());
+		ImGui::SameLine();
+		ImGui::image("Target Canny", targetCanny->asImTexture());
 
-		ImGui::SetCursorPosX(x);
+		ImGui::image("Source int", sourceGrayscale->asImTexture());
+		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Sobel X", sobelX->asImTexture());
-
-		ImGui::SetCursorPosX(x);
+		ImGui::image("Source blur", sourceBlur->asImTexture());
+		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Sobel Y", sobelY->asImTexture());
-
-		ImGui::SetCursorPosX(x);
-		ImGui::arrow();
+		ImGui::image("Source Sobel", sourceSobel->asImTexture());
 		ImGui::SameLine();
-		ImGui::image("Sobel XY", sobelXY->asImTexture());
-
-		ImGui::SetCursorPosX(x);
-		ImGui::arrow();
-		ImGui::SameLine();
-		ImGui::image("Canny", canny->asImTexture());
+		ImGui::image("Source Canny", sourceCanny->asImTexture());
 	}
 
 	ImGui::End();
@@ -179,7 +177,10 @@ void PipelineTab::onSourceRotationChanged(bool propagate) {
 	cv::warpAffine(screen->settings->sourceTexture->texture->data, rotatedSource->data, rotation, cv::Size(size[0], size[1]));
 	rotatedSource->reloadGL();
 
+	// Grayscale
 	ImageUtils::computeGrayscale(rotatedSource.get(), sourceGrayscale.get());
+
+	onSourceBlurChanged(propagate);
 }
 
 void PipelineTab::onSourceChanged(bool propagate) {
@@ -229,14 +230,27 @@ void PipelineTab::onEqualizationWeightChanged(bool propagate) {
 	ImageUtils::renderHistogram(wequalized.get(), wequalizedHistogram.get());
 	ImageUtils::renderCDF(wequalized.get(), wequalizedCDF.get());
 
+	onTargetBlurChanged(propagate);
+}
+
+void PipelineTab::onTargetBlurChanged(bool propagate) {
 	// Blur
-	ImageUtils::renderBlur(wequalized.get(), blur.get());
+	ImageUtils::renderBlur(wequalized.get(), targetBlur.get());
 
 	// Sobel
-	ImageUtils::renderSobel(blur.get(), sobelX.get(), SobelType::X);
-	ImageUtils::renderSobel(blur.get(), sobelY.get(), SobelType::Y);
-	ImageUtils::renderSobel(blur.get(), sobelXY.get(), SobelType::XY);
+	ImageUtils::renderSobel(targetBlur.get(), targetSobel.get());
 
 	// Canny
-	ImageUtils::renderCanny(blur.get(), canny.get());
+	ImageUtils::renderCanny(targetBlur.get(), targetCanny.get());
+}
+
+void PipelineTab::onSourceBlurChanged(bool propagate) {
+	// Blur
+	ImageUtils::renderBlur(sourceGrayscale.get(), sourceBlur.get());
+
+	// Sobel
+	ImageUtils::renderSobel(sourceBlur.get(), sourceSobel.get());
+
+	// Canny
+	ImageUtils::renderCanny(sourceBlur.get(), sourceCanny.get());
 }
