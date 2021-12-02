@@ -68,9 +68,11 @@ void Settings::render() {
 	
 	if (ImGui::SliderFloat("Intensity weight", &intensityWeight, 0.0f, 1.0f)) {
 		screen->editor->seedPointsTab->onRecalculateMatching();
+		edgeWeight = 1.0f - intensityWeight;
 	}
 	if (ImGui::SliderFloat("Edge weight", &edgeWeight, 0.0f, 1.0f)) {
 		screen->editor->seedPointsTab->onRecalculateMatching();
+		intensityWeight = 1.0f - edgeWeight;
 	}
 	if (ImGui::SliderFloat("Equalization weight", &equalizationWeight, 0.0f, 1.0f)) {
 		screen->editor->pipelineTab->onEqualizationWeightChanged(true);
