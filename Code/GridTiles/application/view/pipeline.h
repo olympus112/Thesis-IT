@@ -35,6 +35,8 @@ public:
 	URef<Texture> sourceSobel;
 	URef<Texture> sourceCanny;
 
+	URef<Texture> saliencyMap;
+
 	PipelineTab();
 
 	void init();

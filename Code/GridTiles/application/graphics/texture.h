@@ -28,7 +28,7 @@ public:
 
 	void bind();
 	void unbind();
-	void reloadGL(bool linear = false);
+	void reloadGL(bool linear = false, int internalFormat = 0, int extenalFormat = 0, int dataType = 0);
 
 	void setData(int width, int height, const void* data, int internalformat,
 	             unsigned externalFormat, unsigned dataType, unsigned target, bool linear);

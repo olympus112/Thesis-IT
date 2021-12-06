@@ -52,13 +52,13 @@ void Texture::unbind() {
 	glBindTexture(target, 0);
 }
 
-void Texture::reloadGL(bool linear) {
-	auto internalFormat = data.channels() == 1 ? GL_LUMINANCE : data.channels() == 3 ? GL_RGB : GL_RGBA;
-	auto externalFormat = data.channels() == 1 ? GL_LUMINANCE : data.channels() == 3 ? GL_BGR : GL_BGRA;
-	auto dataType = GL_UNSIGNED_BYTE;
+void Texture::reloadGL(bool linear, int internalFormat, int extenalFormat, int dataType) {
+	auto internalFormat_ = internalFormat != 0 ? internalFormat : data.channels() == 1 ? GL_LUMINANCE : data.channels() == 3 ? GL_RGB : GL_RGBA;
+	auto externalFormat_ = extenalFormat != 0 ? extenalFormat : data.channels() == 1 ? GL_LUMINANCE : data.channels() == 3 ? GL_BGR : GL_BGRA;
+	auto dataType_ = dataType != 0 ? dataType : GL_UNSIGNED_BYTE;
 	auto target = GL_TEXTURE_2D;
 
-	setData(data.size[1], data.size[0], data.data, internalFormat, externalFormat, dataType, target, linear);
+	setData(data.size[1], data.size[0], data.data, internalFormat_, externalFormat_, dataType_, target, linear);
 }
 
 GLID Texture::generate(int target, int wrapS, int wrapT, int minFilter, int magFilter) {

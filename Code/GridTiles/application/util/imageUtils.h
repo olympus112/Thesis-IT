@@ -1,5 +1,4 @@
 #pragma once
-#include <opencv2/imgproc.hpp>
 
 #include "graphics/texture.h"
 #include "graphics/opencv/blur.h"
@@ -9,6 +8,7 @@
 #include "graphics/opencv/grayscale.h"
 #include "graphics/opencv/histogram.h"
 #include "graphics/opencv/sobel.h"
+#include "opencv2/saliency/saliencySpecializedClasses.hpp"
 
 namespace ImageUtils {
 
@@ -27,7 +27,7 @@ namespace ImageUtils {
 		destination->reloadGL(true);
 	}
 
-	inline void computeGrayscale(Texture* source, Texture* destination) {
+	inline void renderGrayscale(Texture* source, Texture* destination) {
 		Grayscale grayscale(source->data);
 		
 		destination->data = grayscale.grayscale;
@@ -61,5 +61,11 @@ namespace ImageUtils {
 		
 		destination->data = canny.canny;
 		destination->reloadGL();
+	}
+
+	auto saliency = cv::saliency::StaticSaliencyFineGrained::create();
+	inline void renderSalience(Texture* source, Texture* destination) {
+		saliency->computeSaliency(source->data, destination->data);
+		destination->reloadGL(false, GL_RGB32F, GL_LUMINANCE, GL_FLOAT);
 	}
 }

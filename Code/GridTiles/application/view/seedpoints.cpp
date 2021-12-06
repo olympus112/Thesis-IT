@@ -140,9 +140,9 @@ void SeedPointsTab::render() {
 	targetHover = ImGui::IsItemHovered();
 
 	// Bounding boxes
-	ImGui::GetWindowDrawList()->AddRect(sourceBox.min(), sourceBox.max(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All,
+	ImGui::GetWindowDrawList()->AddRect(sourceBox.min().asImVec(), sourceBox.max().asImVec(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All,
 	                                    2);
-	ImGui::GetWindowDrawList()->AddRect(targetBox.min(), targetBox.max(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All,
+	ImGui::GetWindowDrawList()->AddRect(targetBox.min().asImVec(), targetBox.max().asImVec(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All,
 	                                    2);
 
 	// Cursor
@@ -158,32 +158,32 @@ void SeedPointsTab::render() {
 		                                    thickness);
 
 		if (sourceHover) {
-			ImGui::GetWindowDrawList()->AddLine(ImVec2(sourceBox.minX(), cursor.y),
-			                                    ImVec2(sourceBox.minX() + size, cursor.y), Colors::WHITE.u32(),
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(sourceBox.minX, cursor.y),
+			                                    ImVec2(sourceBox.minX + size, cursor.y), Colors::WHITE.u32(),
 			                                    thickness);
-			ImGui::GetWindowDrawList()->AddLine(ImVec2(sourceBox.maxX(), cursor.y),
-			                                    ImVec2(sourceBox.maxX() - size, cursor.y), Colors::WHITE.u32(),
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(sourceBox.maxX, cursor.y),
+			                                    ImVec2(sourceBox.maxX - size, cursor.y), Colors::WHITE.u32(),
 			                                    thickness);
-			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, sourceBox.minY()),
-			                                    ImVec2(cursor.x, sourceBox.minY() + size), Colors::WHITE.u32(),
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, sourceBox.minY),
+			                                    ImVec2(cursor.x, sourceBox.minY + size), Colors::WHITE.u32(),
 			                                    thickness);
-			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, sourceBox.maxY()),
-			                                    ImVec2(cursor.x, sourceBox.maxY() - size), Colors::WHITE.u32(),
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, sourceBox.maxY),
+			                                    ImVec2(cursor.x, sourceBox.maxY - size), Colors::WHITE.u32(),
 			                                    thickness);
 		}
 
 		if (targetHover) {
-			ImGui::GetWindowDrawList()->AddLine(ImVec2(targetBox.minX(), cursor.y),
-			                                    ImVec2(targetBox.minX() + size, cursor.y), Colors::WHITE.u32(),
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(targetBox.minX, cursor.y),
+			                                    ImVec2(targetBox.minX + size, cursor.y), Colors::WHITE.u32(),
 			                                    thickness);
-			ImGui::GetWindowDrawList()->AddLine(ImVec2(targetBox.maxX(), cursor.y),
-			                                    ImVec2(targetBox.maxX() - size, cursor.y), Colors::WHITE.u32(),
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(targetBox.maxX, cursor.y),
+			                                    ImVec2(targetBox.maxX - size, cursor.y), Colors::WHITE.u32(),
 			                                    thickness);
-			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, targetBox.minY()),
-			                                    ImVec2(cursor.x, targetBox.minY() + size), Colors::WHITE.u32(),
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, targetBox.minY),
+			                                    ImVec2(cursor.x, targetBox.minY + size), Colors::WHITE.u32(),
 			                                    thickness);
-			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, targetBox.maxY()),
-			                                    ImVec2(cursor.x, targetBox.maxY() - size), Colors::WHITE.u32(),
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x, targetBox.maxY),
+			                                    ImVec2(cursor.x, targetBox.maxY - size), Colors::WHITE.u32(),
 			                                    thickness);
 		}
 	}
@@ -204,7 +204,7 @@ void SeedPointsTab::render() {
 		Bounds sourceUV = sourceBox.subBoundsUV(sourcePatch);
 		Bounds targetUV = targetBox.subBoundsUV(targetPatch);
 
-		ImGui::SetCursorPos(tooltiptPosition);
+		ImGui::SetCursorPos(tooltiptPosition.asImVec());
 
 		ImGui::SetNextWindowSize(ImVec2(190, 0));
 		ImGui::BeginTooltip();
@@ -221,15 +221,15 @@ void SeedPointsTab::render() {
 		ImGui::Text("X: %.0f", seedPointPair.source.position.x);
 		ImGui::Text("Y: %.0f", seedPointPair.source.position.y);
 		ImGui::image("Source", screen->editor->pipelineTab->rotatedSource->asImTexture(), ImVec2(80, 80),
-		             sourceUV.min(), sourceUV.max());
+		             sourceUV.min().asImVec(), sourceUV.max().asImVec());
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, 95);
 		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
 		ImGui::Text("X: %.0f", seedPointPair.target.position.x);
 		ImGui::Text("Y: %.0f", seedPointPair.target.position.y);
-		ImGui::image("Target", screen->settings->targetTexture->texture->asImTexture(), ImVec2(80, 80), targetUV.min(),
-		             targetUV.max());
+		ImGui::image("Target", screen->settings->targetTexture->texture->asImTexture(), ImVec2(80, 80), targetUV.min().asImVec(),
+		             targetUV.max().asImVec());
 
 		ImGui::Columns(1);
 
@@ -273,8 +273,8 @@ void SeedPointsTab::render() {
 		ImGui::Columns(4, 0, false);
 		ImGui::SetColumnWidth(-1, size + 10);
 		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
-		ImGui::Image(screen->editor->pipelineTab->rotatedSource->asImTexture(), ImVec2(size, size), sourceUV.min(),
-		             sourceUV.max());
+		ImGui::Image(screen->editor->pipelineTab->rotatedSource->asImTexture(), ImVec2(size, size), sourceUV.min().asImVec(),
+		             sourceUV.max().asImVec());
 		ImGui::NextColumn();
 		ImGui::Text("");
 		ImGui::Text("X: %.0f", seedPointPair.source.position.x);
@@ -283,25 +283,25 @@ void SeedPointsTab::render() {
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
-		ImGui::Image(screen->settings->targetTexture->texture->asImTexture(), ImVec2(size, size), targetUV.min(),
-		             targetUV.max());
+		ImGui::Image(screen->settings->targetTexture->texture->asImTexture(), ImVec2(size, size), targetUV.min().asImVec(),
+		             targetUV.max().asImVec());
 		ImGui::NextColumn();
 		ImGui::Text("");
 		ImGui::Text("X: %.0f", seedPointPair.target.position.x);
 		ImGui::Text("Y: %.0f", seedPointPair.target.position.y);
 
 		ImGui::NextColumn();
-		ImGui::Image(screen->editor->pipelineTab->sourceGrayscale->asImTexture(), ImVec2(size, size), sourceUV.min(),
-		             sourceUV.max());
+		ImGui::Image(screen->editor->pipelineTab->sourceGrayscale->asImTexture(), ImVec2(size, size), sourceUV.min().asImVec(),
+		             sourceUV.max().asImVec());
 		ImGui::NextColumn();
-		ImGui::Image(screen->editor->pipelineTab->sourceSobel->asImTexture(), ImVec2(size, size), sourceUV.min(),
-		             sourceUV.max());
+		ImGui::Image(screen->editor->pipelineTab->sourceSobel->asImTexture(), ImVec2(size, size), sourceUV.min().asImVec(),
+		             sourceUV.max().asImVec());
 		ImGui::NextColumn();
-		ImGui::Image(screen->editor->pipelineTab->wequalized->asImTexture(), ImVec2(size, size), targetUV.min(),
-		             targetUV.max());
+		ImGui::Image(screen->editor->pipelineTab->wequalized->asImTexture(), ImVec2(size, size), targetUV.min().asImVec(),
+		             targetUV.max().asImVec());
 		ImGui::NextColumn();
-		ImGui::Image(screen->editor->pipelineTab->targetSobel->asImTexture(), ImVec2(size, size), targetUV.min(),
-		             targetUV.max());
+		ImGui::Image(screen->editor->pipelineTab->targetSobel->asImTexture(), ImVec2(size, size), targetUV.min().asImVec(),
+		             targetUV.max().asImVec());
 		ImGui::NextColumn();
 
 		ImGui::Columns(1);
@@ -327,10 +327,10 @@ void SeedPointsTab::onRecalculateMatching() {
 //! -------------
 
 void SeedPointPair::render(const Bounds& sourceBox, const Bounds& targetBox, bool intersected, bool selected, const Color& color) const {
-	source.render(sourceBox.min(), [](const Vec2f& position) {
+	source.render(sourceBox.min().asImVec(), [](const Vec2f& position) {
 		return textureToScreen(position, screen->settings->sourceTexture->texture->data).asImVec();
 	}, intersected, selected);
-	target.render(targetBox.min(), [](const Vec2f& position) {
+	target.render(targetBox.min().asImVec(), [](const Vec2f& position) {
 		return textureToScreen(position, screen->settings->targetTexture->texture->data).asImVec();
 	}, intersected, selected);
 
@@ -340,8 +340,8 @@ void SeedPointPair::render(const Bounds& sourceBox, const Bounds& targetBox, boo
 	Bounds(targetScreenPosition, size).render(targetBox.min(), color);
 
 	if (intersected || selected)
-		ImGui::GetWindowDrawList()->AddLine(sourceBox.min() + sourceScreenPosition,
-		                                    targetBox.min() + targetScreenPosition,
+		ImGui::GetWindowDrawList()->AddLine(sourceBox.min().asImVec() + sourceScreenPosition,
+		                                    targetBox.min().asImVec() + targetScreenPosition,
 		                                    ImGui::ColorConvertFloat4ToU32(ImVec4(1.0, 1.0, 1.0, 0.5)));
 }
 
@@ -353,7 +353,7 @@ void SeedPointPair::calculateMatch(const std::vector<cv::Mat>& sourceTextures,
 		cv::Mat sourcePatch = source.calculatePatch(sourceTextures[index], size);
 		cv::Mat targetPatch = target.calculatePatch(targetTextures[index], size);
 
-		matching += distribution[index] * cv::norm(sourcePatch, targetPatch) / static_cast<float>(sourceTextures[index].size[0] * sourceTextures[index].size[1]) *1000.0f;
+		matching += distribution[index] * cv::norm(sourcePatch, targetPatch) / static_cast<float>(sourceTextures[index].size[0] * sourceTextures[index].size[1]) * 1000.0f;
 	}
 }
 
@@ -370,10 +370,10 @@ cv::Mat SeedPoint::calculatePatch(const cv::Mat& texture, int size) {
 	int textureRows = texture.size[0];
 	int textureCols = texture.size[1];
 
-	int minX = Utils::clamp<int>(0, floor(position.x) - size, textureCols);
-	int maxX = Utils::clamp<int>(0, floor(position.x) + size, textureCols);
-	int minY = Utils::clamp<int>(0, floor(position.y) - size, textureRows);
-	int maxY = Utils::clamp<int>(0, floor(position.y) + size, textureRows);
+	int minX = Utils::clamp<int>(floor(position.x) - size, 0, textureCols);
+	int maxX = Utils::clamp<int>(floor(position.x) + size, 0, textureCols);
+	int minY = Utils::clamp<int>(floor(position.y) - size, 0, textureRows);
+	int maxY = Utils::clamp<int>(floor(position.y) + size, 0, textureRows);
 
 	cv::Range rows(minY, maxY);
 	cv::Range cols(minX, maxX);
@@ -392,24 +392,4 @@ void SeedPoint::render(const ImVec2& offset, ImVec2 (*transform)(const Vec2f&), 
 
 	if (selected)
 		ImGui::GetWindowDrawList()->AddCircleFilled(offset + transform(position), radius - 4, Colors::WHITE.u32());
-}
-
-//! ------
-//! Bounds
-//! ------
-
-Bounds::Bounds() = default;
-
-Bounds::Bounds(const ImRect& rect) {
-	this->rect = rect;
-}
-
-Bounds::Bounds(const Vec2f& position, float size) {
-	float halfSize = size / 2.0f;
-	this->rect = ImRect(position.x - halfSize, position.y - halfSize, position.x + halfSize, position.y + halfSize);
-}
-
-void Bounds::render(const Vec2f& offset, const Color& color) const {
-	ImGui::GetWindowDrawList()->AddRect(offset + min(), offset + max(), color.u32(), 0,
-	                                    ImDrawCornerFlags_All);
 }

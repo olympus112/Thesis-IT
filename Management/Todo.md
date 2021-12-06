@@ -1,6 +1,1 @@
-- Look up [[Intensity filter]]
-- Look up [[Sobel filter]]
-- Complete [[Notes/WoodPixel]]
-- Create [[Timeline]]
-- Look for grid/texture generation/stylised fabrication papers/
-- Escherization [[Escherization.pdf]]
+- `GL_TEXTURE_RECTANGLE` rectangle textures

@@ -7,7 +7,7 @@
 #include "util/imageUtils.h"
 
 static int pipeline = 0;
-static std::vector pipelines = {"Default", "Histogram", "CDF", "Blur"};
+static std::vector pipelines = {"Default", "Histogram", "CDF", "Blur", "Saliency"};
 
 PipelineTab::PipelineTab() = default;
 
@@ -43,6 +43,8 @@ void PipelineTab::init() {
 	sourceBlur = std::make_unique<Texture>();
 	sourceSobel = std::make_unique<Texture>();
 	sourceCanny = std::make_unique<Texture>();
+
+	saliencyMap = std::make_unique<Texture>();
 }
 
 void PipelineTab::update() {
@@ -159,6 +161,15 @@ void PipelineTab::render() {
 		ImGui::image("Source Canny", sourceCanny->asImTexture());
 	}
 
+	// Salience
+	if (pipeline == 4) {
+		ImGui::image("Target", screen->settings->targetTexture->texture->asImTexture());
+		ImGui::SameLine();
+		ImGui::arrow();
+		ImGui::SameLine();
+		ImGui::image("Target salience", saliencyMap->asImTexture());
+	}
+
 	ImGui::End();
 
 }
@@ -178,7 +189,7 @@ void PipelineTab::onSourceRotationChanged(bool propagate) {
 	rotatedSource->reloadGL();
 
 	// Grayscale
-	ImageUtils::computeGrayscale(rotatedSource.get(), sourceGrayscale.get());
+	ImageUtils::renderGrayscale(rotatedSource.get(), sourceGrayscale.get());
 
 	onSourceBlurChanged(propagate);
 }
@@ -204,9 +215,12 @@ void PipelineTab::onTargetChanged(bool propagate) {
 	ImageUtils::renderCDF(screen->settings->targetTexture->texture.get(), targetCDF.get());
 
 	// Target grayscale
-	ImageUtils::computeGrayscale(screen->settings->targetTexture->texture.get(), targetGrayscale.get());
+	ImageUtils::renderGrayscale(screen->settings->targetTexture->texture.get(), targetGrayscale.get());
 	ImageUtils::renderHistogram(targetGrayscale.get(), targetGrayscaleHistogram.get());
 	ImageUtils::renderCDF(targetGrayscale.get(), targetGrayscaleCDF.get());
+
+	// Saliency
+	ImageUtils::renderSalience(screen->settings->targetTexture->texture.get(), saliencyMap.get());
 
 	if (propagate)
 		onSourceOrTargetChanged(propagate);

@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <opencv2/core/types.hpp>
 
 #include "imgui/imgui.h"
 
@@ -148,7 +149,11 @@ struct Vector<T, 2> {
 	}
 
 	ImVec2 asImVec() const {
-		return ImVec2(x, y);
+		return ImVec2(static_cast<float>(x), static_cast<float>(y));
+	}
+
+	cv::Point asCV() const {
+		return cv::Point(static_cast<int>(x), static_cast<int>(y));
 	}
 };
 

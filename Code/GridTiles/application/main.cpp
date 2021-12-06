@@ -1,6 +1,9 @@
 #include "core.h"
 #include "main.h"
 
+#include <opencv2/highgui.hpp>
+
+#include "graphics/patch.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -146,7 +149,7 @@ bool shouldClose() {
 	return glfwWindowShouldClose(window) || ImGui::IsKeyDown(GLFW_KEY_ESCAPE);
 }
 
-int main(int, char**) {
+int startApplication() {
 	if (!init())
 		return -1;
 
@@ -159,4 +162,26 @@ int main(int, char**) {
 	close();
 
 	return 0;
+}
+
+int main(int, char**) {
+	std::vector points = {
+		Vec2(40, 30),
+		Vec2(0, 50),
+		Vec2(0, 0),
+	};
+
+	Shape shape(points);
+
+	Patch patch(shape);
+
+	cv::Mat image = cv::imread("../res/wood.jpg");
+	cv::Mat cut = Mask::copy(image, patch.mask, patch.shape.bounds.minX, patch.shape.bounds.minY);
+	Mask::paste(image, patch.mask, patch.shape.bounds.minX, patch.shape.bounds.minY);
+
+	cv::imshow("Image", image);
+	cv::imshow("Patch", patch.mask.pixels);
+	cv::imshow("Cut", cut);
+
+	cv::waitKey(0);
 }

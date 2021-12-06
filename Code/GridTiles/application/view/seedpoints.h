@@ -1,68 +1,6 @@
 #pragma once
+#include "graphics/bounds.h"
 #include "graphics/color.h"
-#include "imgui/imgui_internal.h"
-
-struct Bounds {
-	ImRect rect;
-
-	Bounds();
-	Bounds(const ImRect& rect);
-	Bounds(const Vec2f& position, float size);
-
-	void render(const Vec2f& offset, const Color& color = Colors::WHITE) const;
-
-	bool contains(const Vec2f& point) const {
-		return rect.Contains(point.asImVec());
-	}
-
-	float minX() const {
-		return rect.Min.x;
-	}
-
-	float minY() const {
-		return rect.Min.y;
-	}
-
-	float maxX() const {
-		return rect.Max.x;
-	}
-
-	float maxY() const {
-		return rect.Max.y;
-	}
-
-	ImVec2 min() const {
-		return rect.Min;
-	}
-
-	ImVec2 max() const {
-		return rect.Max;
-	}
-
-	float width() const {
-		return maxX() - minX();
-	}
-
-	float height() const {
-		return maxY() - minY();
-	}
-
-	ImRect subBoundsUV(const Bounds& bounds) const {
-		float w = width();
-		float h = height();
-		float xMin = (bounds.minX() - minX()) / w;
-		float xMax = (bounds.maxX() - minX()) / w;
-		float yMin = (bounds.minY() - minY()) / h;
-		float yMax = (bounds.maxY() - minY()) / h;
-
-		return ImRect(
-			xMin,
-			yMin,
-			xMax,
-			yMax
-		);
-	}
-};
 
 struct SeedPoint {
 	Vec2f position;

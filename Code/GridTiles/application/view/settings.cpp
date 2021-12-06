@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "screen.h"
+#include "graphics/imgui/widgets.h"
 #include "util/stringUtil.h"
 
 Settings::Settings() = default;
@@ -11,6 +12,7 @@ void Settings::init() {
 	sourceTexture = std::make_unique<ImGui::TexturePicker>("Source texture");
 	targetTexture = std::make_unique<ImGui::TexturePicker>("Target texture");
 
+	rotations = 10;
 	sourceRotation = 0.0f;
 	imageSize = 350.0f;
 
@@ -57,7 +59,15 @@ void Settings::render() {
 	ImGui::Separator();
 	ImGui::Spacing();
 
-	if (ImGui::SliderFloat("Source rotation", &sourceRotation, 0.0f, 360.0f)) {
+	if (ImGui::SliderInt("Rotations", &rotations, 1, 30)) {
+		float interval = 360.0f / rotations;
+		float distanceFromFloor = fmod(sourceRotation, interval);
+		sourceRotation -= distanceFromFloor < interval / 2.0f ? distanceFromFloor : -(interval - distanceFromFloor);
+		screen->editor->pipelineTab->onSourceRotationChanged(true);
+		screen->editor->seedPointsTab->onRecalculateMatching();
+	}
+
+	if (ImGui::SliderFloatWithSteps("Source rotation", &sourceRotation, 0.0f, 360.0f, 360.0f / rotations, "%.2f")) {
 		screen->editor->pipelineTab->onSourceRotationChanged(true);
 		screen->editor->seedPointsTab->onRecalculateMatching();
 	}

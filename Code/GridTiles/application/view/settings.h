@@ -7,6 +7,7 @@ public:
 	URef<ImGui::TexturePicker> sourceTexture;
 	URef<ImGui::TexturePicker> targetTexture;
 
+	int rotations;
 	float sourceRotation;
 	float imageSize;
 

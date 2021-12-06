@@ -57,7 +57,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>core.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)application;$(OPENCV_DIR)\..\..\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)application;$(OPENCV_DIR)\..\..\include;$(SolutionDir)application\graphics\opencv\saliency\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -78,7 +78,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>core.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)application;$(OPENCV_DIR)\..\..\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)application;$(OPENCV_DIR)\..\..\include;$(SolutionDir)application\graphics\opencv\saliency\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -120,6 +120,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="graphics\bounds.cpp" />
     <ClCompile Include="graphics\opencv\canny.cpp" />
     <ClCompile Include="graphics\opencv\blur.cpp" />
     <ClCompile Include="graphics\opencv\draw.cpp" />
@@ -130,8 +131,39 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="graphics\opencv\histogram.cpp" />
+    <ClCompile Include="graphics\opencv\saliency\src\motionSaliency.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">precomp.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">precomp.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\saliency\src\motionSaliencyBinWangApr2014.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">precomp.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">precomp.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\saliency\src\objectness.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">precomp.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">precomp.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\saliency\src\saliency.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">precomp.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">precomp.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\saliency\src\staticSaliency.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">precomp.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">precomp.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\saliency\src\staticSaliencyFineGrained.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">precomp.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">precomp.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\saliency\src\staticSaliencySpectralResidual.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">precomp.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">precomp.hpp</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="graphics\opencv\sobel.cpp" />
     <ClCompile Include="graphics\opencv\grayscale.cpp" />
+    <ClCompile Include="graphics\patch.cpp" />
+    <ClCompile Include="graphics\mask.cpp" />
+    <ClCompile Include="graphics\shape.cpp" />
     <ClCompile Include="util\globals.cpp" />
     <ClCompile Include="view\pipeline.cpp" />
     <ClCompile Include="view\seedpoints.cpp" />
@@ -158,6 +190,7 @@
     <ClInclude Include="..\include\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="graphics\bounds.h" />
     <ClInclude Include="graphics\opencv\canny.h" />
     <ClInclude Include="graphics\opencv\blur.h" />
     <ClInclude Include="graphics\opencv\draw.h" />
@@ -166,8 +199,15 @@
     <ClInclude Include="core.h" />
     <ClInclude Include="graphics\opencv\histogram.h" />
     <ClInclude Include="graphics\opencv\grayscale.h" />
+    <ClInclude Include="graphics\opencv\saliency\include\opencv2\saliency.hpp" />
+    <ClInclude Include="graphics\opencv\saliency\include\opencv2\saliency\saliencyBaseClasses.hpp" />
+    <ClInclude Include="graphics\opencv\saliency\include\opencv2\saliency\saliencySpecializedClasses.hpp" />
+    <ClInclude Include="graphics\opencv\saliency\src\precomp.hpp" />
     <ClInclude Include="main.h" />
     <ClInclude Include="graphics\opencv\sobel.h" />
+    <ClInclude Include="graphics\patch.h" />
+    <ClInclude Include="graphics\mask.h" />
+    <ClInclude Include="graphics\shape.h" />
     <ClInclude Include="util\globals.h" />
     <ClInclude Include="util\imageUtils.h" />
     <ClInclude Include="view\pipeline.h" />

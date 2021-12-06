@@ -77,5 +77,13 @@
 | 2021-11-29 | Rectangle patch                          | 2    |
 | 2021-11-30 | Seedpoint viewer, patch size             | 1.5  |
 | 2021-11-30 | Primitive patch distance                 | 2    |
-| 2021-12-30 | Blur settings, better UI                 | 1    |
-| 2021-12-30 | Matching uses weighted intensity & edges | 2    | 
+| 2021-11-30 | Blur settings, better UI                 | 1    |
+| 2021-11-30 | Matching uses weighted intensity & edges | 2    |
+| 2021-12-02 | Meeting                                  | 1    |
+
+| Week 10    | Beschrijving               | Uren |
+| ---------- | -------------------------- | ---- |
+| 2021-12-05 | OpenCV builden met utils   | 1    |
+| 2021-12-06 | Build saliency             | 1    |
+| 2021-12-06 | Create salience map        | 1    |
+| 2021-12-06 | Mask, Shape, Bounds, Patch | 3    | 
