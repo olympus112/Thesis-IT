@@ -21,11 +21,11 @@ public:
 		this->dimension = bounds.dimension();
 	}
 
-	void render(const Canvas& canvas, bool fill, const Color& color) const {
+	void render(const Canvas& canvas, const Vec2& screenOffset, bool fill = false, const Color& color = Colors::WHITE) const {
 		std::vector<ImVec2> poly(this->points.size());
 
 		for (std::size_t index = 0; index < this->points.size(); index++)
-			poly[index] = canvas.toAbsoluteScreenSpace(this->points[index]).iv();
+			poly[index] = screenOffset + canvas.toAbsoluteScreenSpace(this->points[index]).iv();
 
 		if (fill)
 			ImGui::GetWindowDrawList()->AddConvexPolyFilled(poly.data(), poly.size(), color.u32());

@@ -1,11 +1,15 @@
 #pragma once
 
+#include <random>
+
 #include "graphics/canvas.h"
 #include "graphics/mondriaanPatch.h"
 #include "graphics/seedPoint.h"
 
 class SeedPointsTab {
 public:
+	std::mt19937 generator;
+
 	Canvas source;
 	Canvas target;
 
@@ -22,6 +26,9 @@ public:
 	void init();
 	void update();
 	void render();
+
+	void spawnPatches();
+	void mutatePatches();
 
 	void onSourceChanged();
 	void onTargetChanged();

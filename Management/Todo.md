@@ -1,1 +1,8 @@
 - `GL_TEXTURE_RECTANGLE` rectangle textures
+- How to search for best place to place source seedpoint?
+	- Target based on salience
+	- Source? Convolution?
+- How large is initial seedpoint
+- Smaller patch is altijd beter qua afstand, hoe normalizeren we dit
+- Datastructuur om grid op te slagen
+- 

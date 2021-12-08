@@ -12,6 +12,9 @@ public:
 	MondriaanPatch(const Vec2& dimension, const Vec2& sourceOffset, const Vec2& targetOffset);
 
 	void mutate(int mutation, double step);
+	MondriaanPatch getMutation(int mutation, double step) const;
+
+	Vec2 dimension() const;
 
 	static int mutations();
 	static Shape computeShape(const Vec2& dimension);

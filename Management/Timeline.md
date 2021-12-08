@@ -88,4 +88,6 @@
 | 2021-12-06 | Create salience map        | 1    |
 | 2021-12-06 | Mask, Shape, Bounds, Patch | 3    |
 | 2021-12-07 | Started on algorithm       | 3    |
-| 2021-12-07 | Major refactorings         | 3    | 
+| 2021-12-08 | Major refactorings         | 2.5  |
+| 2021-12-08 | Fixed circular import mess | 1    |
+|            |                            |      |

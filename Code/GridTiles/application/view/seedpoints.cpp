@@ -1,6 +1,7 @@
 #include <core.h>
 #include "seedpoints.h"
 #include <format>
+#include <algorithm>
 
 #include "main.h"
 #include "screen.h"
@@ -13,7 +14,7 @@
 //! -------------
 
 void SeedPointsTab::init() {
-
+	generator = std::mt19937(std::random_device()());
 }
 
 void SeedPointsTab::update() {
@@ -95,7 +96,7 @@ void SeedPointsTab::render() {
 	ImGui::SameLine(0, 20);
 
 	// Target image
-	ImGui::image("Target", target.texture->it());
+	ImGui::image("Target", target.texture->it(), target.dimension.iv());
 	target.offset = ImGui::GetItemRectMin();
 	target.hover = ImGui::IsItemHovered();
 
@@ -166,8 +167,9 @@ void SeedPointsTab::render() {
 		Bounds sourceUV = source.uv(sourcePatch);
 		Bounds targetUV = target.uv(targetPatch);
 
-		ImGui::SetCursorPos(tooltipPosition.iv());
+		ImVec2 restore = ImGui::GetCursorPos();
 
+		ImGui::SetCursorPos(tooltipPosition.iv());
 		ImGui::SetNextWindowSize(ImVec2(190, 0));
 		ImGui::BeginTooltip();
 
@@ -196,6 +198,8 @@ void SeedPointsTab::render() {
 		ImGui::Columns(1);
 
 		ImGui::EndTooltip();
+
+		ImGui::SetCursorPos(restore);
 	}
 
 	// Render seedPoints
@@ -205,8 +209,24 @@ void SeedPointsTab::render() {
 
 	// 
 
+	// Render seedpoints
 	for (int index = 0; index < seedPoints.size(); index++)
 		seedPoints[index].render(source, target, intersectedIndex == index, selectedIndex == index);
+
+	// Render patches
+	for (int index = 0; index < patches.size(); index++)
+		patches[index].render(source, target);
+
+	if (ImGui::Button("Spawn patches", ImVec2(screen->settings->imageSize + 10, 80)))
+		spawnPatches();
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Mutate patches", ImVec2(screen->settings->imageSize + 10, 80)))
+		mutatePatches();
+
+	if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
+		mutatePatches();
 
 	ImGui::End();
 
@@ -280,6 +300,49 @@ void SeedPointsTab::render() {
 	}*/
 	ImGui::End();
 }
+
+void SeedPointsTab::spawnPatches() {
+	patches.clear();
+	for (const auto& seedPoint : seedPoints)
+		patches.push_back(MondriaanPatch(Vec2(20, 20), seedPoint.sourcePosition, seedPoint.targetPosition));
+
+}
+
+std::size_t mutations = 3;
+std::vector indices = { 0, 1, 2, 3, 4, 5 };
+
+void SeedPointsTab::mutatePatches() {
+	std::vector sourceTextures = { screen->editor->pipelineTab->sourceGrayscale->data, screen->editor->pipelineTab->sourceSobel->data };
+	std::vector targetTextures = { screen->editor->pipelineTab->wequalized->data, screen->editor->pipelineTab->targetSobel->data };
+	std::vector<double> distribution = { screen->settings->intensityWeight, screen->settings->edgeWeight };
+
+	for (MondriaanPatch& patch : patches) {
+		double currentDistance = Match(patch, sourceTextures, targetTextures, distribution).distance;
+
+
+		int bestMutation = -1;
+		double bestDistance = std::numeric_limits<double>::max();
+		std::ranges::shuffle(indices, generator);
+		for (std::size_t index = 0; index < mutations; index++) {
+			MondriaanPatch newPatch = patch.getMutation(indices[index], 1.0);
+			double newDistance = Match(patch, sourceTextures, targetTextures, distribution).distance;
+
+			if (newDistance < bestDistance) {
+				bestDistance = newDistance;
+				bestMutation = indices[index];
+			}
+		}
+
+		if (bestMutation == -1) {
+			Log::debug("skip");
+			continue;
+		}
+
+		patch.mutate(bestMutation, 1.0);
+	}
+
+}
+
 
 void SeedPointsTab::onSourceChanged() {
 	source.texture = screen->editor->pipelineTab->rotatedSource.get();

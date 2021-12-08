@@ -9,6 +9,11 @@ Patch::Patch(const Shape& shape, const Vec2& sourceOffset, const Vec2& targetOff
 	this->mask = computeMask(shape);
 }
 
+void Patch::render(const Canvas& source, const Canvas& target, bool fill, Color color) {
+	shape.render(source, source.toScreenSpace(sourceOffset), fill, color);
+	shape.render(target, target.toScreenSpace(targetOffset), fill, color);
+}
+
 Mask& Patch::computeMask(const Shape& shape) {
 	this->mask = Mask(shape);
 

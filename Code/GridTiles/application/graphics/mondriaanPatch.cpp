@@ -34,9 +34,19 @@ void MondriaanPatch::mutate(int mutation, double step) {
 	mask = computeMask(shape);
 }
 
+MondriaanPatch MondriaanPatch::getMutation(int mutation, double step) const {
+	MondriaanPatch patch(shape.dimension, sourceOffset, targetOffset);
+	patch.mutate(mutation, step);
+
+	return patch;
+}
 
 int MondriaanPatch::mutations() {
 	return 4;
+}
+
+Vec2 MondriaanPatch::dimension() const {
+	return shape.dimension;
 }
 
 Shape MondriaanPatch::computeShape(const Vec2& dimension) {

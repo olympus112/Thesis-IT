@@ -82,8 +82,8 @@ void SeedPoint::render(const Canvas& sourceCanvas, const Canvas& targetCanvas, b
 	ImGui::GetWindowDrawList()->AddCircle(targetCanvas.toAbsoluteScreenSpace(targetPosition).iv(), radius, Colors::WHITE.u32(), 12, 2);
 
 	if (intersected) {
-		Bounds(sourcePosition, 20).render(sourceCanvas);
-		Bounds(targetPosition, 20).render(targetCanvas);
+		Bounds(sourceCanvas.toScreenSpace(sourcePosition), 20).render(sourceCanvas);
+		Bounds(targetCanvas.toScreenSpace(targetPosition), 20).render(targetCanvas);
 	}
 
 	if (selected) {

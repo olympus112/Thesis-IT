@@ -17,4 +17,3 @@ public:
 	static void cut(const cv::Mat& texture, const Mask& mask, int rowOffset, int columnOffset);
 	static void paste(const cv::Mat& texture, const Mask& mask, int rowOffset, int columnOffset, const Color& color = Colors::WHITE);
 };
-
