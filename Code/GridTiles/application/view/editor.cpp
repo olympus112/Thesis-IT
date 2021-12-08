@@ -1,9 +1,7 @@
 #include "core.h"
 #include "editor.h"
 
-#include "main.h"
 #include "screen.h"
-#include "imgui/imgui.h"
 
 Editor::Editor() = default;
 

@@ -14,7 +14,7 @@ namespace ImGui {
 		if (len == 0.0f)
 			return;
 
-		ImVec2 size = abs(direction).asImVec();
+		ImVec2 size = abs(direction).iv();
 		ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size);
 
 		ImGui::ItemSize(bb);

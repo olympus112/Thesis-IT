@@ -51,5 +51,5 @@ void ImGui::TexturePicker::load(const std::string& path) {
 }
 
 ImTextureID ImGui::TexturePicker::asImTexture() {
-	return texture->asImTexture();
+	return texture->it();
 }

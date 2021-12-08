@@ -1,6 +1,5 @@
 #pragma once
 #include "imgui/imgui.h"
-#include "opencv2/core.hpp"
 
 template <typename T>
 struct ColorTemplate {
@@ -15,26 +14,40 @@ struct ColorTemplate {
 		T data[4];
 	};
 
-	constexpr ColorTemplate() : r(static_cast<T>(0)), g(static_cast<T>(0)), b(static_cast<T>(0)), a(static_cast<T>(1)) {
-	}
+	constexpr ColorTemplate() : r(static_cast<T>(0))
+	                          , g(static_cast<T>(0))
+	                          , b(static_cast<T>(0))
+	                          , a(static_cast<T>(1)) { }
 
-	constexpr ColorTemplate(T r, T g, T b) : r(r), g(g), b(b), a(a) {
-	}
+	constexpr ColorTemplate(T r, T g, T b) : r(r)
+	                                       , g(g)
+	                                       , b(b)
+	                                       , a(a) { }
 
-	constexpr ColorTemplate(T r, T g, T b, T a) : r(r), g(g), b(b), a(static_cast<T>(1)) {
-	}
+	constexpr ColorTemplate(T r, T g, T b, T a) : r(r)
+	                                            , g(g)
+	                                            , b(b)
+	                                            , a(static_cast<T>(1)) { }
 
-	constexpr ColorTemplate(T value) : r(value), g(value), b(value), a(static_cast<T>(1)) {
-	}
+	constexpr ColorTemplate(T value) : r(value)
+	                                 , g(value)
+	                                 , b(value)
+	                                 , a(static_cast<T>(1)) { }
 
-	constexpr ColorTemplate(T value, T a) : r(value), g(value), b(value), a(a) {
-	}
+	constexpr ColorTemplate(T value, T a) : r(value)
+	                                      , g(value)
+	                                      , b(value)
+	                                      , a(a) { }
 
-	constexpr ColorTemplate(const Vector<T, 3>& rgb) : r(rgb.x), g(rgb.y), b(rgb.z), a(static_cast<T>(1)) {
-	}
+	constexpr ColorTemplate(const Vector<T, 3>& rgb) : r(rgb.x)
+	                                                 , g(rgb.y)
+	                                                 , b(rgb.z)
+	                                                 , a(static_cast<T>(1)) { }
 
-	constexpr ColorTemplate(const Vector<T, 4> rgba) : r(rgba.x), g(rgba.y), b(rgba.z), a(rgba.w) {
-	}
+	constexpr ColorTemplate(const Vector<T, 4> rgba) : r(rgba.x)
+	                                                 , g(rgba.y)
+	                                                 , b(rgba.z)
+	                                                 , a(rgba.w) { }
 
 	constexpr operator Vector<T, 3>() const {
 		return Vector<T, 3>{r, g, b};
@@ -44,7 +57,11 @@ struct ColorTemplate {
 		return Vector<T, 4>{r, g, b, a};
 	}
 
-	constexpr T& operator[](size_t index) const noexcept  {
+	constexpr T& operator[](size_t index) noexcept {
+		return data[index];
+	}
+
+	constexpr const T& operator[](size_t index) const noexcept {
 		return data[index];
 	}
 
@@ -71,8 +88,7 @@ struct ColorTemplate {
 			static_cast<T>(value >> 8 & 0xFF) / static_cast<T>(255),
 			static_cast<T>(value & 0xFF) / static_cast<T>(255)
 			};
-		}
-		else {
+		} else {
 			constexpr int value = Hex << 8 | 0xFF;
 			return ColorTemplate<T>{
 			static_cast<T>(value >> 24 & 0xFF) / static_cast<T>(255),

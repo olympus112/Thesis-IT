@@ -52,6 +52,22 @@ struct Vector {
 		}
 		return result;
 	}
+
+	constexpr bool zero() const noexcept {
+		for (size_t i = 0; i < Size; i++) {
+			if (data[i] != 0)
+				return false;
+		}
+		return true;
+	}
+
+	constexpr bool nonzero() const noexcept {
+		for (size_t i = 0; i < Size; i++) 
+			if (data[i] == 0)
+				return true;
+		
+		return false;
+	}
 };
 
 template <typename T>
@@ -99,6 +115,15 @@ struct Vector<T, 1> {
 	}
 
 	constexpr operator T() const { return data[0]; }
+
+
+	constexpr bool zero() const noexcept {
+		return data[0] == 0;
+	}
+
+	constexpr bool nonzero() const noexcept {
+		return data[0] != 0;
+	}
 };
 
 template <typename T>
@@ -118,7 +143,8 @@ struct Vector<T, 2> {
 	constexpr Vector(T x, T y) noexcept : data{x, y} {
 	}
 
-	constexpr Vector(const ImVec2& v) noexcept : data { v.x, v.y } {}
+	constexpr Vector(const ImVec2& v) noexcept : data{v.x, v.y} {
+	}
 
 	template <typename OtherT>
 	constexpr operator Vector<OtherT, 2>() const noexcept {
@@ -148,12 +174,20 @@ struct Vector<T, 2> {
 		return result;
 	}
 
-	ImVec2 asImVec() const {
+	ImVec2 iv() const {
 		return ImVec2(static_cast<float>(x), static_cast<float>(y));
 	}
 
 	cv::Point asCV() const {
 		return cv::Point(static_cast<int>(x), static_cast<int>(y));
+	}
+
+	constexpr bool zero() const noexcept {
+		return data[0] == 0 && data[1] == 0;
+	}
+
+	constexpr bool nonzero() const noexcept {
+		return data[0] != 0 && data[1] != 0;
 	}
 };
 
@@ -729,7 +763,7 @@ constexpr Vector<T, Size> bisect(const Vector<T, Size>& first, const Vector<T, S
 // ImGui extension
 
 inline auto operator+(const Vector<float, 2>& a,
-                         const ImVec2& b) noexcept -> ImVec2 {
+                      const ImVec2& b) noexcept -> ImVec2 {
 	ImVec2 result{a.x + b.x, a.y + b.y};
 	return result;
 }
@@ -740,12 +774,12 @@ inline auto operator+(const ImVec2& a, const Vector<float, 2>& b) noexcept -> Im
 }
 
 inline auto operator+(const ImVec2& a, const ImVec2& b) noexcept -> ImVec2 {
-	ImVec2 result { a.x + b.x, a.y + b.y };
+	ImVec2 result{a.x + b.x, a.y + b.y};
 	return result;
 }
 
 inline auto operator-(const Vector<float, 2>& a,
-                         const ImVec2& b) noexcept -> ImVec2 {
+                      const ImVec2& b) noexcept -> ImVec2 {
 	ImVec2 result{a.x - b.x, a.y - b.y};
 	return result;
 }
@@ -756,7 +790,7 @@ inline auto operator-(const ImVec2& a, const Vector<float, 2>& b) noexcept -> Im
 }
 
 inline auto operator-(const ImVec2& a, const ImVec2& b) noexcept -> ImVec2 {
-	ImVec2 result { a.x - b.x, a.y - b.y };
+	ImVec2 result{a.x - b.x, a.y - b.y};
 	return result;
 }
 
@@ -776,7 +810,7 @@ constexpr auto operator*(const T& factor,
 
 template <typename T>
 constexpr auto operator/(const ImVec2& vec,
-	const T& factor) noexcept -> ImVec2 {
-	ImVec2 result { vec.x / factor, vec.y / factor };
+                         const T& factor) noexcept -> ImVec2 {
+	ImVec2 result{vec.x / factor, vec.y / factor};
 	return result;
 }

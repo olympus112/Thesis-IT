@@ -36,5 +36,5 @@ public:
 	static GLID generate(int target, int wrapS, int wrapT,
 	                     int minFilter, int magFilter);
 
-	ImTextureID asImTexture();
+	ImTextureID it();
 };

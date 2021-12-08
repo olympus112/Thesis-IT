@@ -65,109 +65,109 @@ void PipelineTab::render() {
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target int", targetGrayscale->asImTexture());
+		ImGui::image("Target int", targetGrayscale->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Equalized", equalized->asImTexture());
+		ImGui::image("Equalized", equalized->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Weighted equalization", wequalized->asImTexture());
+		ImGui::image("Weighted equalization", wequalized->it());
 		ImGui::NewLine();
-		ImGui::image("Source", rotatedSource->asImTexture());
+		ImGui::image("Source", rotatedSource->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Source int", sourceGrayscale->asImTexture());
+		ImGui::image("Source int", sourceGrayscale->it());
 		ImGui::SameLine();
 		ImGui::arrow({0, Globals::imageWidth / 2}, {Globals::arrowWidth, 0});
 	}
 
 	// Histogram
 	if (pipeline == 1) {
-		ImGui::image("Target hist", targetHistogram->asImTexture());
+		ImGui::image("Target hist", targetHistogram->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target int hist", targetGrayscaleHistogram->asImTexture());
+		ImGui::image("Target int hist", targetGrayscaleHistogram->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Equalized hist", equalizedHistogram->asImTexture());
+		ImGui::image("Equalized hist", equalizedHistogram->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Weighted hist", wequalizedHistogram->asImTexture());
+		ImGui::image("Weighted hist", wequalizedHistogram->it());
 		ImGui::NewLine();
-		ImGui::image("Source hist", sourceHistogram->asImTexture());
+		ImGui::image("Source hist", sourceHistogram->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Source int hist", sourceGrayscaleHistogram->asImTexture());
+		ImGui::image("Source int hist", sourceGrayscaleHistogram->it());
 		ImGui::SameLine();
 		ImGui::arrow({0, Globals::imageWidth / 2}, {Globals::arrowWidth, 0});
 	}
 
 	// CDF
 	if (pipeline == 2) {
-		ImGui::image("Target cdf", targetCDF->asImTexture());
+		ImGui::image("Target cdf", targetCDF->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target int cdf", targetGrayscaleCDF->asImTexture());
+		ImGui::image("Target int cdf", targetGrayscaleCDF->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Equalized cdf", equalizedCDF->asImTexture());
+		ImGui::image("Equalized cdf", equalizedCDF->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Weighted cdf", wequalizedCDF->asImTexture());
+		ImGui::image("Weighted cdf", wequalizedCDF->it());
 		ImGui::NewLine();
-		ImGui::image("Source cdf", sourceCDF->asImTexture());
+		ImGui::image("Source cdf", sourceCDF->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Source int cdf", sourceGrayscaleCDF->asImTexture());
+		ImGui::image("Source int cdf", sourceGrayscaleCDF->it());
 		ImGui::SameLine();
 		ImGui::arrow({0, Globals::imageWidth / 2}, {Globals::arrowWidth, 0});
 	}
 
 	// Edge
 	if (pipeline == 3) {
-		ImGui::image("Weight equalized", wequalized->asImTexture());
+		ImGui::image("Weight equalized", wequalized->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target blur", targetBlur->asImTexture());
+		ImGui::image("Target blur", targetBlur->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target Sobel", targetSobel->asImTexture());
+		ImGui::image("Target Sobel", targetSobel->it());
 		ImGui::SameLine();
-		ImGui::image("Target Canny", targetCanny->asImTexture());
+		ImGui::image("Target Canny", targetCanny->it());
 
-		ImGui::image("Source int", sourceGrayscale->asImTexture());
+		ImGui::image("Source int", sourceGrayscale->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Source blur", sourceBlur->asImTexture());
+		ImGui::image("Source blur", sourceBlur->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Source Sobel", sourceSobel->asImTexture());
+		ImGui::image("Source Sobel", sourceSobel->it());
 		ImGui::SameLine();
-		ImGui::image("Source Canny", sourceCanny->asImTexture());
+		ImGui::image("Source Canny", sourceCanny->it());
 	}
 
 	// Salience
 	if (pipeline == 4) {
-		ImGui::image("Target", screen->settings->targetTexture->texture->asImTexture());
+		ImGui::image("Target", screen->settings->targetTexture->texture->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target salience", saliencyMap->asImTexture());
+		ImGui::image("Target salience", saliencyMap->it());
 	}
 
 	ImGui::End();

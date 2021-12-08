@@ -86,4 +86,6 @@
 | 2021-12-05 | OpenCV builden met utils   | 1    |
 | 2021-12-06 | Build saliency             | 1    |
 | 2021-12-06 | Create salience map        | 1    |
-| 2021-12-06 | Mask, Shape, Bounds, Patch | 3    | 
+| 2021-12-06 | Mask, Shape, Bounds, Patch | 3    |
+| 2021-12-07 | Started on algorithm       | 3    |
+| 2021-12-07 | Major refactorings         | 3    | 

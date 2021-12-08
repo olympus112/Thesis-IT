@@ -165,7 +165,8 @@ int startApplication() {
 }
 
 int main(int, char**) {
-	std::vector points = {
+	startApplication();
+	/*std::vector points = {
 		Vec2(40, 30),
 		Vec2(0, 50),
 		Vec2(0, 0),
@@ -177,11 +178,11 @@ int main(int, char**) {
 
 	cv::Mat image = cv::imread("../res/wood.jpg");
 	cv::Mat cut = Mask::copy(image, patch.mask, patch.shape.bounds.minX, patch.shape.bounds.minY);
-	Mask::paste(image, patch.mask, patch.shape.bounds.minX, patch.shape.bounds.minY);
+	Mask::paste(image, patch.mask, patch.shape.bounds.minX, patch.shape.bounds.minY, Colors::RED);
 
 	cv::imshow("Image", image);
 	cv::imshow("Patch", patch.mask.pixels);
 	cv::imshow("Cut", cut);
 
-	cv::waitKey(0);
+	cv::waitKey(0);*/
 }

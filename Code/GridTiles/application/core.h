@@ -9,3 +9,4 @@ typedef unsigned int GLID;
 #include "util/smartPointers.h"
 
 #include "math/vec.h"
+#include "math/utils.h"

@@ -4,18 +4,13 @@
 #include <opencv2/imgproc.hpp>
 
 Mask::Mask(const Shape& shape) {
-	Boundsi bounds = shape.bounds;
+	Vec2i dimension = shape.dimension;
 
 	std::vector<cv::Point> points(shape.size());
-	for (std::size_t index = 0; index < shape.size(); index++) {
-		cv::Point point = shape[index].asCV();
-		cv::Point min = bounds.min().asCV();
-		cv::Point result = point - min;
-		points[index] = result;
-	}
-
-	this->offset = bounds.min();
-	this->pixels = cv::Mat(bounds.height(), bounds.width(), CV_8U, cv::Scalar(0));
+	for (std::size_t index = 0; index < shape.size(); index++) 
+		points[index] = shape[index].asCV();
+	
+	this->pixels = cv::Mat(dimension.y, dimension.x, CV_8U, cv::Scalar(0));
 
 	cv::fillConvexPoly(this->pixels, points.data(), static_cast<int>(shape.size()), cv::Scalar(255));
 }
@@ -41,8 +36,8 @@ void Mask::cut(const cv::Mat& texture, const Mask& mask, int rowOffset, int colu
 	cv::Mat cutout(texture, mask.rowRange(rowOffset), mask.columnRange(columnOffset));
 	cv::bitwise_and(cutout, cv::Scalar(0), cutout, mask.pixels);
 }
-
+ 
 void Mask::paste(const cv::Mat& texture, const Mask& mask, int rowOffset, int columnOffset, const Color& color) {
 	cv::Mat cutout(texture, mask.rowRange(rowOffset), mask.columnRange(columnOffset));
-	cv::Mat(mask.pixels.rows, mask.pixels.cols, CV_8U, cv::Scalar(128)).copyTo(cutout, mask.pixels);
+	cutout.setTo(color.cv(), mask.pixels);
 }

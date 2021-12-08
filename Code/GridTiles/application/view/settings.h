@@ -9,7 +9,7 @@ public:
 
 	int rotations;
 	float sourceRotation;
-	float imageSize;
+	double imageSize;
 
 	int sobelDerivative;
 	int sobelSize;

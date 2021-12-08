@@ -5,7 +5,6 @@
 
 class Mask {
 public:
-	Vec2i offset;
 	cv::Mat pixels;
 
 	Mask() = default;

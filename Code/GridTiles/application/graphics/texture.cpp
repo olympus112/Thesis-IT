@@ -74,6 +74,6 @@ GLID Texture::generate(int target, int wrapS, int wrapT, int minFilter, int magF
 	return id;
 }
 
-ImTextureID Texture::asImTexture() {
+ImTextureID Texture::it() {
 	return reinterpret_cast<ImTextureID>(this->id);
 }

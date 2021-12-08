@@ -120,6 +120,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="graphics\canvas.cpp" />
     <ClCompile Include="graphics\bounds.cpp" />
     <ClCompile Include="graphics\opencv\canny.cpp" />
     <ClCompile Include="graphics\opencv\blur.cpp" />
@@ -164,6 +165,9 @@
     <ClCompile Include="graphics\patch.cpp" />
     <ClCompile Include="graphics\mask.cpp" />
     <ClCompile Include="graphics\shape.cpp" />
+    <ClCompile Include="graphics\mondriaanPatch.cpp" />
+    <ClCompile Include="graphics\match.cpp" />
+    <ClCompile Include="graphics\seedPoint.cpp" />
     <ClCompile Include="util\globals.cpp" />
     <ClCompile Include="view\pipeline.cpp" />
     <ClCompile Include="view\seedpoints.cpp" />
@@ -190,6 +194,7 @@
     <ClInclude Include="..\include\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="graphics\canvas.h" />
     <ClInclude Include="graphics\bounds.h" />
     <ClInclude Include="graphics\opencv\canny.h" />
     <ClInclude Include="graphics\opencv\blur.h" />
@@ -208,6 +213,9 @@
     <ClInclude Include="graphics\patch.h" />
     <ClInclude Include="graphics\mask.h" />
     <ClInclude Include="graphics\shape.h" />
+    <ClInclude Include="graphics\mondriaanPatch.h" />
+    <ClInclude Include="graphics\match.h" />
+    <ClInclude Include="graphics\seedPoint.h" />
     <ClInclude Include="util\globals.h" />
     <ClInclude Include="util\imageUtils.h" />
     <ClInclude Include="view\pipeline.h" />
