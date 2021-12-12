@@ -7,9 +7,16 @@
 #include "graphics/seedPoint.h"
 
 class SeedPointsTab {
-public:
-	std::mt19937 generator;
+private:
+	bool showConnections = false;
 
+	int targetSeedPoints = 10;
+	int targetSeedPointInterDistance = 100;
+	bool targetSeedPointsGridMethod = false;
+	int targetSeedPointsGridDivisions = 10;
+
+	std::mt19937 generator;
+public:
 	Canvas source;
 	Canvas target;
 
@@ -25,8 +32,22 @@ public:
 
 	void init();
 	void update();
-	void render();
 
+	void render();
+	void renderCursor();
+	void renderTooltip();
+	void renderPatchViewer();
+	void renderSeedPointViewer();
+	void renderSeedPoints();
+	void renderPatches();
+	void renderTextures();
+	void renderSettings();
+	void renderTargetGrid();
+
+	void resetSelection();
+
+	void spawnTargetSeedpoints();
+	void spawnSourceSeedpoints();
 	void spawnPatches();
 	void mutatePatches();
 

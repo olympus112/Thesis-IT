@@ -9,9 +9,13 @@ Patch::Patch(const Shape& shape, const Vec2& sourceOffset, const Vec2& targetOff
 	this->mask = computeMask(shape);
 }
 
-void Patch::render(const Canvas& source, const Canvas& target, bool fill, Color color) {
-	shape.render(source, source.toScreenSpace(sourceOffset), fill, color);
-	shape.render(target, target.toScreenSpace(targetOffset), fill, color);
+void Patch::render(const Canvas& source, const Canvas& target, bool fill, Color color) const {
+	shape.render(source, source.toRelativeScreenSpace(sourceOffset), fill, color);
+	shape.render(target, target.toRelativeScreenSpace(targetOffset), fill, color);
+}
+
+void Patch::render(const Bounds& bounds, bool fill, Color color) const {
+	shape.render(bounds, fill, color);
 }
 
 Mask& Patch::computeMask(const Shape& shape) {

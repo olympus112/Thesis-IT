@@ -5,20 +5,11 @@
 namespace Utils {
 
 	template <typename T> requires std::integral<T> || std::floating_point<T>
-	constexpr Vector<T, 2> screenToTextureSpace(const Vector<T, 2>& vector, const Vector<T, 2>& screenDimension,
-	                                            const Vector<T, 2>& textureDimension) {
+	constexpr Vector<T, 2> transform(const Vector<T, 2>& vector, const Vector<T, 2>& inputDimension,
+	                                            const Vector<T, 2>& outputDimension) {
 		return Vector<T, 2>(
-			vector.x / screenDimension.x * textureDimension.x,
-			vector.y / screenDimension.y * textureDimension.y
-		);
-	}
-
-	template <typename T> requires std::integral<T> || std::floating_point<T>
-	constexpr Vector<T, 2> textureToScreenSpace(const Vector<T, 2>& vector, const Vector<T, 2>& textureDimension,
-	                                            const Vector<T, 2>& screenDimension) {
-		return Vector<T, 2>(
-			vector.x / textureDimension.x * screenDimension.x,
-			vector.y / textureDimension.y * screenDimension.y
+			vector.x / inputDimension.x * outputDimension.x,
+			vector.y / inputDimension.y * outputDimension.y
 		);
 	}
 

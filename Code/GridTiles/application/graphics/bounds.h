@@ -25,7 +25,7 @@ public:
 	                 , maxY(0) { }
 
 	BoundsTemplate(const T& size) : minX(-size / 2)
-	                              , minY(size / 2)
+	                              , minY(-size / 2)
 	                              , maxX(size / 2)
 	                              , maxY(size / 2) { }
 
@@ -50,15 +50,20 @@ public:
 	                                   , maxX(rect.Max.x)
 	                                   , maxY(rect.Max.y) { }
 
-	BoundsTemplate(const Vector<T, 2>& center, T size) : minX(center.x - size / 2)
-	                                                   , minY(center.y - size / 2)
-	                                                   , maxX(center.x + size / 2)
-	                                                   , maxY(center.y + size / 2) { }
+	BoundsTemplate(const Vector<T, 2>& center, const T& size) : minX(center.x - size / 2)
+	                                                          , minY(center.y - size / 2)
+	                                                          , maxX(center.x + size / 2)
+	                                                          , maxY(center.y + size / 2) { }
+
+	BoundsTemplate(const Vector<T, 2>& center, const T& width, const T& height) : minX(center.x - width / 2)
+		, minY(center.y - height / 2)
+		, maxX(center.x + width / 2)
+		, maxY(center.y + height / 2) { }
 
 	BoundsTemplate(const Vector<T, 2>& tl, const Vector<T, 2>& br) : minX(tl.x)
 	                                                               , minY(tl.y)
 	                                                               , maxX(br.x)
-	                                                               , maxY(br.y) {}
+	                                                               , maxY(br.y) { }
 
 	const Vector<T, 2>& operator[](int index) const {
 		switch (index) {
@@ -114,7 +119,7 @@ public:
 
 	template <typename U>
 	constexpr bool contains(const Vector<U, 2>& point) const {
-		return Utils::contains<U>(point.x, minX, maxX) && Utils::contains<U>(point.x, minX, maxX);
+		return Utils::contains<T>(static_cast<T>(point.x), minX, maxX) && Utils::contains<T>(static_cast<T>(point.y), minY, maxY);
 	}
 
 	constexpr void move(const Vector<T, 2>& offset) {

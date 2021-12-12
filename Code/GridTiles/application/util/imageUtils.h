@@ -68,4 +68,5 @@ namespace ImageUtils {
 		saliency->computeSaliency(source->data, destination->data);
 		destination->reloadGL(false, GL_RGB32F, GL_LUMINANCE, GL_FLOAT);
 	}
+
 }

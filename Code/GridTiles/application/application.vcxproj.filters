@@ -314,5 +314,8 @@
     <ClInclude Include="graphics\canvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\imgui\imguiUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

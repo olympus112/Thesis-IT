@@ -33,6 +33,18 @@ public:
 			ImGui::GetWindowDrawList()->AddPolyline(poly.data(), poly.size(), color.u32(), true, 1.0);
 	}
 
+	void render(const Bounds& bounds, bool fill = false, Color color = Colors::WHITE) const {
+		std::vector<ImVec2> poly(this->points.size());
+
+		for (std::size_t index = 0; index < this->points.size(); index++)
+			poly[index] = (bounds.min() + Utils::transform(this->points[index], this->dimension, bounds.dimension())).iv();
+
+		if (fill)
+			ImGui::GetWindowDrawList()->AddConvexPolyFilled(poly.data(), poly.size(), color.u32());
+		else
+			ImGui::GetWindowDrawList()->AddPolyline(poly.data(), poly.size(), color.u32(), true, 1.0);
+	}
+
 	const Vector<T, 2>& operator[](std::size_t index) const {
 		return points[index];
 	}

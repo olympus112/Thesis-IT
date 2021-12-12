@@ -2,13 +2,15 @@
 #include "graphics/bounds.h"
 
 struct SeedPoint {
-	// Source position in texture space
+	// Texture space
 	Vec2 sourcePosition;
-	// Target position in texture space
+	// Texture space
 	Vec2 targetPosition;
+	// Screen space
+	int screenSize = 16;
 
 	SeedPoint() = default;
 	SeedPoint(const Vec2& sourcePosition, const Vec2& targetPosition);
 
-	void render(const Canvas& sourceCanvas, const Canvas& targetCanvas, bool intersected, bool selected) const;
+	void render(const Canvas& sourceCanvas, const Canvas& targetCanvas, bool intersected, bool selected, bool showConnections, const Color& color) const;
 };

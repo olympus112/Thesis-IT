@@ -19,22 +19,22 @@ struct ColorTemplate {
 	                          , b(static_cast<T>(0))
 	                          , a(static_cast<T>(1)) { }
 
-	constexpr ColorTemplate(T r, T g, T b) : r(r)
+	constexpr ColorTemplate(const T& r, const T& g, const T& b) : r(r)
 	                                       , g(g)
 	                                       , b(b)
 	                                       , a(a) { }
 
-	constexpr ColorTemplate(T r, T g, T b, T a) : r(r)
+	constexpr ColorTemplate(const T& r, const T& g, const T& b, const T& a) : r(r)
 	                                            , g(g)
 	                                            , b(b)
 	                                            , a(static_cast<T>(1)) { }
 
-	constexpr ColorTemplate(T value) : r(value)
+	constexpr ColorTemplate(const T& value) : r(value)
 	                                 , g(value)
 	                                 , b(value)
 	                                 , a(static_cast<T>(1)) { }
 
-	constexpr ColorTemplate(T value, T a) : r(value)
+	constexpr ColorTemplate(const T& value, const T& a) : r(value)
 	                                      , g(value)
 	                                      , b(value)
 	                                      , a(a) { }
@@ -48,6 +48,10 @@ struct ColorTemplate {
 	                                                 , g(rgba.y)
 	                                                 , b(rgba.z)
 	                                                 , a(rgba.w) { }
+
+	static constexpr ColorTemplate<T> hsva(const T& h, const T& s, const T& v, const T& a = static_cast<T>(1)) {
+		return ColorTemplate<T>::hsvaToRgba(ColorTemplate<T>(h, s, v, a));
+	}
 
 	constexpr operator Vector<T, 3>() const {
 		return Vector<T, 3>{r, g, b};
@@ -63,6 +67,10 @@ struct ColorTemplate {
 
 	constexpr const T& operator[](size_t index) const noexcept {
 		return data[index];
+	}
+
+	constexpr ColorTemplate<T> withOpacity(const T& opacity) const {
+		return ColorTemplate<T>(r, g, b, opacity);
 	}
 
 	constexpr ImU32 u32() const noexcept {
@@ -83,18 +91,18 @@ struct ColorTemplate {
 		if constexpr (Alpha == true) {
 			constexpr int value = Hex;
 			return ColorTemplate<T>{
-			static_cast<T>(value >> 24 & 0xFF) / static_cast<T>(255),
-			static_cast<T>(value >> 16 & 0xFF) / static_cast<T>(255),
-			static_cast<T>(value >> 8 & 0xFF) / static_cast<T>(255),
-			static_cast<T>(value & 0xFF) / static_cast<T>(255)
+				static_cast<T>(value >> 24 & 0xFF) / static_cast<T>(255),
+				static_cast<T>(value >> 16 & 0xFF) / static_cast<T>(255),
+				static_cast<T>(value >> 8 & 0xFF) / static_cast<T>(255),
+				static_cast<T>(value & 0xFF) / static_cast<T>(255)
 			};
 		} else {
 			constexpr int value = Hex << 8 | 0xFF;
 			return ColorTemplate<T>{
-			static_cast<T>(value >> 24 & 0xFF) / static_cast<T>(255),
-			static_cast<T>(value >> 16 & 0xFF) / static_cast<T>(255),
-			static_cast<T>(value >> 8 & 0xFF) / static_cast<T>(255),
-			static_cast<T>(value & 0xFF) / static_cast<T>(255)
+				static_cast<T>(value >> 24 & 0xFF) / static_cast<T>(255),
+				static_cast<T>(value >> 16 & 0xFF) / static_cast<T>(255),
+				static_cast<T>(value >> 8 & 0xFF) / static_cast<T>(255),
+				static_cast<T>(value & 0xFF) / static_cast<T>(255)
 			};
 		}
 	}
@@ -166,8 +174,23 @@ struct ColorTemplate {
 		return ColorTemplate<T>(h, d / max, max);
 	}
 
-	constexpr static ColorTemplate<T> blend(const ColorTemplate<T>& color1, const ColorTemplate<T>& color2, T blend) {
-		return (static_cast<T>(1) - blend) * color1 + blend * color2;
+	constexpr static ColorTemplate<T> sum(const ColorTemplate<T>& color1, const ColorTemplate<T>& color2) {
+		T a = color1.a + color2.a * (static_cast<T>(1) - color1.a);
+		return ColorTemplate<T>(
+			(color1.r + color1.a + color2.r * color2.a * (static_cast<T>(1) - color1.a)) / a,
+			(color1.g + color1.a + color2.g * color2.a * (static_cast<T>(1) - color1.a)) / a,
+			(color1.b + color1.a + color2.b * color2.a * (static_cast<T>(1) - color1.a)) / a,
+			a
+		);
+	}
+
+	constexpr static ColorTemplate<T> blend(const ColorTemplate<T>& color1, const ColorTemplate<T>& color2, const T& blend) {
+		return ColorTemplate<T>(
+			(static_cast<T>(1) - blend) * color1.r + blend * color2.r,
+			(static_cast<T>(1) - blend) * color1.g + blend * color2.g,
+			(static_cast<T>(1) - blend) * color1.b + blend * color2.b,
+			(static_cast<T>(1) - blend) * color1.a + blend * color2.a
+		);
 	}
 };
 
@@ -184,30 +207,30 @@ template <typename T>
 constexpr ColorTemplate<T> operator+(const ColorTemplate<T>& first, const
                                      ColorTemplate<T>& second) {
 	return ColorTemplate<T>{
-	first.r + second.r,
-	first.g + second.g,
-	first.b + second.b,
-	first.a + second.a
+		first.r + second.r,
+		first.g + second.g,
+		first.b + second.b,
+		first.a + second.a
 	};
 }
 
 template <typename T>
-constexpr ColorTemplate<T> operator*(const ColorTemplate<T>& color, T factor) {
+constexpr ColorTemplate<T> operator*(const ColorTemplate<T>& color, const T& factor) {
 	return ColorTemplate<T>{
-	color.r * factor,
-	color.g * factor,
-	color.b * factor,
-	color.a * factor
+		color.r * factor,
+		color.g * factor,
+		color.b * factor,
+		color.a * factor
 	};
 }
 
 template <typename T>
-constexpr ColorTemplate<T> operator*(T factor, const ColorTemplate<T>& color) {
+constexpr ColorTemplate<T> operator*(const T& factor, const ColorTemplate<T>& color) {
 	return ColorTemplate<T>{
-	factor * color.r,
-	factor * color.g,
-	factor * color.b,
-	factor * color.a
+		factor * color.r,
+		factor * color.g,
+		factor * color.b,
+		factor * color.a
 	};
 }
 

@@ -38,7 +38,7 @@ double Canvas::maxY() const {
 }
 
 bool Canvas::covers(const Vec2& center, const Vec2& point) const {
-	return Bounds(center, 20.0).contains(point);
+	return Bounds(center, 5).contains(point);
 }
 
 Vec2 Canvas::textureDimension() const {
@@ -53,15 +53,15 @@ Vec2 Canvas::screenDimension() const {
 }
 
 Vec2 Canvas::toTextureSpace(const Vec2& screenVector) const {
-	return Utils::screenToTextureSpace(screenVector, screenDimension(), textureDimension());
+	return Utils::transform(screenVector, screenDimension(), textureDimension());
 }
 
-Vec2 Canvas::toScreenSpace(const Vec2& textureVector) const {
-	return Utils::textureToScreenSpace(textureVector, textureDimension(), screenDimension());
+Vec2 Canvas::toRelativeScreenSpace(const Vec2& textureVector) const {
+	return Utils::transform(textureVector, textureDimension(), screenDimension());
 }
 
 Vec2 Canvas::toAbsoluteScreenSpace(const Vec2& textureVector) const {
-	return offset + toScreenSpace(textureVector);
+	return offset + toRelativeScreenSpace(textureVector);
 }
 
 Bounds Canvas::bounds() const {
@@ -81,13 +81,13 @@ Vec2 Canvas::computeDimension(const Vec2& textureDimension, double preferredSize
 	if (aspect > 1.0) {
 		return Vec2(
 			preferredSize,
-			preferredSize * aspect
+			preferredSize / aspect
 		);
 	}
 
 	if (aspect < 1.0) {
 		return Vec2(
-			preferredSize / aspect,
+			preferredSize * aspect,
 			preferredSize
 		);
 	}

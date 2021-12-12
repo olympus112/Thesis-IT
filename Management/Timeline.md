@@ -81,13 +81,18 @@
 | 2021-11-30 | Matching uses weighted intensity & edges | 2    |
 | 2021-12-02 | Meeting                                  | 1    |
 
-| Week 10    | Beschrijving               | Uren |
-| ---------- | -------------------------- | ---- |
-| 2021-12-05 | OpenCV builden met utils   | 1    |
-| 2021-12-06 | Build saliency             | 1    |
-| 2021-12-06 | Create salience map        | 1    |
-| 2021-12-06 | Mask, Shape, Bounds, Patch | 3    |
-| 2021-12-07 | Started on algorithm       | 3    |
-| 2021-12-08 | Major refactorings         | 2.5  |
-| 2021-12-08 | Fixed circular import mess | 1    |
-|            |                            |      |
+| Week 10    | Beschrijving                                 | Uren |
+| ---------- | -------------------------------------------- | ---- |
+| 2021-12-05 | OpenCV builden met utils                     | 1    |
+| 2021-12-06 | Build saliency                               | 1    |
+| 2021-12-06 | Create salience map                          | 1    |
+| 2021-12-06 | Mask, Shape, Bounds, Patch                   | 3    |
+| 2021-12-07 | Started on algorithm                         | 3    |
+| 2021-12-08 | Major refactorings                           | 2.5  |
+| 2021-12-08 | Fixed circular import mess                   | 1    |
+| 2021-12-10 | Work on patches                              | 1.5  |
+| 2021-12-12 | Target seedpoints based on salience          | 2    |
+| 2021-12-12 | Target seedpoints ordered on salience        | 0.5  |
+| 2021-12-12 | Target seedpoints grid method                | 1.5  |
+| 2021-12-12 | Source seedpoints matching based on features | 1    |
+| Totaal     |                                              | 19   | 

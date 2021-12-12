@@ -7,14 +7,21 @@ class BoundsTemplate;
 
 class Canvas {
 public:
+	constexpr static int FEATURE_SOBEL = 0;
+	constexpr static int FEATURE_INT = 1;
+		
 	bool hover;
 	bool drag;
 
+	// Screen space
 	Vec2 dimension;
+	// Screen space
 	Vec2 offset;
+	// Screen / texture space
 	double aspect;
 
 	Texture* texture;
+	std::vector<Texture*> features = { nullptr, nullptr };
 
 	Canvas() = default;
 	Canvas(Texture* texture, const Vec2& offset, double preferredSize);
@@ -33,10 +40,12 @@ public:
 	Vec2 screenDimension() const;
 
 	Vec2 toTextureSpace(const Vec2& screenVector) const;
-	Vec2 toScreenSpace(const Vec2& textureVector) const;
+	Vec2 toRelativeScreenSpace(const Vec2& textureVector) const;
 	Vec2 toAbsoluteScreenSpace(const Vec2& textureVector) const;
 
+	// Screen space
 	BoundsTemplate<double> bounds() const;
+	// Screen space
 	BoundsTemplate<double> uv(const BoundsTemplate<double>& subBounds) const;
 
 	static Vec2 computeDimension(const Vec2& textureDimension, double preferredSize);

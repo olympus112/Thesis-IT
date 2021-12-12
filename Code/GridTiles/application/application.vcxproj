@@ -60,6 +60,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)application;$(OPENCV_DIR)\..\..\include;$(SolutionDir)application\graphics\opencv\saliency\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -81,6 +82,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)application;$(OPENCV_DIR)\..\..\include;$(SolutionDir)application\graphics\opencv\saliency\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -196,6 +198,7 @@
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
     <ClInclude Include="graphics\canvas.h" />
     <ClInclude Include="graphics\bounds.h" />
+    <ClInclude Include="graphics\imgui\imguiUtils.h" />
     <ClInclude Include="graphics\opencv\canny.h" />
     <ClInclude Include="graphics\opencv\blur.h" />
     <ClInclude Include="graphics\opencv\draw.h" />

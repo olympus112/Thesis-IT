@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Management/Todo.md",
+            "file": "Management/Timeline.md",
             "mode": "source"
           }
         }
@@ -60,7 +60,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 230
+    "width": 218
   },
   "right": {
     "id": "ece90af34884dcac",
@@ -76,7 +76,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Management/Todo.md",
+                "file": "Management/Timeline.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Management/Todo.md"
+                "file": "Management/Timeline.md"
               }
             }
           },
@@ -126,8 +126,8 @@
   },
   "active": "358bf2a0709db690",
   "lastOpenFiles": [
-    "Management/Todo.md",
     "Management/Timeline.md",
+    "Management/Todo.md",
     "Notes/WoodPixel.md",
     "Papers/WoodPixel.pdf",
     "Meetings/2-12-2021.md",

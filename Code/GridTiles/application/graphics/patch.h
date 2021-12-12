@@ -17,7 +17,8 @@ public:
 
 	Patch(const Shape& shape, const Vec2& sourceOffset, const Vec2& targetOffset);
 
-	void render(const Canvas& source, const Canvas& target, bool fill = false, Color color = Colors::WHITE);
+	void render(const Canvas& source, const Canvas& target, bool fill = false, Color color = Colors::WHITE) const;
+	void render(const Bounds& bounds, bool fill = false, Color color = Colors::WHITE) const;
 
 	Mask& computeMask(const Shape& shape);
 	Match computeMatch(const std::vector<cv::Mat>& sourceTextures, const std::vector<cv::Mat>& targetTextures, const std::vector<double>& distribution);

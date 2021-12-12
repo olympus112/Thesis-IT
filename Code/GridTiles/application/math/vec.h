@@ -178,7 +178,7 @@ struct Vector<T, 2> {
 		return ImVec2(static_cast<float>(x), static_cast<float>(y));
 	}
 
-	cv::Point asCV() const {
+	cv::Point cv() const {
 		return cv::Point(static_cast<int>(x), static_cast<int>(y));
 	}
 

@@ -8,7 +8,7 @@ Mask::Mask(const Shape& shape) {
 
 	std::vector<cv::Point> points(shape.size());
 	for (std::size_t index = 0; index < shape.size(); index++) 
-		points[index] = shape[index].asCV();
+		points[index] = shape[index].cv();
 	
 	this->pixels = cv::Mat(dimension.y, dimension.x, CV_8U, cv::Scalar(0));
 
