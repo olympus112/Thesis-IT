@@ -13,6 +13,7 @@
 #include "graphics/imgui/widgets.h"
 #include "graphics/imgui/imguiUtils.h"
 #include "omp.h"
+#include "graphics/mondriaanPatch.h"
 
 //! -------------
 //! SeedPointsTab
@@ -31,16 +32,16 @@ void SeedPointsTab::update() {
 		intersectedPoint = relativeOffset;
 
 		for (int index = 0; index < seedPoints.size(); index++) {
-			const auto& [sourcePosition, targetPosition, screenSize] = seedPoints[index];
+			const auto& [sourcePosition, targetPosition, textureSize, patch] = seedPoints[index];
 
-			if (source.hover && Bounds(source.toRelativeScreenSpace(sourcePosition), screenSize).contains(
-				intersectedPoint)) {
+			if (source.hover && Bounds(sourcePosition, textureSize).contains(
+				source.toTextureSpace(intersectedPoint))) {
 				intersectedIndex = index;
 				break;
 			}
 
-			if (target.hover && Bounds(target.toRelativeScreenSpace(targetPosition), screenSize).contains(
-				intersectedPoint)) {
+			if (target.hover && Bounds(targetPosition, textureSize).contains(
+				target.toTextureSpace(intersectedPoint))) {
 				intersectedIndex = index;
 				break;
 			}
@@ -65,12 +66,8 @@ void SeedPointsTab::update() {
 	}
 
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && (source.hover || target.hover)) {
-		SeedPoint seedpoint(
-			source.toTextureSpace(relativeOffset),
-			target.toTextureSpace(relativeOffset)
-		);
-
-		seedPoints.push_back(seedpoint);
+		seedPoints.emplace_back(source.toTextureSpace(relativeOffset),
+		                        target.toTextureSpace(relativeOffset));
 	}
 
 	// Mouse drag
@@ -194,7 +191,7 @@ void SeedPointsTab::renderSeedPointViewer() {
 	// Seedpoint viewer
 	ImGui::Begin("Seedpoint viewer");
 	for (int index = 0; index < seedPoints.size(); index++) {
-		auto& seedPoint = seedPoints[index];
+		const auto& seedPoint = seedPoints[index];
 		auto sourceScreenPosition = source.toAbsoluteScreenSpace(seedPoint.sourcePosition);
 		auto targetScreenPosition = target.toAbsoluteScreenSpace(seedPoint.targetPosition);
 		Bounds sourcePatch(sourceScreenPosition, 20.0);
@@ -260,12 +257,15 @@ void SeedPointsTab::renderSeedPointViewer() {
 void SeedPointsTab::renderPatchViewer() {
 	// Patch viewer
 	ImGui::Begin("Patch viewer");
-	for (int index = 0; index < patches.size(); index++) {
-		auto& patch = patches[index];
-		auto sourceScreenPosition = source.toAbsoluteScreenSpace(patch.sourceOffset);
-		auto targetScreenPosition = target.toAbsoluteScreenSpace(patch.targetOffset);
-		Bounds sourcePatch(sourceScreenPosition, patch.dimension().x, patch.dimension().y);
-		Bounds targetPatch(targetScreenPosition, patch.dimension().x, patch.dimension().y);
+	for (int index = 0; index < seedPoints.size(); index++) {
+		Patch* patch = seedPoints[index].patch.get();
+		if (patch == nullptr)
+			continue;
+
+		auto sourceScreenPosition = source.toAbsoluteScreenSpace(patch->sourceOffset);
+		auto targetScreenPosition = target.toAbsoluteScreenSpace(patch->targetOffset);
+		Bounds sourcePatch(sourceScreenPosition, patch->dimension().x, patch->dimension().y);
+		Bounds targetPatch(targetScreenPosition, patch->dimension().x, patch->dimension().y);
 		Bounds sourceUV = source.uv(sourcePatch);
 		Bounds targetUV = target.uv(targetPatch);
 
@@ -278,12 +278,12 @@ void SeedPointsTab::renderPatchViewer() {
 		ImGui::Image(source.texture->it(), ImVec2(size, size),
 		             sourceUV.min().iv(),
 		             sourceUV.max().iv());
-		patch.render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
+		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
 		ImGui::Text("");
-		ImGui::Text("X: %.0f", patch.sourceOffset.x);
-		ImGui::Text("Y: %.0f", patch.sourceOffset.y);
+		ImGui::Text("X: %.0f", patch->sourceOffset.x);
+		ImGui::Text("Y: %.0f", patch->sourceOffset.y);
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
@@ -291,14 +291,14 @@ void SeedPointsTab::renderPatchViewer() {
 		ImGui::Image(target.texture->it(), ImVec2(size, size),
 		             targetUV.min().iv(),
 		             targetUV.max().iv());
-		patch.render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
+		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 
 		ImGui::Text("");
-		ImGui::Text("X: %.0f", patch.targetOffset.x);
-		ImGui::Text("Y: %.0f", patch.targetOffset.y);
+		ImGui::Text("X: %.0f", patch->targetOffset.x);
+		ImGui::Text("Y: %.0f", patch->targetOffset.y);
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
@@ -306,7 +306,7 @@ void SeedPointsTab::renderPatchViewer() {
 		ImGui::Image(source.features[Canvas::FEATURE_INT]->it(), ImVec2(size, size),
 		             sourceUV.min().iv(),
 		             sourceUV.max().iv());
-		patch.render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
+		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
@@ -314,7 +314,7 @@ void SeedPointsTab::renderPatchViewer() {
 		ImGui::Image(source.features[Canvas::FEATURE_SOBEL]->it(), ImVec2(size, size),
 		             sourceUV.min().iv(),
 		             sourceUV.max().iv());
-		patch.render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
+		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
@@ -322,7 +322,7 @@ void SeedPointsTab::renderPatchViewer() {
 		ImGui::Image(target.features[Canvas::FEATURE_INT]->it(), ImVec2(size, size),
 		             targetUV.min().iv(),
 		             targetUV.max().iv());
-		patch.render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
+		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
@@ -330,13 +330,13 @@ void SeedPointsTab::renderPatchViewer() {
 		ImGui::Image(target.features[Canvas::FEATURE_SOBEL]->it(), ImVec2(size, size),
 		             targetUV.min().iv(),
 		             targetUV.max().iv());
-		patch.render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
+		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
 
 		ImGui::Columns(1);
 
-		ImGui::Text("Dimension: (%.0f, %.0f)", patch.dimension().x, patch.dimension().y);
+		ImGui::Text("Dimension: (%.0f, %.0f)", patch->dimension().x, patch->dimension().y);
 
 		ImGui::Separator();
 	}
@@ -345,8 +345,10 @@ void SeedPointsTab::renderPatchViewer() {
 
 void SeedPointsTab::renderPatches() {
 	// Render patches
-	for (int index = 0; index < patches.size(); index++)
-		patches[index].render(source, target);
+	for (int index = 0; index < seedPoints.size(); index++) {
+		if (Patch* patch = seedPoints[index].patch.get())
+			patch->render(source, target);
+	}
 }
 
 void SeedPointsTab::renderSeedPoints() {
@@ -376,18 +378,32 @@ void SeedPointsTab::renderTextures() {
 
 	ImGui::NextColumn();
 
+	// Target
 	ImGui::TextColored(Colors::BLUE.iv4(), "Target seedpoints");
 	ImGui::Separator();
 	ImGui::Checkbox("Grid method", &targetSeedPointsGridMethod);
-
 	bool showGrid = false;
 	if (!targetSeedPointsGridMethod) {
-		ImGui::SliderInt("#seedpoints", &targetSeedPoints, 1, 50);
+		ImGui::SliderInt("# Seedpoints", &targetSeedPoints, 1, 50);
 		ImGui::SliderInt("Interdistance", &targetSeedPointInterDistance, 20, 500);
 	} else {
 		ImGui::SliderInt("Grid size", &targetSeedPointsGridDivisions, 2, 50);
 		showGrid = ImGui::IsItemActive();
 	}
+
+	// Source
+	ImGui::TextColored(Colors::BLUE.iv4(), "Source seedpoints");
+	ImGui::Separator();
+	ImGui::SliderInt("Interdistance", &sourceSeedPointInterDistance, 20, 500);
+	ImGui::RadioButton("SQDIFF", &sourceSeedPointsMethod, cv::TM_SQDIFF);
+	ImGui::SameLine();
+	ImGui::RadioButton("SQDIFF_NORMED", &sourceSeedPointsMethod, cv::TM_SQDIFF_NORMED);
+	ImGui::RadioButton("CCOEFF", &sourceSeedPointsMethod, cv::TM_CCOEFF);
+	ImGui::SameLine();
+	ImGui::RadioButton("CCOEFF_NORMED", &sourceSeedPointsMethod, cv::TM_CCOEFF_NORMED);
+	ImGui::RadioButton("CCORR", &sourceSeedPointsMethod, cv::TM_CCORR);
+	ImGui::SameLine();
+	ImGui::RadioButton("TCCORR_NORMED", &sourceSeedPointsMethod, cv::TM_CCORR_NORMED);
 
 	ImGui::NextColumn();
 	ImGui::Columns(1);
@@ -425,9 +441,21 @@ void SeedPointsTab::renderTargetGrid() {
 
 void SeedPointsTab::renderSettings() {
 	float height = 30.0f;
+
+	ImGuiUtils::pushButtonColor(0.0);
+	ImGui::SetCursorPosX(static_cast<float>(source.minX() - ImGui::GetWindowPos().x));
+	if (ImGui::Button("Delete seedpoints", ImVec2(source.dimension.x, height)))
+		seedPoints.clear();
+	ImGui::SameLine();
+	ImGui::SetCursorPosX(static_cast<float>(target.minX() - ImGui::GetWindowPos().x));
+	if (ImGui::Button("Delete selected seedpoint", ImVec2(target.dimension.x, height)))
+		if (selectedIndex != -1)
+			seedPoints.erase(seedPoints.begin() + selectedIndex);
+	ImGuiUtils::popButtonColor();
+
 	ImGuiUtils::pushButtonColor(0.28);
 	ImGui::SetCursorPosX(static_cast<float>(source.minX() - ImGui::GetWindowPos().x));
-	if (ImGui::Button("Spawn source seedpoints", ImVec2(source.dimension.x, height)))
+	if (ImGui::Button("Move source seedpoints", ImVec2(source.dimension.x, height)))
 		spawnSourceSeedpoints();
 	ImGui::SameLine();
 	ImGui::SetCursorPosX(static_cast<float>(target.minX() - ImGui::GetWindowPos().x));
@@ -444,6 +472,8 @@ void SeedPointsTab::renderSettings() {
 		mutatePatches();
 
 	ImGui::Checkbox("Show connections", &showConnections);
+	if (ImGui::Button("Generate image"))
+		generateImage();
 
 	if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
 		mutatePatches();
@@ -492,8 +522,8 @@ void SeedPointsTab::spawnTargetSeedpoints() {
 						value,
 						SeedPoint(
 							Utils::transform(Vec2(xMin + point.x, yMin + point.y),
-							                            target.textureDimension(),
-							                            source.textureDimension()),
+							                 target.textureDimension(),
+							                 source.textureDimension()),
 							Vec2(xMin + point.x, yMin + point.y)
 						)
 					)
@@ -503,6 +533,7 @@ void SeedPointsTab::spawnTargetSeedpoints() {
 
 		for (const auto& [distance, seedPoint] : seedPoints)
 			this->seedPoints.push_back(seedPoint);
+
 	} else {
 		cv::Mat mask(salience.rows, salience.cols, CV_8U, cv::Scalar(255));
 		for (int i = 0; i < targetSeedPoints; i++) {
@@ -511,54 +542,76 @@ void SeedPointsTab::spawnTargetSeedpoints() {
 
 			cv::circle(mask, point, targetSeedPointInterDistance, cv::Scalar(0), -1);
 
-			this->seedPoints.push_back(
-				SeedPoint(
-					Utils::transform(Vec2(point.x, point.y), target.textureDimension(),
-					                            source.textureDimension()),
-					Vec2(point.x, point.y)
-				)
+			this->seedPoints.emplace_back(
+				Utils::transform(Vec2(point.x, point.y), target.textureDimension(),
+				                 source.textureDimension()),
+				Vec2(point.x, point.y)
 			);
 		}
 	}
 }
 
 void SeedPointsTab::spawnSourceSeedpoints() {
-	int method = cv::TM_SQDIFF_NORMED;
+	std::vector<double> distribution = {screen->settings->intensityWeight, screen->settings->edgeWeight};
 
+	int textureRows = source.texture->data.rows;
+	int textureCols = source.texture->data.cols;
+	cv::Mat mask(textureRows, textureCols, CV_8UC1, cv::Scalar(255));
+
+	for (auto& seedPoint : seedPoints) {
+		cv::Rect rect = seedPoint.targetBounds(target.texture).cv();
+		int patchRows = rect.height;
+		int patchCols = rect.width;
+
+		// Create all features
+		std::vector<cv::Mat> features(source.features.size());
 #pragma omp parallel for
-	for (int i = 0; i < seedPoints.size(); i++) {
-		cv::Point point;
-
-		auto& seedPoint = seedPoints[i];
-		cv::Rect rect(seedPoint.targetPosition.cv(), cv::Size(seedPoint.screenSize, seedPoint.screenSize));
-
-		cv::Mat output;
-		std::vector<cv::Mat> features;
 		for (int featureIndex = 0; featureIndex < source.features.size(); featureIndex++) {
 			cv::Mat patch(target.features[featureIndex]->data, rect);
 
-			if (featureIndex == 0) {
-				cv::matchTemplate(source.features[featureIndex]->data, patch, output, method);
-			} else {
-				cv::Mat featureOutput;
-				cv::matchTemplate(source.features[featureIndex]->data, patch, featureOutput, method);
-				double alpha = 1.0 / (featureIndex + 1.0);
-				double beta = 1.0 - alpha;
-				cv::addWeighted(featureOutput, alpha, output, beta, 0.0, output);
-			}
+			cv::matchTemplate(source.features[featureIndex]->data, patch, features[featureIndex],
+			                  sourceSeedPointsMethod);
+			// Todo: check need
+			cv::normalize(features[featureIndex], features[featureIndex], 1.0, 0.0, cv::NORM_MINMAX);
 		}
 
-		cv::minMaxLoc(output, nullptr, nullptr, &point, nullptr);
+		// Merge features
+		int featureRows = textureRows - patchRows + 1;
+		int featureCols = textureCols - patchCols + 1;
+		cv::Mat output(featureRows, featureCols, CV_32F, cv::Scalar(0.0));
+		for (int i = 0; i < features.size(); i++)
+			cv::addWeighted(output, 1.0, features[i], distribution[i], 0.0, output);
 
-		seedPoint.sourcePosition = Vec2(point.x, point.y);
-		//cv::imshow("", output);
+		// Find brightest point
+		cv::Point point;
+		if (sourceSeedPointsMethod == cv::TM_SQDIFF || sourceSeedPointsMethod == cv::TM_SQDIFF_NORMED)
+			cv::minMaxLoc(output, nullptr, nullptr, &point, nullptr, mask(cv::Rect(0, 0, featureCols, featureRows)));
+		else
+			cv::minMaxLoc(output, nullptr, nullptr, nullptr, &point, mask(cv::Rect(0, 0, featureCols, featureRows)));
+
+		// Correct point
+		cv::Point center(point.x + patchCols / 2, point.y + patchRows / 2);
+
+		// Set mask
+		cv::circle(mask, center, sourceSeedPointInterDistance, cv::Scalar(0), -1);
+
+		// Move seedpoint
+		seedPoint.sourcePosition = Vec2(center.x, center.y);
 	}
 }
 
 void SeedPointsTab::spawnPatches() {
-	patches.clear();
-	for (const auto& seedPoint : seedPoints)
-		patches.push_back(MondriaanPatch(Vec2(20, 20), seedPoint.sourcePosition, seedPoint.targetPosition));
+	for (auto& seedPoint : seedPoints) {
+		Vec2 sourceCenter(seedPoint.sourcePosition.x - seedPoint.textureSize / 2,
+		                  seedPoint.sourcePosition.x - seedPoint.textureSize / 2);
+		Vec2 targetCenter(seedPoint.targetPosition.x - seedPoint.textureSize / 2,
+		                  seedPoint.targetPosition.x - seedPoint.textureSize / 2);
+		seedPoint.patch = std::make_unique<MondriaanPatch>(
+			sourceCenter,
+			targetCenter,
+			Vec2(seedPoint.textureSize, seedPoint.textureSize)
+		);
+	}
 }
 
 std::size_t mutations = 3;
@@ -573,14 +626,18 @@ void SeedPointsTab::mutatePatches() {
 	};
 	std::vector<double> distribution = {screen->settings->intensityWeight, screen->settings->edgeWeight};
 
-	for (MondriaanPatch& patch : patches) {
+	for (const SeedPoint& seedPoint : seedPoints) {
+		MondriaanPatch* patch = reinterpret_cast<MondriaanPatch*>(seedPoint.patch.get());
+		if (patch == nullptr)
+			continue;
+
 		double currentDistance = Match(patch, sourceTextures, targetTextures, distribution).distance;
 
 		int bestMutation = -1;
 		double bestDistance = std::numeric_limits<double>::max();
 		std::ranges::shuffle(indices, generator);
 		for (std::size_t index = 0; index < mutations; index++) {
-			MondriaanPatch newPatch = patch.getMutation(indices[index], 5.0);
+			MondriaanPatch newPatch = patch->getMutation(indices[index], 5.0);
 			double newDistance = Match(patch, sourceTextures, targetTextures, distribution).distance;
 
 			if (newDistance < bestDistance) {
@@ -594,8 +651,60 @@ void SeedPointsTab::mutatePatches() {
 			continue;
 		}
 
-		patch.mutate(bestMutation, 1.0);
+		patch->mutate(bestMutation, 1.0);
 	}
+}
+
+void SeedPointsTab::generateImage() {
+
+	seedPoints.clear();
+	std::multimap<double, SeedPoint, std::greater<>> seedPoints;
+
+	for (int i = 0; i < targetSeedPointsGridDivisions; i++) {
+		for (int j = 0; j < targetSeedPointsGridDivisions; j++) {
+			int xInterval = screen->editor->pipelineTab->saliencyMap->data.cols / targetSeedPointsGridDivisions;
+			int yInterval = screen->editor->pipelineTab->saliencyMap->data.rows / targetSeedPointsGridDivisions;
+			int xMin = i * screen->editor->pipelineTab->saliencyMap->data.cols / targetSeedPointsGridDivisions;
+			int yMin = j * screen->editor->pipelineTab->saliencyMap->data.rows / targetSeedPointsGridDivisions;
+			cv::Rect rect(xMin, yMin, xInterval, yInterval);
+			cv::Mat subTexture(screen->editor->pipelineTab->saliencyMap->data, rect);
+
+			double value;
+			cv::minMaxLoc(subTexture, nullptr, &value, nullptr, nullptr);
+
+			seedPoints.insert(
+				std::make_pair(
+					value,
+					SeedPoint(
+						Utils::transform(Vec2(xMin + xInterval / 2, yMin + yInterval / 2),
+							target.textureDimension(),
+							source.textureDimension()),
+						Vec2(xMin + xInterval / 2, yMin + yInterval / 2),
+						screen->settings->seedPointSize
+					)
+				)
+			);
+		}
+	}
+
+	for (const auto& [distance, seedPoint] : seedPoints)
+		this->seedPoints.push_back(seedPoint);
+
+	spawnSourceSeedpoints();
+	
+	cv::Mat output(target.texture->data.rows, target.texture->data.cols, target.texture->data.type());
+	for (const auto& sp : this->seedPoints) {
+		cv::Rect sourceBounds = sp.sourceBounds(source.texture).cv();
+		cv::Rect targetBounds = sp.targetBounds(target.texture).cv();
+		sourceBounds.width = Utils::min(sourceBounds.width, targetBounds.width);
+		targetBounds.width = Utils::min(sourceBounds.width, targetBounds.width);
+		sourceBounds.height = Utils::min(sourceBounds.height, targetBounds.height);
+		targetBounds.height = Utils::min(sourceBounds.height, targetBounds.height);
+
+		cv::copyTo(source.texture->data(sourceBounds), output(targetBounds), cv::Mat());
+	}
+
+	cv::imshow("Output", output);
 }
 
 

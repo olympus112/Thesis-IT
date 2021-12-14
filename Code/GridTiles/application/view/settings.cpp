@@ -15,6 +15,7 @@ void Settings::init() {
 	rotations = 10;
 	sourceRotation = 0.0f;
 	imageSize = 350.0;
+	seedPointSize = 16;
 
 	sobelDerivative = 1;
 	sobelSize = 5;
@@ -72,6 +73,12 @@ void Settings::render() {
 		screen->editor->pipelineTab->onSourceRotationChanged(true);
 		//screen->editor->seedPointsTab->onRecalculateMatching();
 	}
+
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+
+	ImGui::SliderInt("SeedPoint size", &seedPointSize, 10, 50);
 
 	ImGui::Spacing();
 	ImGui::Separator();

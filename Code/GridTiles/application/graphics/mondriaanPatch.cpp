@@ -1,7 +1,7 @@
 #include "core.h"
 #include "mondriaanPatch.h"
 
-MondriaanPatch::MondriaanPatch(const Vec2& dimension, const Vec2& sourceOffset, const Vec2& targetOffset) : Patch(computeShape(dimension), sourceOffset, targetOffset) {
+MondriaanPatch::MondriaanPatch(const Vec2& sourceOffset, const Vec2& targetOffset, const Vec2& dimension) : Patch(computeShape(dimension), sourceOffset, targetOffset) {
 
 }
 
@@ -43,10 +43,6 @@ MondriaanPatch MondriaanPatch::getMutation(int mutation, double step) const {
 
 int MondriaanPatch::mutations() {
 	return 4;
-}
-
-Vec2 MondriaanPatch::dimension() const {
-	return shape.dimension;
 }
 
 Shape MondriaanPatch::computeShape(const Vec2& dimension) {

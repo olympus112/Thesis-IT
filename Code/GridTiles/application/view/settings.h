@@ -10,6 +10,7 @@ public:
 	int rotations;
 	float sourceRotation;
 	double imageSize;
+	int seedPointSize;
 
 	int sobelDerivative;
 	int sobelSize;

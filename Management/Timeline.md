@@ -96,3 +96,9 @@
 | 2021-12-12 | Target seedpoints grid method                | 1.5  |
 | 2021-12-12 | Source seedpoints matching based on features | 1    |
 | Totaal     |                                              | 19   | 
+
+| Week 11    | Beschrijving                               | Uren |
+| ---------- | ------------------------------------------ | ---- |
+| 2021-12-13 | Work on various things                     | 3    |
+| 2021-12-14 | Fixed seedpoint matching                   | 3    |
+| 2021-12-14 | Tried to generate an image without success | 1    | 

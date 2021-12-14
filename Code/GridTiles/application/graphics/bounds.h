@@ -65,6 +65,15 @@ public:
 	                                                               , maxX(br.x)
 	                                                               , maxY(br.y) { }
 
+	static BoundsTemplate<T> clamped(const BoundsTemplate<T>& bounds, const BoundsTemplate<T>& clamp) {
+		return BoundsTemplate<T>(
+			Utils::clamp(bounds.minX, clamp.minX, clamp.maxX),
+			Utils::clamp(bounds.minY, clamp.minY, clamp.maxY),
+			Utils::clamp(bounds.maxX, clamp.minX, clamp.maxX),
+			Utils::clamp(bounds.maxY, clamp.minY, clamp.maxY)
+		);
+	}
+
 	const Vector<T, 2>& operator[](int index) const {
 		switch (index) {
 		case TL:
@@ -159,6 +168,13 @@ public:
 
 	constexpr ImRect ir() const {
 		return ImRect(minX, minY, maxX, maxY);
+	}
+
+	constexpr cv::Rect cv() const {
+		return cv::Rect(
+			min().cv(),
+			max().cv()
+		);
 	}
 
 	constexpr cv::Range xRange() const {

@@ -3,8 +3,8 @@
 
 #include "patch.h"
 
-Match::Match(const Patch& patch, const std::vector<cv::Mat>& sourceTextures, const std::vector<cv::Mat>& targetTextures,
-             const std::vector<double>& distribution) : Match(patch.mask, patch.sourceOffset, patch.targetOffset,
+Match::Match(const Patch* patch, const std::vector<cv::Mat>& sourceTextures, const std::vector<cv::Mat>& targetTextures,
+             const std::vector<double>& distribution) : Match(patch->mask, patch->sourceOffset, patch->targetOffset,
                                                               sourceTextures, targetTextures, distribution) {}
 
 Match::Match(const Mask& mask, const Vec2& sourceOffset, const Vec2& targetOffset,

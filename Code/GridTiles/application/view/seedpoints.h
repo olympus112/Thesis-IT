@@ -3,7 +3,6 @@
 #include <random>
 
 #include "graphics/canvas.h"
-#include "graphics/mondriaanPatch.h"
 #include "graphics/seedPoint.h"
 
 class SeedPointsTab {
@@ -15,13 +14,15 @@ private:
 	bool targetSeedPointsGridMethod = false;
 	int targetSeedPointsGridDivisions = 10;
 
+	int sourceSeedPointsMethod = 0;
+	int sourceSeedPointInterDistance = 100;
+
 	std::mt19937 generator;
 public:
 	Canvas source;
 	Canvas target;
 
 	std::vector<SeedPoint> seedPoints;
-	std::vector<MondriaanPatch> patches;
 
 	int intersectedIndex = -1;
 	int selectedIndex = -1;
@@ -50,6 +51,7 @@ public:
 	void spawnSourceSeedpoints();
 	void spawnPatches();
 	void mutatePatches();
+	void generateImage();
 
 	void onSourceChanged();
 	void onTargetChanged();

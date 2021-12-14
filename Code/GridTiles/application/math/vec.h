@@ -795,21 +795,21 @@ inline auto operator-(const ImVec2& a, const ImVec2& b) noexcept -> ImVec2 {
 }
 
 template <typename T>
-constexpr auto operator*(const ImVec2& vec,
+auto operator*(const ImVec2& vec,
                          const T& factor) noexcept -> ImVec2 {
 	ImVec2 result{vec.x * factor, vec.y * factor};
 	return result;
 }
 
 template <typename T>
-constexpr auto operator*(const T& factor,
+auto operator*(const T& factor,
                          const ImVec2& vec) noexcept -> ImVec2 {
 	ImVec2 result{factor * vec.x, factor * vec.y};
 	return result;
 }
 
 template <typename T>
-constexpr auto operator/(const ImVec2& vec,
+auto operator/(const ImVec2& vec,
                          const T& factor) noexcept -> ImVec2 {
 	ImVec2 result{vec.x / factor, vec.y / factor};
 	return result;

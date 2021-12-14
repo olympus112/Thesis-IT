@@ -9,12 +9,12 @@ Patch::Patch(const Shape& shape, const Vec2& sourceOffset, const Vec2& targetOff
 	this->mask = computeMask(shape);
 }
 
-void Patch::render(const Canvas& source, const Canvas& target, bool fill, Color color) const {
+void Patch::render(const Canvas& source, const Canvas& target, bool fill, const Color& color) const {
 	shape.render(source, source.toRelativeScreenSpace(sourceOffset), fill, color);
 	shape.render(target, target.toRelativeScreenSpace(targetOffset), fill, color);
 }
 
-void Patch::render(const Bounds& bounds, bool fill, Color color) const {
+void Patch::render(const Bounds& bounds, bool fill, const Color& color) const {
 	shape.render(bounds, fill, color);
 }
 
@@ -26,5 +26,9 @@ Mask& Patch::computeMask(const Shape& shape) {
 
 Match Patch::computeMatch(const std::vector<cv::Mat>& sourceTextures, const std::vector<cv::Mat>& targetTextures, const std::vector<double>& distribution) {
 	return Match(mask, sourceOffset, targetOffset, sourceTextures, targetTextures, distribution);
+}
+
+Vec2 Patch::dimension() const {
+	return shape.dimension;
 }
 
