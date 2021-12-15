@@ -3,9 +3,9 @@
 #include "graphics/bounds.h"
 
 struct SeedPoint {
-	// Texture space
+	// Texture space, center aligned
 	Vec2 sourcePosition;
-	// Texture space
+	// Texture space, center aligned
 	Vec2 targetPosition;
 	// Texture space
 	int textureSize;

@@ -80,6 +80,7 @@
 | 2021-11-30 | Blur settings, better UI                 | 1    |
 | 2021-11-30 | Matching uses weighted intensity & edges | 2    |
 | 2021-12-02 | Meeting                                  | 1    |
+| Totaal     |                                          | 11.5 | 
 
 | Week 10    | Beschrijving                                 | Uren |
 | ---------- | -------------------------------------------- | ---- |
@@ -97,8 +98,10 @@
 | 2021-12-12 | Source seedpoints matching based on features | 1    |
 | Totaal     |                                              | 19   | 
 
-| Week 11    | Beschrijving                               | Uren |
-| ---------- | ------------------------------------------ | ---- |
-| 2021-12-13 | Work on various things                     | 3    |
-| 2021-12-14 | Fixed seedpoint matching                   | 3    |
-| 2021-12-14 | Tried to generate an image without success | 1    | 
+| Week 11    | Beschrijving                                 | Uren |
+| ---------- | -------------------------------------------- | ---- |
+| 2021-12-13 | Work on various things                       | 3    |
+| 2021-12-14 | Fixed seedpoint matching                     | 3    |
+| 2021-12-14 | Tried to generate an image without success   | 1    |
+| 2021-12-15 | Tried to generate an image with mild success | 2    |
+| 2021-12-15 | Wasted time on patches                       | 1    | 

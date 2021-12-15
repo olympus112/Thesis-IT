@@ -385,7 +385,7 @@ void SeedPointsTab::renderTextures() {
 	bool showGrid = false;
 	if (!targetSeedPointsGridMethod) {
 		ImGui::SliderInt("# Seedpoints", &targetSeedPoints, 1, 50);
-		ImGui::SliderInt("Interdistance", &targetSeedPointInterDistance, 20, 500);
+		ImGui::SliderInt("Interdistance##Target", &targetSeedPointInterDistance, 20, 500);
 	} else {
 		ImGui::SliderInt("Grid size", &targetSeedPointsGridDivisions, 2, 50);
 		showGrid = ImGui::IsItemActive();
@@ -394,7 +394,7 @@ void SeedPointsTab::renderTextures() {
 	// Source
 	ImGui::TextColored(Colors::BLUE.iv4(), "Source seedpoints");
 	ImGui::Separator();
-	ImGui::SliderInt("Interdistance", &sourceSeedPointInterDistance, 20, 500);
+	ImGui::SliderInt("Interdistance##Source", &sourceSeedPointInterDistance, 10, 500);
 	ImGui::RadioButton("SQDIFF", &sourceSeedPointsMethod, cv::TM_SQDIFF);
 	ImGui::SameLine();
 	ImGui::RadioButton("SQDIFF_NORMED", &sourceSeedPointsMethod, cv::TM_SQDIFF_NORMED);
@@ -619,10 +619,10 @@ std::vector indices = {0, 1, 2, 3, 4, 5};
 
 void SeedPointsTab::mutatePatches() {
 	std::vector sourceTextures = {
-	screen->editor->pipelineTab->sourceGrayscale->data, screen->editor->pipelineTab->sourceSobel->data
+		screen->editor->pipelineTab->sourceGrayscale->data, screen->editor->pipelineTab->sourceSobel->data
 	};
 	std::vector targetTextures = {
-	screen->editor->pipelineTab->wequalized->data, screen->editor->pipelineTab->targetSobel->data
+		screen->editor->pipelineTab->wequalized->data, screen->editor->pipelineTab->targetSobel->data
 	};
 	std::vector<double> distribution = {screen->settings->intensityWeight, screen->settings->edgeWeight};
 
@@ -631,7 +631,7 @@ void SeedPointsTab::mutatePatches() {
 		if (patch == nullptr)
 			continue;
 
-		double currentDistance = Match(patch, sourceTextures, targetTextures, distribution).distance;
+		//double currentDistance = Match(patch, sourceTextures, targetTextures, distribution).distance;
 
 		int bestMutation = -1;
 		double bestDistance = std::numeric_limits<double>::max();
@@ -656,52 +656,35 @@ void SeedPointsTab::mutatePatches() {
 }
 
 void SeedPointsTab::generateImage() {
+	int size = screen->settings->seedPointSize;
+	int cols = target.texture->data.cols / size;
+	int rows = target.texture->data.rows / size;
 
-	seedPoints.clear();
-	std::multimap<double, SeedPoint, std::greater<>> seedPoints;
-
-	for (int i = 0; i < targetSeedPointsGridDivisions; i++) {
-		for (int j = 0; j < targetSeedPointsGridDivisions; j++) {
-			int xInterval = screen->editor->pipelineTab->saliencyMap->data.cols / targetSeedPointsGridDivisions;
-			int yInterval = screen->editor->pipelineTab->saliencyMap->data.rows / targetSeedPointsGridDivisions;
-			int xMin = i * screen->editor->pipelineTab->saliencyMap->data.cols / targetSeedPointsGridDivisions;
-			int yMin = j * screen->editor->pipelineTab->saliencyMap->data.rows / targetSeedPointsGridDivisions;
-			cv::Rect rect(xMin, yMin, xInterval, yInterval);
-			cv::Mat subTexture(screen->editor->pipelineTab->saliencyMap->data, rect);
-
-			double value;
-			cv::minMaxLoc(subTexture, nullptr, &value, nullptr, nullptr);
-
-			seedPoints.insert(
-				std::make_pair(
-					value,
-					SeedPoint(
-						Utils::transform(Vec2(xMin + xInterval / 2, yMin + yInterval / 2),
-							target.textureDimension(),
-							source.textureDimension()),
-						Vec2(xMin + xInterval / 2, yMin + yInterval / 2),
-						screen->settings->seedPointSize
-					)
-				)
-			);
-		}
-	}
-
-	for (const auto& [distance, seedPoint] : seedPoints)
-		this->seedPoints.push_back(seedPoint);
-
-	spawnSourceSeedpoints();
-	
 	cv::Mat output(target.texture->data.rows, target.texture->data.cols, target.texture->data.type());
-	for (const auto& sp : this->seedPoints) {
-		cv::Rect sourceBounds = sp.sourceBounds(source.texture).cv();
-		cv::Rect targetBounds = sp.targetBounds(target.texture).cv();
-		sourceBounds.width = Utils::min(sourceBounds.width, targetBounds.width);
-		targetBounds.width = Utils::min(sourceBounds.width, targetBounds.width);
-		sourceBounds.height = Utils::min(sourceBounds.height, targetBounds.height);
-		targetBounds.height = Utils::min(sourceBounds.height, targetBounds.height);
+	cv::Mat sourceSobel = source.features[Canvas::FEATURE_SOBEL]->data;
+	cv::Mat sourceInt = source.features[Canvas::FEATURE_INT]->data;
+#pragma omp parallel for
+	for (int row = 0; row < rows; row++) {
+#pragma omp parallel for
+		for (int col = 0; col < cols; col++) {
+			cv::Rect rect(col * size, row * size, size, size);
 
-		cv::copyTo(source.texture->data(sourceBounds), output(targetBounds), cv::Mat());
+			cv::Mat targetSobel = target.features[Canvas::FEATURE_SOBEL]->data(rect);
+			cv::Mat targetInt = target.features[Canvas::FEATURE_INT]->data(rect);
+
+			cv::Mat sobelMatch;
+			cv::matchTemplate(sourceSobel, targetSobel, sobelMatch, cv::TM_CCORR);
+			cv::normalize(sourceSobel, sourceSobel, 1.0, 0.0, cv::NORM_MINMAX);
+			cv::Mat intMatch;
+			cv::matchTemplate(sourceSobel, targetSobel, intMatch, cv::TM_CCORR);
+			cv::normalize(intMatch, intMatch, 1.0, 0.0, cv::NORM_MINMAX);
+			cv::Mat featureMatch = screen->settings->edgeWeight * sobelMatch + screen->settings->intensityWeight * intMatch;
+			cv::Point matchLoc;
+			cv::minMaxLoc(featureMatch, nullptr, nullptr, nullptr, &matchLoc);
+
+			//cv::copyTo(target.texture->data(rect), output(rect), cv::Mat());
+			cv::copyTo(source.texture->data(cv::Rect(matchLoc.x, matchLoc.y, size, size)), output(rect), cv::Mat());
+		}
 	}
 
 	cv::imshow("Output", output);

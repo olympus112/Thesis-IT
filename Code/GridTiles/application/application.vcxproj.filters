@@ -317,5 +317,8 @@
     <ClInclude Include="graphics\imgui\imguiUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\opencv\features.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
