@@ -104,4 +104,7 @@
 | 2021-12-14 | Fixed seedpoint matching                     | 3    |
 | 2021-12-14 | Tried to generate an image without success   | 1    |
 | 2021-12-15 | Tried to generate an image with mild success | 2    |
-| 2021-12-15 | Wasted time on patches                       | 1    | 
+| 2021-12-15 | Wasted time on patches                       | 1    |
+| 2021-12-17 | Presentation + refactoring                   | 2    |
+| 2021-12-18 | Presentation + bounds check while mutating   | 2    |
+| Totaal     |                                              | 14   | 

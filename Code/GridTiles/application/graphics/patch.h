@@ -24,5 +24,7 @@ public:
 	Match computeMatch(const std::vector<cv::Mat>& sourceTextures, const std::vector<cv::Mat>& targetTextures, const std::vector<double>& distribution);
 
 	Vec2 dimension() const;
+	Bounds targetBounds() const;
+	Bounds sourceBounds() const;
 };
 

@@ -51,6 +51,7 @@ public:
 	void spawnSourceSeedpoints();
 	void spawnPatches();
 	void mutatePatches();
+	int checkPatch(Patch* newPatch, Patch* oldPatch);
 	void generateImage();
 
 	void onSourceChanged();

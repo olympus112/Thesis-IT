@@ -32,3 +32,16 @@ Vec2 Patch::dimension() const {
 	return shape.dimension;
 }
 
+Bounds Patch::targetBounds() const {
+	return Bounds(
+		targetOffset,
+		targetOffset + dimension()
+	);
+}
+
+Bounds Patch::sourceBounds() const {
+	return Bounds(
+		sourceOffset,
+		sourceOffset + dimension()
+	);
+}

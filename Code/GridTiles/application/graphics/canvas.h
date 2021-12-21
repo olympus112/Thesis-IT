@@ -48,5 +48,7 @@ public:
 	// Screen space
 	BoundsTemplate<double> uv(const BoundsTemplate<double>& subBounds) const;
 
+	BoundsTemplate<double> textureBounds() const;
+
 	static Vec2 computeDimension(const Vec2& textureDimension, double preferredSize);
 };

@@ -470,13 +470,12 @@ void SeedPointsTab::renderSettings() {
 	ImGui::SetCursorPosX(static_cast<float>(target.minX() - ImGui::GetWindowPos().x));
 	if (ImGui::Button("Mutate patches", ImVec2(target.dimension.x, height)))
 		mutatePatches();
+	if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
+		mutatePatches();
 
 	ImGui::Checkbox("Show connections", &showConnections);
 	if (ImGui::Button("Generate image"))
 		generateImage();
-
-	if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
-		mutatePatches();
 }
 
 void SeedPointsTab::render() {
@@ -565,7 +564,7 @@ void SeedPointsTab::spawnSourceSeedpoints() {
 
 		// Create all features
 		std::vector<cv::Mat> features(source.features.size());
-#pragma omp parallel for
+		//#pragma omp parallel for
 		for (int featureIndex = 0; featureIndex < source.features.size(); featureIndex++) {
 			cv::Mat patch(target.features[featureIndex]->data, rect);
 
@@ -573,6 +572,7 @@ void SeedPointsTab::spawnSourceSeedpoints() {
 			                  sourceSeedPointsMethod);
 			// Todo: check need
 			cv::normalize(features[featureIndex], features[featureIndex], 1.0, 0.0, cv::NORM_MINMAX);
+			//cv::imshow(std::to_string(featureIndex), features[featureIndex]);
 		}
 
 		// Merge features
@@ -581,6 +581,8 @@ void SeedPointsTab::spawnSourceSeedpoints() {
 		cv::Mat output(featureRows, featureCols, CV_32F, cv::Scalar(0.0));
 		for (int i = 0; i < features.size(); i++)
 			cv::addWeighted(output, 1.0, features[i], distribution[i], 0.0, output);
+
+		//cv::imshow("d", output);
 
 		// Find brightest point
 		cv::Point point;
@@ -603,9 +605,9 @@ void SeedPointsTab::spawnSourceSeedpoints() {
 void SeedPointsTab::spawnPatches() {
 	for (auto& seedPoint : seedPoints) {
 		Vec2 sourceCenter(seedPoint.sourcePosition.x - seedPoint.textureSize / 2,
-		                  seedPoint.sourcePosition.x - seedPoint.textureSize / 2);
+		                  seedPoint.sourcePosition.y - seedPoint.textureSize / 2);
 		Vec2 targetCenter(seedPoint.targetPosition.x - seedPoint.textureSize / 2,
-		                  seedPoint.targetPosition.x - seedPoint.textureSize / 2);
+		                  seedPoint.targetPosition.y - seedPoint.textureSize / 2);
 		seedPoint.patch = std::make_unique<MondriaanPatch>(
 			sourceCenter,
 			targetCenter,
@@ -615,14 +617,37 @@ void SeedPointsTab::spawnPatches() {
 }
 
 std::size_t mutations = 3;
-std::vector indices = {0, 1, 2, 3, 4, 5};
+std::vector indices = {0, 1, 2, 3};
+
+int SeedPointsTab::checkPatch(Patch* newPatch, Patch* oldPatch) {
+	for (const SeedPoint& seedPoint : seedPoints) {
+		MondriaanPatch* patch = reinterpret_cast<MondriaanPatch*>(seedPoint.patch.get());
+
+		if (patch == oldPatch)
+			continue;
+
+		if (newPatch->sourceBounds().ir().Overlaps(patch->sourceBounds().ir())) 
+			return 1;
+
+		if (newPatch->targetBounds().ir().Overlaps(patch->targetBounds().ir()))
+			return 2;
+
+		if (!source.textureBounds().ir().Contains(newPatch->sourceBounds().ir()))
+			return 3;
+
+		if (!target.textureBounds().ir().Contains(newPatch->targetBounds().ir()))
+			return 4;
+	}
+
+	return 0;
+}
 
 void SeedPointsTab::mutatePatches() {
 	std::vector sourceTextures = {
-		screen->editor->pipelineTab->sourceGrayscale->data, screen->editor->pipelineTab->sourceSobel->data
+	screen->editor->pipelineTab->sourceGrayscale->data, screen->editor->pipelineTab->sourceSobel->data
 	};
 	std::vector targetTextures = {
-		screen->editor->pipelineTab->wequalized->data, screen->editor->pipelineTab->targetSobel->data
+	screen->editor->pipelineTab->wequalized->data, screen->editor->pipelineTab->targetSobel->data
 	};
 	std::vector<double> distribution = {screen->settings->intensityWeight, screen->settings->edgeWeight};
 
@@ -638,6 +663,14 @@ void SeedPointsTab::mutatePatches() {
 		std::ranges::shuffle(indices, generator);
 		for (std::size_t index = 0; index < mutations; index++) {
 			MondriaanPatch newPatch = patch->getMutation(indices[index], 5.0);
+
+			std::map<int, const char*> d = { {MondriaanPatch::BOTTOM, "Bottom"}, {MondriaanPatch::LEFT, "Left"}, {MondriaanPatch::RIGHT, "Right"}, {MondriaanPatch::TOP, "Top"}};
+			int error = checkPatch(&newPatch, patch);
+			if (error != 0) {
+				Log::debug("(%f, %f) %s: %d", seedPoint.sourcePosition.x, seedPoint.sourcePosition.y, d[indices[index]], error);
+				continue;
+			}
+
 			double newDistance = Match(patch, sourceTextures, targetTextures, distribution).distance;
 
 			if (newDistance < bestDistance) {
@@ -647,7 +680,6 @@ void SeedPointsTab::mutatePatches() {
 		}
 
 		if (bestMutation == -1) {
-			Log::debug("skip");
 			continue;
 		}
 
@@ -678,7 +710,8 @@ void SeedPointsTab::generateImage() {
 			cv::Mat intMatch;
 			cv::matchTemplate(sourceSobel, targetSobel, intMatch, cv::TM_CCORR);
 			cv::normalize(intMatch, intMatch, 1.0, 0.0, cv::NORM_MINMAX);
-			cv::Mat featureMatch = screen->settings->edgeWeight * sobelMatch + screen->settings->intensityWeight * intMatch;
+			cv::Mat featureMatch = screen->settings->edgeWeight * sobelMatch + screen->settings->intensityWeight *
+				intMatch;
 			cv::Point matchLoc;
 			cv::minMaxLoc(featureMatch, nullptr, nullptr, nullptr, &matchLoc);
 

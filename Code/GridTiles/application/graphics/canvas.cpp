@@ -71,6 +71,13 @@ Bounds Canvas::bounds() const {
 	);
 }
 
+Bounds Canvas::textureBounds() const {
+	return Bounds(
+		Vec2(),
+		textureDimension()
+	);
+}
+
 Bounds Canvas::uv(const Bounds& subBounds) const {
 	return bounds().subBoundsUV(subBounds);
 }

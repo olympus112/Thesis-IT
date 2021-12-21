@@ -8,34 +8,28 @@ MondriaanPatch::MondriaanPatch(const Vec2& sourceOffset, const Vec2& targetOffse
 void MondriaanPatch::mutate(int mutation, double step) {
 	switch (mutation) {
 		case LEFT:
-			shape.dimension.x += step;
-			shape[Bounds::TL].x -= step;
-			shape[Bounds::BL].x -= step;
-			break;
+			sourceOffset.x -= step;
+			targetOffset.x -= step;
 		case RIGHT:
 			shape.dimension.x += step;
-			shape[Bounds::TR].x += step;
-			shape[Bounds::BR].x += step;
 			break;
 		case TOP:
-			shape.dimension.y += step;
-			shape[Bounds::TL].y -= step;
-			shape[Bounds::TR].y -= step;
-			break;
+			sourceOffset.y -= step;
+			targetOffset.y -= step;
 		case BOTTOM:
 			shape.dimension.y += step;
-			shape[Bounds::BL].y += step;
-			shape[Bounds::BR].y += step;
 			break;
 		default:
+			Log::error("Unknown mutation");
 			break;
 	}
-	
+
+	shape = computeShape(shape.dimension);
 	mask = computeMask(shape);
 }
 
 MondriaanPatch MondriaanPatch::getMutation(int mutation, double step) const {
-	MondriaanPatch patch(shape.dimension, sourceOffset, targetOffset);
+	MondriaanPatch patch(sourceOffset, targetOffset, shape.dimension);
 	patch.mutate(mutation, step);
 
 	return patch;
