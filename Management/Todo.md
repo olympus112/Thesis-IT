@@ -1,5 +1,5 @@
 - `GL_TEXTURE_RECTANGLE` rectangle textures
-- Source and target textures may exhibit highly different gamuts and filter response distributions, so we apply a histogram matching step in order to achieve a meaningful matching between target and source patches --> Match features as well?
+- ~~Source and target textures may exhibit highly different gamuts and filter response distributions, so we apply a histogram matching step in order to achieve a meaningful matching between target and source patches --> Match features as well?~~
 - Prepare all rotations
 - Scaling of target
 - Normalization of template

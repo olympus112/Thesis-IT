@@ -258,6 +258,8 @@ struct Vector<T, 4> {
 	constexpr Vector(T x, T y, T z, T w) noexcept : data{x, y, z, w} {
 	}
 
+	constexpr Vector(const Vector<T, 2>& a, const Vector<T, 2>& b) noexcept : data {a.x, a.y, b.x, b.y} {}
+
 	template <typename OtherT>
 	constexpr operator Vector<OtherT, 4>() const noexcept {
 		return Vector<OtherT, 4>(static_cast<OtherT>(this->data[0]), static_cast<OtherT>(this->data[1]),

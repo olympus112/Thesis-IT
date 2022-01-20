@@ -108,3 +108,8 @@
 | 2021-12-17 | Presentation + refactoring                   | 2    |
 | 2021-12-18 | Presentation + bounds check while mutating   | 2    |
 | Totaal     |                                              | 14   | 
+
+| Blok       | Beschrijving                     | Uren |
+| ---------- | -------------------------------- | ---- |
+| 19-01-2022 | Image rotations                  | 2    |
+| 20-01-2022 | Extended texture, collision grid | 3.5  | 

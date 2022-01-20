@@ -36,6 +36,12 @@ cv::Mat Equalization::computeEqualization(const std::vector<cv::Mat>& channels, 
 	return result;
 }
 
+Equalization::Equalization(Texture* texture, const CDF& source, const CDF& reference) : Equalization(texture->data, source, reference) {}
+
+Equalization::Equalization(Texture* texture, const Histogram& source, const Histogram& reference) : Equalization(texture->data, source, reference) {}
+
+Equalization::Equalization(Texture* texture, Texture* reference) : Equalization(texture->data, reference->data) {}
+
 Equalization::Equalization(const cv::Mat& texture, const CDF& source, const CDF& reference) {
 	std::vector<cv::Mat> channels;
 	cv::split(texture, channels);

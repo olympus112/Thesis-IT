@@ -1,15 +1,15 @@
-#pragma once
+﻿#pragma once
 
-#include "graphics/imgui/texturepicker.h"
+#include "graphics/textures/rotatedTexture.h"
 
-class Settings {
-public:
-	URef<ImGui::TexturePicker> sourceTexture;
-	URef<ImGui::TexturePicker> targetTexture;
+struct Settings {
+	RotatedTextures source;
+	Texture target;
 
 	int rotations;
 	float sourceRotation;
 	double imageSize;
+
 	int seedPointSize;
 
 	int sobelDerivative;
@@ -21,13 +21,9 @@ public:
 	int cannyAperture;
 	bool cannyL2gradient;
 
-	float intensityWeight;	
+	float intensityWeight;
 	float edgeWeight;
 	float equalizationWeight;
 
 	Settings();
-
-	void init();
-	void update();
-	void render();
 };

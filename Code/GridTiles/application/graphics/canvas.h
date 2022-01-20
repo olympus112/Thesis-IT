@@ -1,6 +1,6 @@
 #pragma once
 
-#include "texture.h"
+#include "graphics/textures/texture.h"
 
 template <typename T>
 class BoundsTemplate;

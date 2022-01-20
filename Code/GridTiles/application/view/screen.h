@@ -1,12 +1,12 @@
 #pragma once
 
-#include "editor.h"
-#include "settings.h"
+#include "editorView.h"
+#include "settingsView.h"
 
 class Screen {
 public:
-	URef<Editor> editor;
-	URef<Settings> settings;
+	EditorView editor;
+	SettingsView settingsView;
 
 	Screen();
 

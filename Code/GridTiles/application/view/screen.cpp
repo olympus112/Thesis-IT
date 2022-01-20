@@ -3,29 +3,22 @@
 #include "screen.h"
 
 #include "imgui/imgui.h"
-#include "imgui/imfilebrowser.h"
 
-URef<Editor> editor;
-URef<Settings> settings;
-
-Screen::Screen() {
-	settings = std::make_unique<Settings>();
-	editor = std::make_unique<Editor>();
-};
+Screen::Screen() = default;
 
 void Screen::init() {
-	editor->init();
-	settings->init();
+	editor.init();
+	settingsView.init();
 }
 
 void Screen::update() {
-	editor->update();
-	settings->update();
+	editor.update();
+	settingsView.update();
 }
 
 void Screen::render() {
 	ImGui::ShowDemoWindow();
 
-	editor->render();
-	settings->render();
+	editor.render();
+	settingsView.render();
 }

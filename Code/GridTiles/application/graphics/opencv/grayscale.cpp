@@ -8,6 +8,8 @@ cv::Mat Grayscale::computeGrayscale(const cv::Mat& source) {
 	return result;
 }
 
+Grayscale::Grayscale(Texture* texture) : Grayscale(texture->data) {}
+
 Grayscale::Grayscale(const cv::Mat& texture) {
 	this->grayscale = computeGrayscale(texture);
 }

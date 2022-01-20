@@ -1,5 +1,16 @@
 {
   "showLineNumber": true,
   "promptDelete": false,
-  "alwaysUpdateLinks": true
+  "alwaysUpdateLinks": true,
+  "readableLineLength": false,
+  "strictLineBreaks": false,
+  "showFrontmatter": true,
+  "foldHeading": true,
+  "foldIndent": true,
+  "spellcheck": true,
+  "spellcheckDictionary": [
+    "dataset"
+  ],
+  "legacyEditor": false,
+  "livePreview": false
 }

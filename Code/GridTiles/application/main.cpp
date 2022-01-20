@@ -3,16 +3,14 @@
 
 #include <opencv2/highgui.hpp>
 
-#include "graphics/patch.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-#include "view/screen.h"
-
 Vec2i dimension;
-URef<Screen> screen;
+Screen screen;
 GLFWwindow* window;
+Settings settings;
 
 bool init() {
 	// GLFW init
@@ -60,8 +58,7 @@ bool init() {
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 130");
 
-	screen = std::make_unique<Screen>();
-	screen->init();
+	screen.init();
 
 	return true;
 }
@@ -70,7 +67,7 @@ void update() {
 	// Get events
 	glfwPollEvents();
 
-	screen->update();
+	screen.update();
 }
 
 void render() {
@@ -119,7 +116,7 @@ void render() {
 		ImGui::EndMenuBar();
 	}
 
-	screen->render();
+	screen.render();
 
 	ImGui::End();
 

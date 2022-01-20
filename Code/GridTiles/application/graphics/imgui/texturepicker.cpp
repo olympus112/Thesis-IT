@@ -36,7 +36,6 @@ bool ImGui::TexturePicker::render() {
 
 	if (browser->HasSelected()) {
 		path = browser->GetSelected().string();
-		texture = std::make_unique<Texture>(path);
 		browser->ClearSelected();
 
 		result = true;
@@ -45,11 +44,12 @@ bool ImGui::TexturePicker::render() {
 	return result;
 }
 
-void ImGui::TexturePicker::load(const std::string& path) {
+void ImGui::TexturePicker::load(Texture* texture, const std::string& path) {
 	this->path = path;
-	texture = std::make_unique<Texture>(path);
+	this->texture = texture;
 }
 
-ImTextureID ImGui::TexturePicker::asImTexture() {
+
+ImTextureID ImGui::TexturePicker::it() {
 	return texture->it();
 }

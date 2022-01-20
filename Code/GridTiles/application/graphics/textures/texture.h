@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include <opencv2/core/mat.hpp>
 
-#include "opengl/bindable.h"
+#include "../opengl/bindable.h"
 #include "imgui/imgui.h"
 
 class Texture : public Bindable {
@@ -30,11 +30,16 @@ public:
 	void unbind();
 	void reloadGL(bool linear = false, int internalFormat = 0, int extenalFormat = 0, int dataType = 0);
 
-	void setData(int width, int height, const void* data, int internalformat,
-	             unsigned externalFormat, unsigned dataType, unsigned target, bool linear);
+	void setData(int width,
+	             int height,
+	             const void* data,
+	             int internalformat,
+	             unsigned externalFormat,
+	             unsigned dataType,
+	             unsigned target,
+	             bool linear);
 
-	static GLID generate(int target, int wrapS, int wrapT,
-	                     int minFilter, int magFilter);
+	static GLID generate(int target, int wrapS, int wrapT, int minFilter, int magFilter);
 
 	ImTextureID it();
 };

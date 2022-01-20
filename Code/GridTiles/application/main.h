@@ -3,9 +3,12 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-class Screen;
+#include "view/screen.h"
+#include "view/settings.h"
 
-extern URef<Screen> screen;
+
+extern Settings settings;
+extern Screen screen;
 extern GLFWwindow* window;
 
 bool init();

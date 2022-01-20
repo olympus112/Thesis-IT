@@ -22,10 +22,15 @@ namespace Util {
 		return value;
 	}
 
-	template<>
-	inline std::string str(const Vec2f& value) {
+	template<typename T, int N>
+	std::string str(const Vector<T, N>& value) {
 		std::stringstream ss;
-		ss << "{ " << value.x << ", " << value.y << " }";
+
+		ss << "{ ";
+		for (int i = 0; i <= N; i++)
+			ss << value[i] << ", ";
+		ss << value[N - 1] << " }";
+
 		return ss.str();
 	}
 };

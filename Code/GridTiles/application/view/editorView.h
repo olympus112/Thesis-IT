@@ -2,12 +2,12 @@
 #include "pipeline.h"
 #include "seedpoints.h"
 
-class Editor {
+class EditorView {
 public:
-	URef<PipelineTab> pipelineTab;
-	URef<SeedPointsTab> seedPointsTab;
+	PipelineTab pipeline;
+	SeedPointsTab seedpoints;
 
-	Editor();
+	EditorView();
 
 	void init();
 	void update();

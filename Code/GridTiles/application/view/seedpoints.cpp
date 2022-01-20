@@ -495,7 +495,7 @@ void SeedPointsTab::render() {
 }
 
 void SeedPointsTab::spawnTargetSeedpoints() {
-	const auto& salience = screen->editor->pipelineTab->saliencyMap->data;
+	const auto& salience = screen.editor.pipeline.saliencyMap->data;
 	seedPoints.clear();
 	resetSelection();
 
@@ -551,7 +551,7 @@ void SeedPointsTab::spawnTargetSeedpoints() {
 }
 
 void SeedPointsTab::spawnSourceSeedpoints() {
-	std::vector<double> distribution = {screen->settings->intensityWeight, screen->settings->edgeWeight};
+	std::vector<double> distribution = { settings.intensityWeight, settings.edgeWeight};
 
 	int textureRows = source.texture->data.rows;
 	int textureCols = source.texture->data.cols;
@@ -644,12 +644,12 @@ int SeedPointsTab::checkPatch(Patch* newPatch, Patch* oldPatch) {
 
 void SeedPointsTab::mutatePatches() {
 	std::vector sourceTextures = {
-	screen->editor->pipelineTab->sourceGrayscale->data, screen->editor->pipelineTab->sourceSobel->data
+		screen.editor.pipeline.sourceGrayscaleE->data, screen.editor.pipeline.sourceSobel->data
 	};
 	std::vector targetTextures = {
-	screen->editor->pipelineTab->wequalized->data, screen->editor->pipelineTab->targetSobel->data
+		screen.editor.pipeline.wequalizedE->data, screen.editor.pipeline.targetSobel->data
 	};
-	std::vector<double> distribution = {screen->settings->intensityWeight, screen->settings->edgeWeight};
+	std::vector<double> distribution = {settings.intensityWeight, settings.edgeWeight};
 
 	for (const SeedPoint& seedPoint : seedPoints) {
 		MondriaanPatch* patch = reinterpret_cast<MondriaanPatch*>(seedPoint.patch.get());
@@ -688,7 +688,7 @@ void SeedPointsTab::mutatePatches() {
 }
 
 void SeedPointsTab::generateImage() {
-	int size = screen->settings->seedPointSize;
+	int size = settings.seedPointSize;
 	int cols = target.texture->data.cols / size;
 	int rows = target.texture->data.rows / size;
 
@@ -710,7 +710,7 @@ void SeedPointsTab::generateImage() {
 			cv::Mat intMatch;
 			cv::matchTemplate(sourceSobel, targetSobel, intMatch, cv::TM_CCORR);
 			cv::normalize(intMatch, intMatch, 1.0, 0.0, cv::NORM_MINMAX);
-			cv::Mat featureMatch = screen->settings->edgeWeight * sobelMatch + screen->settings->intensityWeight *
+			cv::Mat featureMatch = settings.edgeWeight * sobelMatch + settings.intensityWeight *
 				intMatch;
 			cv::Point matchLoc;
 			cv::minMaxLoc(featureMatch, nullptr, nullptr, nullptr, &matchLoc);
@@ -725,19 +725,19 @@ void SeedPointsTab::generateImage() {
 
 
 void SeedPointsTab::onSourceChanged() {
-	source.texture = screen->editor->pipelineTab->rotatedSource.get();
+	source.texture = *settings.source;
 	source.aspect = static_cast<double>(source.texture->data.cols) / static_cast<double>(source.texture->data.rows);
-	source.features[Canvas::FEATURE_SOBEL] = screen->editor->pipelineTab->sourceSobel.get();
-	source.features[Canvas::FEATURE_INT] = screen->editor->pipelineTab->sourceGrayscale.get();
-	source.dimension = Canvas::computeDimension(source.textureDimension(), screen->settings->imageSize);
+	source.features[Canvas::FEATURE_SOBEL] = screen.editor.pipeline.sourceSobel.get();
+	source.features[Canvas::FEATURE_INT] = *screen.editor.pipeline.sourceGrayscaleE;
+	source.dimension = Canvas::computeDimension(source.textureDimension(), settings.imageSize);
 }
 
 void SeedPointsTab::onTargetChanged() {
-	target.texture = screen->settings->targetTexture->texture.get();
+	target.texture = &settings.target;
 	target.aspect = static_cast<double>(target.texture->data.cols) / static_cast<double>(target.texture->data.rows);
-	target.features[Canvas::FEATURE_SOBEL] = screen->editor->pipelineTab->targetSobel.get();
-	target.features[Canvas::FEATURE_INT] = screen->editor->pipelineTab->wequalized.get();
-	target.dimension = Canvas::computeDimension(target.textureDimension(), screen->settings->imageSize);
+	target.features[Canvas::FEATURE_SOBEL] = screen.editor.pipeline.targetSobel.get();
+	target.features[Canvas::FEATURE_INT] = *screen.editor.pipeline.wequalizedE;
+	target.dimension = Canvas::computeDimension(target.textureDimension(), settings.imageSize);
 }
 
 void SeedPointsTab::reload() {

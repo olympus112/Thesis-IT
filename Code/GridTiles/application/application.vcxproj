@@ -59,7 +59,7 @@
       <PrecompiledHeaderFile>core.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)application;$(OPENCV_DIR)\..\..\include;$(SolutionDir)application\graphics\opencv\saliency\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard_C>Default</LanguageStandard_C>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -81,7 +81,7 @@
       <PrecompiledHeaderFile>core.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)application;$(OPENCV_DIR)\..\..\include;$(SolutionDir)application\graphics\opencv\saliency\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard_C>Default</LanguageStandard_C>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -170,15 +170,18 @@
     <ClCompile Include="graphics\mondriaanPatch.cpp" />
     <ClCompile Include="graphics\match.cpp" />
     <ClCompile Include="graphics\seedPoint.cpp" />
+    <ClCompile Include="graphics\textures\extendedTexture.cpp" />
+    <ClCompile Include="graphics\textures\rotatedTexture.cpp" />
     <ClCompile Include="util\globals.cpp" />
+    <ClCompile Include="view\settings.cpp" />
     <ClCompile Include="view\pipeline.cpp" />
     <ClCompile Include="view\seedpoints.cpp" />
-    <ClCompile Include="view\settings.cpp" />
-    <ClCompile Include="view\editor.cpp" />
+    <ClCompile Include="view\settingsView.cpp" />
+    <ClCompile Include="view\editorView.cpp" />
     <ClCompile Include="graphics\opengl\bindable.cpp" />
     <ClCompile Include="graphics\imgui\texturepicker.cpp" />
     <ClCompile Include="graphics\imgui\widgets.cpp" />
-    <ClCompile Include="graphics\texture.cpp" />
+    <ClCompile Include="graphics\textures\texture.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="util\fileUtils.cpp" />
     <ClCompile Include="util\log.cpp" />
@@ -212,6 +215,7 @@
     <ClInclude Include="graphics\opencv\saliency\include\opencv2\saliency\saliencyBaseClasses.hpp" />
     <ClInclude Include="graphics\opencv\saliency\include\opencv2\saliency\saliencySpecializedClasses.hpp" />
     <ClInclude Include="graphics\opencv\saliency\src\precomp.hpp" />
+    <ClInclude Include="graphics\textures\extendedTexture.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="graphics\opencv\sobel.h" />
     <ClInclude Include="graphics\patch.h" />
@@ -220,17 +224,22 @@
     <ClInclude Include="graphics\mondriaanPatch.h" />
     <ClInclude Include="graphics\match.h" />
     <ClInclude Include="graphics\seedPoint.h" />
+    <ClInclude Include="graphics\textures\rotatedTexture.h" />
+    <ClInclude Include="util\collisionGrid.h" />
     <ClInclude Include="util\globals.h" />
     <ClInclude Include="util\imageUtils.h" />
+    <ClInclude Include="util\list.h" />
+    <ClInclude Include="util\sat.h" />
+    <ClInclude Include="view\settings.h" />
     <ClInclude Include="view\pipeline.h" />
     <ClInclude Include="view\seedpoints.h" />
-    <ClInclude Include="view\settings.h" />
-    <ClInclude Include="view\editor.h" />
+    <ClInclude Include="view\settingsView.h" />
+    <ClInclude Include="view\editorView.h" />
     <ClInclude Include="graphics\opengl\bindable.h" />
     <ClInclude Include="graphics\color.h" />
     <ClInclude Include="graphics\imgui\texturepicker.h" />
     <ClInclude Include="graphics\imgui\widgets.h" />
-    <ClInclude Include="graphics\texture.h" />
+    <ClInclude Include="graphics\textures\texture.h" />
     <ClInclude Include="math\mat.h" />
     <ClInclude Include="math\quat.h" />
     <ClInclude Include="math\utils.h" />

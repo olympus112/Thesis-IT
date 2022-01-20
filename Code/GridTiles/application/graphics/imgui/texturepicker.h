@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphics/texture.h"
+#include "graphics/textures/texture.h"
 #include "imgui/imfilebrowser.h"
 
 namespace ImGui {
@@ -8,14 +8,14 @@ namespace ImGui {
 	public:
 		std::string name;
 		std::string path;
-		URef<Texture> texture;
+		Texture* texture;
 		URef<FileBrowser> browser;
 
 		TexturePicker(const std::string& name);
 
 		bool render();
-		void load(const std::string& path);
+		void load(Texture* texture, const std::string& path);
 
-		ImTextureID asImTexture();
+		ImTextureID it();
 	};
 }

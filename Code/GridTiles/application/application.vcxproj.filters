@@ -57,7 +57,7 @@
     <ClCompile Include="..\include\imgui\imfilebrowser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graphics\texture.cpp">
+    <ClCompile Include="graphics\textures\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graphics\opengl\bindable.cpp">
@@ -69,10 +69,10 @@
     <ClCompile Include="graphics\imgui\widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="view\editor.cpp">
+    <ClCompile Include="view\editorView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="view\settings.cpp">
+    <ClCompile Include="view\settingsView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="util\globals.cpp">
@@ -153,6 +153,15 @@
     <ClCompile Include="graphics\canvas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="view\settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\textures\rotatedTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\textures\extendedTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -215,7 +224,7 @@
     <ClInclude Include="..\include\imgui\imfilebrowser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\texture.h">
+    <ClInclude Include="graphics\textures\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphics\opengl\bindable.h">
@@ -233,10 +242,10 @@
     <ClInclude Include="math\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="view\editor.h">
+    <ClInclude Include="view\editorView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="view\settings.h">
+    <ClInclude Include="view\settingsView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="main.h">
@@ -318,6 +327,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphics\opencv\features.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="view\settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\textures\rotatedTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\textures\extendedTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util\collisionGrid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util\sat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util\list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

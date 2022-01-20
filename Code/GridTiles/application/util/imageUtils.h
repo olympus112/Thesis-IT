@@ -1,6 +1,7 @@
 #pragma once
 
-#include "graphics/texture.h"
+#include "main.h"
+#include "graphics/textures/texture.h"
 #include "graphics/opencv/blur.h"
 #include "graphics/opencv/canny.h"
 #include "graphics/opencv/cdf.h"
@@ -50,20 +51,20 @@ namespace ImageUtils {
 
 	inline void renderSobel(Texture* source, Texture* destination) {
 		SobelType sobelTypes[] = {SobelType::X, SobelType::Y, SobelType::XY};
-		Sobel sobel(source->data, sobelTypes[screen->settings->sobelType], screen->settings->sobelDerivative, screen->settings->sobelSize);
+		Sobel sobel(source->data, sobelTypes[settings.sobelType], settings.sobelDerivative, settings.sobelSize);
 		
 		destination->data = sobel.sobel;
 		destination->reloadGL(false);
 	}
 
 	inline void renderCanny(Texture* source, Texture* destination) {
-		Canny canny(source->data, screen->settings->cannyThreshold1, screen->settings->cannyThreshold2, screen->settings->cannyAperture, screen->settings->cannyL2gradient);
+		Canny canny(source->data, settings.cannyThreshold1, settings.cannyThreshold2, settings.cannyAperture, settings.cannyL2gradient);
 		
 		destination->data = canny.canny;
 		destination->reloadGL();
 	}
 
-	auto saliency = cv::saliency::StaticSaliencyFineGrained::create();
+	inline auto saliency = cv::saliency::StaticSaliencyFineGrained::create();
 	inline void renderSalience(Texture* source, Texture* destination) {
 		saliency->computeSaliency(source->data, destination->data);
 		destination->reloadGL(false, GL_RGB32F, GL_LUMINANCE, GL_FLOAT);
