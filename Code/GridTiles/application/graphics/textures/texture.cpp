@@ -17,6 +17,34 @@ Texture::Texture(const cv::Mat& texture) {
 	reloadGL(false);
 }
 
+Texture::Texture(Texture&& other) noexcept {
+	this->id = std::exchange(other.id, 0);
+	this->data = other.data;
+	this->target = other.target;
+	this->internalFormat = other.internalFormat;
+	this->externalFormat = other.externalFormat;
+	this->dataType = other.dataType;
+	this->wrapS = other.wrapS;
+	this->wrapT = other.wrapT;
+	this->minFilter = other.minFilter;
+	this->magFilter = other.magFilter;
+}
+
+Texture& Texture::operator=(Texture&& other) noexcept {
+	this->id = std::exchange(other.id, 0);
+	this->data = other.data;
+	this->target = other.target;
+	this->internalFormat = other.internalFormat;
+	this->externalFormat = other.externalFormat;
+	this->dataType = other.dataType;
+	this->wrapS = other.wrapS;
+	this->wrapT = other.wrapT;
+	this->minFilter = other.minFilter;
+	this->magFilter = other.magFilter;
+
+	return *this;
+}
+
 Texture::~Texture() {
 	unbind();
 	glDeleteTextures(1, &id);
@@ -38,8 +66,7 @@ void Texture::setData(int width, int height, const void* data, int internalForma
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glTexImage2D(target, 0, internalFormat, width, height, 0, externalFormat, dataType, data);
 		glGenerateMipmap(target);
-	}
-	else {
+	} else {
 		Log::error("Texture data is null");
 	}
 }
@@ -74,6 +101,6 @@ GLID Texture::generate(int target, int wrapS, int wrapT, int minFilter, int magF
 	return id;
 }
 
-ImTextureID Texture::it() {
+ImTextureID Texture::it() const {
 	return reinterpret_cast<ImTextureID>(this->id);
 }

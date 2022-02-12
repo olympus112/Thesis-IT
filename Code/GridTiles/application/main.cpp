@@ -3,6 +3,7 @@
 
 #include <opencv2/highgui.hpp>
 
+#include "graphics/imgui/imguiStyle.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -51,13 +52,16 @@ bool init() {
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-	// Setup dark style
-	ImGui::StyleColorsDark();
-
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 130");
 
+	// Setup dark style
+	ImGui::StyleColorsDark();
+	setupImGuiStyle();
+	setHue(95.0f / 255.0f);
+
+	settings.init();
 	screen.init();
 
 	return true;
@@ -115,6 +119,10 @@ void render() {
 
 		ImGui::EndMenuBar();
 	}
+
+	// Default windows
+	ImGui::ShowDemoWindow();
+	renderImGuiStyleEditor();
 
 	screen.render();
 

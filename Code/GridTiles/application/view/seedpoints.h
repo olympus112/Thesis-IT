@@ -2,19 +2,18 @@
 
 #include <random>
 
+#include "TSPGeneration.h"
+#include "SSPGeneration.h"
 #include "graphics/canvas.h"
 #include "graphics/seedPoint.h"
 
 class SeedPointsTab {
 private:
+	URef<TSPGenerationMethod> tspGenerationMethod;
+	URef<SSPGenerationMethod> sspGenerationMethod;
+
 	bool showConnections = false;
 
-	int targetSeedPoints = 10;
-	int targetSeedPointInterDistance = 100;
-	bool targetSeedPointsGridMethod = false;
-	int targetSeedPointsGridDivisions = 10;
-
-	int sourceSeedPointsMethod = 0;
 	int sourceSeedPointInterDistance = 100;
 
 	std::mt19937 generator;

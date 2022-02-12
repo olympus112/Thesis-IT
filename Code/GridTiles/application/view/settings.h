@@ -1,10 +1,11 @@
 ﻿#pragma once
 
+#include "graphics/textures/extendedTexture.h"
 #include "graphics/textures/rotatedTexture.h"
 
 struct Settings {
 	RotatedTextures source;
-	Texture target;
+	ExtendedTexture target;
 
 	int rotations;
 	float sourceRotation;
@@ -26,4 +27,6 @@ struct Settings {
 	float equalizationWeight;
 
 	Settings();
+
+	void init();
 };

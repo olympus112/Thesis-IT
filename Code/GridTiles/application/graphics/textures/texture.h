@@ -24,6 +24,11 @@ public:
 	Texture(const std::string& path);
 	Texture(const cv::Mat& texture);
 
+	Texture(Texture&& other) noexcept;
+	Texture(const Texture& other) = delete;
+	Texture& operator=(Texture&& other) noexcept;
+	Texture& operator=(const Texture& other) = delete;
+
 	~Texture();
 
 	void bind();
@@ -41,5 +46,5 @@ public:
 
 	static GLID generate(int target, int wrapS, int wrapT, int minFilter, int magFilter);
 
-	ImTextureID it();
+	ImTextureID it() const;
 };

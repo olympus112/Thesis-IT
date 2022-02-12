@@ -19,6 +19,11 @@ struct RotatedTextures {
 	RotatedTextures();
 	RotatedTextures(const std::string& path, int rotations);
 
+	RotatedTextures(RotatedTextures&& other) noexcept;
+	RotatedTextures(const RotatedTextures& other) = delete;
+	RotatedTextures& operator=(RotatedTextures&& other) noexcept;
+	RotatedTextures& operator=(const RotatedTextures& other) = delete;
+
 	std::size_t size() {
 		return textures.size();
 	}

@@ -13,9 +13,6 @@ PipelineTab::PipelineTab() = default;
 void PipelineTab::init() {
 	sourceHistogram = std::make_unique<Texture>();
 	sourceCDF = std::make_unique<Texture>();
-
-	targetHistogram = std::make_unique<Texture>();
-	targetCDF = std::make_unique<Texture>();
 	
 	targetBlur = std::make_unique<Texture>();
 	targetSobel = std::make_unique<Texture>();
@@ -42,7 +39,7 @@ void PipelineTab::render() {
 
 	// Default
 	if (pipeline == 0) {
-		ImGui::image("Target", settings.target.it());
+		ImGui::image("Target", settings.target->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
@@ -67,7 +64,7 @@ void PipelineTab::render() {
 
 	// Histogram
 	if (pipeline == 1) {
-		ImGui::image("Target hist", targetHistogram->it());
+		ImGui::image("Target hist", settings.target.histogram.it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
@@ -92,7 +89,7 @@ void PipelineTab::render() {
 
 	// CDF
 	if (pipeline == 2) {
-		ImGui::image("Target cdf", targetCDF->it());
+		ImGui::image("Target cdf", settings.target.cdf.it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
@@ -144,7 +141,7 @@ void PipelineTab::render() {
 
 	// Salience
 	if (pipeline == 4) {
-		ImGui::image("Target", settings.target.it());
+		ImGui::image("Target", settings.target->it());
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
@@ -176,16 +173,12 @@ void PipelineTab::onSourceChanged(bool propagate) {
 }
 
 void PipelineTab::onTargetChanged(bool propagate) {
-	// Target
-	ImageUtils::renderHistogram(&settings.target, targetHistogram.get());
-	ImageUtils::renderCDF(&settings.target, targetCDF.get());
-
 	// Target grayscale
-	Grayscale grayscale(&settings.target);
+	Grayscale grayscale(*settings.target);
 	targetGrayscaleE = ExtendedTexture("Target grayscale", grayscale.grayscale);
 
 	// Saliency
-	ImageUtils::renderSalience(&settings.target, saliencyMap.get());
+	ImageUtils::renderSalience(*settings.target, saliencyMap.get());
 
 	if (propagate)
 		onSourceOrTargetChanged(propagate);

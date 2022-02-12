@@ -13,13 +13,9 @@ static ImGui::TexturePicker targetTexture("Target texture");
 SettingsView::SettingsView() = default;
 
 void SettingsView::init() {
-	std::string sourcePath = "../res/wood_sphere.jpg";
-	std::string targetPath = "../res/cliff_sphere.jpg";
-	settings.source = RotatedTextures(sourcePath, settings.rotations);
-	settings.target = Texture(targetPath);
 
-	sourceTexture.load(*settings.source, sourcePath);
-	targetTexture.load(&settings.target, targetPath);
+	sourceTexture.load(*settings.source);
+	targetTexture.load(*settings.target);
 
 	screen.editor.pipeline.reload();
 	screen.editor.seedpoints.reload();
@@ -122,7 +118,7 @@ void SettingsView::render() {
 	ImGui::Spacing();
 
 	if (targetTexture.render()) {
-		settings.target = Texture(targetTexture.path);
+		settings.target = ExtendedTexture("Target", targetTexture.path);
 		screen.editor.pipeline.onTargetChanged(true);
 		screen.editor.seedpoints.onTargetChanged();
 	}
@@ -131,6 +127,21 @@ void SettingsView::render() {
 		settings.source = RotatedTextures(sourceTexture.path, settings.rotations);
 		screen.editor.pipeline.onSourceChanged(true);
 		screen.editor.seedpoints.onSourceChanged();
+	}
+
+	if (sourceTexture.hovered) {
+		ImGui::BeginTooltip();
+
+		//ImGui::Columns(settings.source.textures.size());
+		for (const RotatedTexture& texture : settings.source.textures) {
+			std::string name = std::format("{:.2f} deg", texture.angle / CV_PI * 180);
+			ImGui::image(name.c_str(), texture.it() , ImVec2(100, 100));
+			ImGui::SameLine();
+			//ImGui::NextColumn();
+		}
+		//ImGui::Columns(1);
+
+		ImGui::EndTooltip();
 	}
 
 	ImGui::End();

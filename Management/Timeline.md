@@ -109,7 +109,11 @@
 | 2021-12-18 | Presentation + bounds check while mutating   | 2    |
 | Totaal     |                                              | 14   | 
 
-| Blok       | Beschrijving                     | Uren |
-| ---------- | -------------------------------- | ---- |
-| 19-01-2022 | Image rotations                  | 2    |
-| 20-01-2022 | Extended texture, collision grid | 3.5  | 
+| Blok       | Beschrijving                                     | Uren |
+| ---------- | ------------------------------------------------ | ---- |
+| 19-01-2022 | Image rotations                                  | 2    |
+| 20-01-2022 | Extended texture, collision grid                 | 3.5  |
+| 22-01-2022 | Collision grid insert / erase                    | 1    |
+| 22-01-2022 | Fixed incorrect move of texture objects          | 2    |
+| 12-02-2022 | Moved source&target seedpoint generation methods | 2    |
+| 12-02-2022 | More cleanup                                     | 2    | 

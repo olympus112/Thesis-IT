@@ -124,6 +124,7 @@
     </ClCompile>
     <ClCompile Include="graphics\canvas.cpp" />
     <ClCompile Include="graphics\bounds.cpp" />
+    <ClCompile Include="graphics\imgui\imguiStyle.cpp" />
     <ClCompile Include="graphics\opencv\canny.cpp" />
     <ClCompile Include="graphics\opencv\blur.cpp" />
     <ClCompile Include="graphics\opencv\draw.cpp" />
@@ -188,6 +189,8 @@
     <ClCompile Include="util\stringUtil.cpp" />
     <ClCompile Include="util\terminalColor.cpp" />
     <ClCompile Include="view\screen.cpp" />
+    <ClCompile Include="view\SSPGeneration.cpp" />
+    <ClCompile Include="view\TSPGeneration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\imgui\imconfig.h" />
@@ -201,6 +204,7 @@
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
     <ClInclude Include="graphics\canvas.h" />
     <ClInclude Include="graphics\bounds.h" />
+    <ClInclude Include="graphics\imgui\imguiStyle.h" />
     <ClInclude Include="graphics\imgui\imguiUtils.h" />
     <ClInclude Include="graphics\opencv\canny.h" />
     <ClInclude Include="graphics\opencv\blur.h" />
@@ -251,6 +255,8 @@
     <ClInclude Include="util\terminalColor.h" />
     <ClInclude Include="util\typetraits.h" />
     <ClInclude Include="view\screen.h" />
+    <ClInclude Include="view\SSPGeneration.h" />
+    <ClInclude Include="view\TSPGeneration.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

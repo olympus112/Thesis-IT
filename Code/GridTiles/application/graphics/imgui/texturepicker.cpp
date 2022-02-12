@@ -29,6 +29,8 @@ bool ImGui::TexturePicker::render() {
 			browser->Open();
 	}
 
+	hovered = ImGui::IsItemHovered();
+
 	NewLine();
 	Separator();
 

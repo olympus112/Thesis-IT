@@ -1,7 +1,9 @@
 ﻿#include "core.h"
 #include "settings.h"
 
-Settings::Settings() {
+Settings::Settings() = default;
+
+void Settings::init() {
 	rotations = 10;
 	sourceRotation = 0.0f;
 	imageSize = 350.0;
@@ -19,4 +21,9 @@ Settings::Settings() {
 	edgeWeight = 0.5f;
 	intensityWeight = 0.5f;
 	equalizationWeight = 0.5f;
+
+	std::string sourcePath = "../res/wood_sphere.jpg";
+	std::string targetPath = "../res/cliff_sphere.jpg";
+	source = RotatedTextures(sourcePath, rotations);
+	target = ExtendedTexture("Target", targetPath);
 }

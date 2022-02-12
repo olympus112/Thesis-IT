@@ -12,7 +12,7 @@ static cv::Rect computeRotatedRect(const cv::Mat& texture, double angle) {
 cv::Mat computeTransformationMatrix(const cv::Mat& texture, double angle) {
 	const cv::Rect bounds = computeRotatedRect(texture, angle);
 	double degrees = 180.0 * angle / CV_PI;
-	const cv::Point2f center(0.5f * static_cast<float>(texture.cols - 1), 0.5f * static_cast<float>(texture.rows - 1));
+	cv::Point2f center(0.5f * static_cast<float>(texture.cols - 1), 0.5f * static_cast<float>(texture.rows - 1));
 
 	cv::Mat transformationMatrix = cv::getRotationMatrix2D(center, degrees, 1.0);
 	transformationMatrix.at<double>(0, 2) += 0.5 * bounds.width - 0.5 * texture.cols;
@@ -46,6 +46,16 @@ RotatedTextures::RotatedTextures(const std::string& path, int rotations) {
 
 		textures.emplace_back(texture, angle);
 	}
+}
+
+RotatedTextures::RotatedTextures(RotatedTextures&& other) noexcept {
+	this->textures = std::move(other.textures);
+}
+
+RotatedTextures& RotatedTextures::operator=(RotatedTextures&& other) noexcept {
+	this->textures = std::move(other.textures);
+
+	return *this;
 }
 
 RotatedTexture* RotatedTextures::operator->() {

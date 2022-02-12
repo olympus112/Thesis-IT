@@ -21,6 +21,8 @@
 
 void SeedPointsTab::init() {
 	generator = std::mt19937(std::random_device()());
+	tspGenerationMethod = std::make_unique<TSPG_Greedy>();
+	sspGenerationMethod = std::make_unique<SSPG_TemplateMatch>();
 }
 
 void SeedPointsTab::update() {
@@ -34,14 +36,12 @@ void SeedPointsTab::update() {
 		for (int index = 0; index < seedPoints.size(); index++) {
 			const auto& [sourcePosition, targetPosition, textureSize, patch] = seedPoints[index];
 
-			if (source.hover && Bounds(sourcePosition, textureSize).contains(
-				source.toTextureSpace(intersectedPoint))) {
+			if (source.hover && Bounds(sourcePosition, textureSize).contains(source.toTextureSpace(intersectedPoint))) {
 				intersectedIndex = index;
 				break;
 			}
 
-			if (target.hover && Bounds(targetPosition, textureSize).contains(
-				target.toTextureSpace(intersectedPoint))) {
+			if (target.hover && Bounds(targetPosition, textureSize).contains(target.toTextureSpace(intersectedPoint))) {
 				intersectedIndex = index;
 				break;
 			}
@@ -66,8 +66,7 @@ void SeedPointsTab::update() {
 	}
 
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && (source.hover || target.hover)) {
-		seedPoints.emplace_back(source.toTextureSpace(relativeOffset),
-		                        target.toTextureSpace(relativeOffset));
+		seedPoints.emplace_back(source.toTextureSpace(relativeOffset), target.toTextureSpace(relativeOffset));
 	}
 
 	// Mouse drag
@@ -98,39 +97,49 @@ void SeedPointsTab::renderCursor() {
 		float thickness = 3;
 		Vec2 cursor = ImGui::GetMousePos();
 		ImGui::GetWindowDrawList()->AddLine(cursor - ImVec2(static_cast<float>(size), 0),
-		                                    cursor + ImVec2(static_cast<float>(size), 0), Colors::WHITE.u32(),
+		                                    cursor + ImVec2(static_cast<float>(size), 0),
+		                                    Colors::WHITE.u32(),
 		                                    thickness);
 		ImGui::GetWindowDrawList()->AddLine(cursor - ImVec2(0, static_cast<float>(size)),
-		                                    cursor + ImVec2(0, static_cast<float>(size)), Colors::WHITE.u32(),
+		                                    cursor + ImVec2(0, static_cast<float>(size)),
+		                                    Colors::WHITE.u32(),
 		                                    thickness);
 
 		if (source.hover) {
 			ImGui::GetWindowDrawList()->AddLine(Vec2(source.minX(), cursor.y).iv(),
-			                                    Vec2(source.minX() + size, cursor.y).iv(), Colors::WHITE.u32(),
+			                                    Vec2(source.minX() + size, cursor.y).iv(),
+			                                    Colors::WHITE.u32(),
 			                                    thickness);
 			ImGui::GetWindowDrawList()->AddLine(Vec2(source.maxX(), cursor.y).iv(),
-			                                    Vec2(source.maxX() - size, cursor.y).iv(), Colors::WHITE.u32(),
+			                                    Vec2(source.maxX() - size, cursor.y).iv(),
+			                                    Colors::WHITE.u32(),
 			                                    thickness);
 			ImGui::GetWindowDrawList()->AddLine(Vec2(cursor.x, source.minY()).iv(),
-			                                    Vec2(cursor.x, source.minY() + size).iv(), Colors::WHITE.u32(),
+			                                    Vec2(cursor.x, source.minY() + size).iv(),
+			                                    Colors::WHITE.u32(),
 			                                    thickness);
 			ImGui::GetWindowDrawList()->AddLine(Vec2(cursor.x, source.maxY()).iv(),
-			                                    Vec2(cursor.x, source.maxY() - size).iv(), Colors::WHITE.u32(),
+			                                    Vec2(cursor.x, source.maxY() - size).iv(),
+			                                    Colors::WHITE.u32(),
 			                                    thickness);
 		}
 
 		if (target.hover) {
 			ImGui::GetWindowDrawList()->AddLine(Vec2(target.minX(), cursor.y).iv(),
-			                                    Vec2(target.minX() + size, cursor.y).iv(), Colors::WHITE.u32(),
+			                                    Vec2(target.minX() + size, cursor.y).iv(),
+			                                    Colors::WHITE.u32(),
 			                                    thickness);
 			ImGui::GetWindowDrawList()->AddLine(Vec2(target.maxX(), cursor.y).iv(),
-			                                    Vec2(target.maxX() - size, cursor.y).iv(), Colors::WHITE.u32(),
+			                                    Vec2(target.maxX() - size, cursor.y).iv(),
+			                                    Colors::WHITE.u32(),
 			                                    thickness);
 			ImGui::GetWindowDrawList()->AddLine(Vec2(cursor.x, target.minY()).iv(),
-			                                    Vec2(cursor.x, target.minY() + size).iv(), Colors::WHITE.u32(),
+			                                    Vec2(cursor.x, target.minY() + size).iv(),
+			                                    Colors::WHITE.u32(),
 			                                    thickness);
 			ImGui::GetWindowDrawList()->AddLine(Vec2(cursor.x, target.maxY()).iv(),
-			                                    Vec2(cursor.x, target.maxY() - size).iv(), Colors::WHITE.u32(),
+			                                    Vec2(cursor.x, target.maxY() - size).iv(),
+			                                    Colors::WHITE.u32(),
 			                                    thickness);
 		}
 	}
@@ -142,9 +151,7 @@ void SeedPointsTab::renderTooltip() {
 		const auto& seedPoint = seedPoints[intersectedIndex != -1 ? intersectedIndex : selectedIndex];
 		auto sourceScreenPosition = source.toAbsoluteScreenSpace(seedPoint.sourcePosition);
 		auto targetScreenPosition = target.toAbsoluteScreenSpace(seedPoint.targetPosition);
-		auto tooltipPosition = intersectedIndex != -1
-			                       ? ImGui::GetCursorPos()
-			                       : source.min() + seedPoint.sourcePosition;
+		auto tooltipPosition = intersectedIndex != -1 ? ImGui::GetCursorPos() : source.min() + seedPoint.sourcePosition;
 
 		Bounds sourcePatch(sourceScreenPosition, 20);
 		Bounds targetPatch(targetScreenPosition, 20);
@@ -167,17 +174,14 @@ void SeedPointsTab::renderTooltip() {
 		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
 		ImGui::Text("X: %.0f", seedPoint.sourcePosition.x);
 		ImGui::Text("Y: %.0f", seedPoint.sourcePosition.y);
-		ImGui::image("Source", source.texture->it(), ImVec2(80, 80),
-		             sourceUV.min().iv(), sourceUV.max().iv());
+		ImGui::image("Source", source.texture->it(), ImVec2(80, 80), sourceUV.min().iv(), sourceUV.max().iv());
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, 95);
 		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
 		ImGui::Text("X: %.0f", seedPoint.targetPosition.x);
 		ImGui::Text("Y: %.0f", seedPoint.targetPosition.y);
-		ImGui::image("Target", target.texture->it(), ImVec2(80, 80),
-		             targetUV.min().iv(),
-		             targetUV.max().iv());
+		ImGui::image("Target", target.texture->it(), ImVec2(80, 80), targetUV.min().iv(), targetUV.max().iv());
 
 		ImGui::Columns(1);
 
@@ -205,9 +209,7 @@ void SeedPointsTab::renderSeedPointViewer() {
 		ImGui::Columns(4, 0, false);
 		ImGui::SetColumnWidth(-1, size + 10);
 		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
-		ImGui::Image(source.texture->it(), ImVec2(size, size),
-		             sourceUV.min().iv(),
-		             sourceUV.max().iv());
+		ImGui::Image(source.texture->it(), ImVec2(size, size), sourceUV.min().iv(), sourceUV.max().iv());
 		ImGui::NextColumn();
 		ImGui::Text("");
 		ImGui::Text("X: %.0f", seedPoint.sourcePosition.x);
@@ -216,9 +218,7 @@ void SeedPointsTab::renderSeedPointViewer() {
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
-		ImGui::Image(target.texture->it(), ImVec2(size, size),
-		             targetUV.min().iv(),
-		             targetUV.max().iv());
+		ImGui::Image(target.texture->it(), ImVec2(size, size), targetUV.min().iv(), targetUV.max().iv());
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 		ImGui::Text("");
@@ -227,24 +227,16 @@ void SeedPointsTab::renderSeedPointViewer() {
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
-		ImGui::Image(source.features[Canvas::FEATURE_INT]->it(), ImVec2(size, size),
-		             sourceUV.min().iv(),
-		             sourceUV.max().iv());
+		ImGui::Image(source.features[Canvas::FEATURE_INT]->it(), ImVec2(size, size), sourceUV.min().iv(), sourceUV.max().iv());
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
-		ImGui::Image(source.features[Canvas::FEATURE_SOBEL]->it(), ImVec2(size, size),
-		             sourceUV.min().iv(),
-		             sourceUV.max().iv());
+		ImGui::Image(source.features[Canvas::FEATURE_SOBEL]->it(), ImVec2(size, size), sourceUV.min().iv(), sourceUV.max().iv());
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
-		ImGui::Image(target.features[Canvas::FEATURE_INT]->it(), ImVec2(size, size),
-		             targetUV.min().iv(),
-		             targetUV.max().iv());
+		ImGui::Image(target.features[Canvas::FEATURE_INT]->it(), ImVec2(size, size), targetUV.min().iv(), targetUV.max().iv());
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
-		ImGui::Image(target.features[Canvas::FEATURE_SOBEL]->it(), ImVec2(size, size),
-		             targetUV.min().iv(),
-		             targetUV.max().iv());
+		ImGui::Image(target.features[Canvas::FEATURE_SOBEL]->it(), ImVec2(size, size), targetUV.min().iv(), targetUV.max().iv());
 		ImGui::NextColumn();
 
 		ImGui::Columns(1);
@@ -275,9 +267,7 @@ void SeedPointsTab::renderPatchViewer() {
 		ImGui::Columns(4, 0, false);
 		ImGui::SetColumnWidth(-1, size + 10);
 		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
-		ImGui::Image(source.texture->it(), ImVec2(size, size),
-		             sourceUV.min().iv(),
-		             sourceUV.max().iv());
+		ImGui::Image(source.texture->it(), ImVec2(size, size), sourceUV.min().iv(), sourceUV.max().iv());
 		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
@@ -288,9 +278,7 @@ void SeedPointsTab::renderPatchViewer() {
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
-		ImGui::Image(target.texture->it(), ImVec2(size, size),
-		             targetUV.min().iv(),
-		             targetUV.max().iv());
+		ImGui::Image(target.texture->it(), ImVec2(size, size), targetUV.min().iv(), targetUV.max().iv());
 		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
@@ -303,33 +291,25 @@ void SeedPointsTab::renderPatchViewer() {
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 
-		ImGui::Image(source.features[Canvas::FEATURE_INT]->it(), ImVec2(size, size),
-		             sourceUV.min().iv(),
-		             sourceUV.max().iv());
+		ImGui::Image(source.features[Canvas::FEATURE_INT]->it(), ImVec2(size, size), sourceUV.min().iv(), sourceUV.max().iv());
 		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 
-		ImGui::Image(source.features[Canvas::FEATURE_SOBEL]->it(), ImVec2(size, size),
-		             sourceUV.min().iv(),
-		             sourceUV.max().iv());
+		ImGui::Image(source.features[Canvas::FEATURE_SOBEL]->it(), ImVec2(size, size), sourceUV.min().iv(), sourceUV.max().iv());
 		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 
-		ImGui::Image(target.features[Canvas::FEATURE_INT]->it(), ImVec2(size, size),
-		             targetUV.min().iv(),
-		             targetUV.max().iv());
+		ImGui::Image(target.features[Canvas::FEATURE_INT]->it(), ImVec2(size, size), targetUV.min().iv(), targetUV.max().iv());
 		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 
-		ImGui::Image(target.features[Canvas::FEATURE_SOBEL]->it(), ImVec2(size, size),
-		             targetUV.min().iv(),
-		             targetUV.max().iv());
+		ImGui::Image(target.features[Canvas::FEATURE_SOBEL]->it(), ImVec2(size, size), targetUV.min().iv(), targetUV.max().iv());
 		patch->render(Bounds(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), false, Colors::RGB_R);
 
 		ImGui::NextColumn();
@@ -354,9 +334,12 @@ void SeedPointsTab::renderPatches() {
 void SeedPointsTab::renderSeedPoints() {
 	// Render seedpoints
 	for (int index = 0; index < seedPoints.size(); index++)
-		seedPoints[index].render(source, target, intersectedIndex == index, selectedIndex == index, showConnections,
-		                         Color::blend(Colors::YELLOW, Colors::RGB_R,
-		                                      static_cast<float>(index + 1) / static_cast<float>(seedPoints.size())));
+		seedPoints[index].render(source,
+		                         target,
+		                         intersectedIndex == index,
+		                         selectedIndex == index,
+		                         showConnections,
+		                         Color::blend(Colors::YELLOW, Colors::RGB_R, static_cast<float>(index + 1) / static_cast<float>(seedPoints.size())));
 }
 
 void SeedPointsTab::renderTextures() {
@@ -381,62 +364,59 @@ void SeedPointsTab::renderTextures() {
 	// Target
 	ImGui::TextColored(Colors::BLUE.iv4(), "Target seedpoints");
 	ImGui::Separator();
-	ImGui::Checkbox("Grid method", &targetSeedPointsGridMethod);
-	bool showGrid = false;
-	if (!targetSeedPointsGridMethod) {
-		ImGui::SliderInt("# Seedpoints", &targetSeedPoints, 1, 50);
-		ImGui::SliderInt("Interdistance##Target", &targetSeedPointInterDistance, 20, 500);
-	} else {
-		ImGui::SliderInt("Grid size", &targetSeedPointsGridDivisions, 2, 50);
-		showGrid = ImGui::IsItemActive();
+
+	// TSP generation method
+	static int tspMethod = TSPGenerationMethod_Greedy;
+	static const char* tspGenerationMethods[] = {
+		"Regular grid",
+		"Greedy"
+	};
+
+	if (ImGui::Combo("Target seedpoint generation method", &tspMethod, tspGenerationMethods, 2)) {
+		switch (tspMethod) {
+			case TSPGenerationMethod_Greedy:
+				tspGenerationMethod = std::make_unique<TSPG_Greedy>();
+				break;
+			case TSPGenerationMethod_RegularGrid:
+				tspGenerationMethod = std::make_unique<TSPG_RegularGrid>();
+				break;
+		}
 	}
+
+	tspGenerationMethod->renderSettings(source, target);
+
 
 	// Source
 	ImGui::TextColored(Colors::BLUE.iv4(), "Source seedpoints");
 	ImGui::Separator();
-	ImGui::SliderInt("Interdistance##Source", &sourceSeedPointInterDistance, 10, 500);
-	ImGui::RadioButton("SQDIFF", &sourceSeedPointsMethod, cv::TM_SQDIFF);
-	ImGui::SameLine();
-	ImGui::RadioButton("SQDIFF_NORMED", &sourceSeedPointsMethod, cv::TM_SQDIFF_NORMED);
-	ImGui::RadioButton("CCOEFF", &sourceSeedPointsMethod, cv::TM_CCOEFF);
-	ImGui::SameLine();
-	ImGui::RadioButton("CCOEFF_NORMED", &sourceSeedPointsMethod, cv::TM_CCOEFF_NORMED);
-	ImGui::RadioButton("CCORR", &sourceSeedPointsMethod, cv::TM_CCORR);
-	ImGui::SameLine();
-	ImGui::RadioButton("TCCORR_NORMED", &sourceSeedPointsMethod, cv::TM_CCORR_NORMED);
+	
+
+	// SSP generation method
+	static int sspMethod = SSPGenerationMethod_TemplateMatch;
+	static const char* sspGenerationMethods[] = {
+		"Template Match"
+	};
+
+	if (ImGui::Combo("Source seedpoint generation method", &tspMethod, tspGenerationMethods, 2)) {
+		switch (sspMethod) {
+			case SSPGenerationMethod_TemplateMatch:
+				sspGenerationMethod = std::make_unique<SSPG_TemplateMatch>();
+				break;
+		}
+	}
+
+	sspGenerationMethod->renderSettings(source, target);
 
 	ImGui::NextColumn();
 	ImGui::Columns(1);
 
-	if (showGrid)
-		renderTargetGrid();
+	// Overlays
+	tspGenerationMethod->renderOverlay(source, target);
+	sspGenerationMethod->renderOverlay(source, target);
 
 	// Bounding boxes
-	ImGui::GetWindowDrawList()->AddRect(source.min().iv(), source.max().iv(), Colors::WHITE.u32(), 0,
-	                                    ImDrawCornerFlags_All,
-	                                    2);
-	ImGui::GetWindowDrawList()->AddRect(target.min().iv(), target.max().iv(), Colors::WHITE.u32(), 0,
-	                                    ImDrawCornerFlags_All,
-	                                    2);
-}
-
-void SeedPointsTab::renderTargetGrid() {
-	for (int i = 0; i < targetSeedPointsGridDivisions; i++) {
-		float y = target.offset.y + target.dimension.y / targetSeedPointsGridDivisions * i;
-		float x = target.offset.x + target.dimension.x / targetSeedPointsGridDivisions * i;
-		ImGui::GetWindowDrawList()->AddLine(
-			ImVec2(target.minX(), y),
-			ImVec2(target.maxX(), y),
-			Colors::WHITE.u32(),
-			2
-		);
-		ImGui::GetWindowDrawList()->AddLine(
-			ImVec2(x, target.minY()),
-			ImVec2(x, target.maxY()),
-			Colors::WHITE.u32(),
-			2
-		);
-	}
+	ImGui::GetWindowDrawList()->AddRect(source.min().iv(), source.max().iv(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All, 2);
+	ImGui::GetWindowDrawList()->AddRect(target.min().iv(), target.max().iv(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All, 2);
 }
 
 void SeedPointsTab::renderSettings() {
@@ -495,124 +475,21 @@ void SeedPointsTab::render() {
 }
 
 void SeedPointsTab::spawnTargetSeedpoints() {
-	const auto& salience = screen.editor.pipeline.saliencyMap->data;
 	seedPoints.clear();
 	resetSelection();
 
-	if (targetSeedPointsGridMethod) {
-		std::multimap<double, SeedPoint, std::greater<>> seedPoints;
-
-		for (int i = 0; i < targetSeedPointsGridDivisions; i++) {
-			for (int j = 0; j < targetSeedPointsGridDivisions; j++) {
-				int xInterval = salience.cols / targetSeedPointsGridDivisions;
-				int yInterval = salience.rows / targetSeedPointsGridDivisions;
-				int xMin = i * salience.cols / targetSeedPointsGridDivisions;
-				int yMin = j * salience.rows / targetSeedPointsGridDivisions;
-				cv::Rect rect(xMin, yMin, xInterval, yInterval);
-				cv::Mat subTexture(salience, rect);
-
-				double value;
-				cv::Point point;
-				cv::minMaxLoc(subTexture, nullptr, &value, nullptr, &point);
-
-
-				seedPoints.insert(
-					std::make_pair(
-						value,
-						SeedPoint(
-							Utils::transform(Vec2(xMin + point.x, yMin + point.y),
-							                 target.textureDimension(),
-							                 source.textureDimension()),
-							Vec2(xMin + point.x, yMin + point.y)
-						)
-					)
-				);
-			}
-		}
-
-		for (const auto& [distance, seedPoint] : seedPoints)
-			this->seedPoints.push_back(seedPoint);
-
-	} else {
-		cv::Mat mask(salience.rows, salience.cols, CV_8U, cv::Scalar(255));
-		for (int i = 0; i < targetSeedPoints; i++) {
-			cv::Point point;
-			cv::minMaxLoc(salience, nullptr, nullptr, nullptr, &point, mask);
-
-			cv::circle(mask, point, targetSeedPointInterDistance, cv::Scalar(0), -1);
-
-			this->seedPoints.emplace_back(
-				Utils::transform(Vec2(point.x, point.y), target.textureDimension(),
-				                 source.textureDimension()),
-				Vec2(point.x, point.y)
-			);
-		}
-	}
+	this->seedPoints = tspGenerationMethod->generate(source, target);
 }
 
 void SeedPointsTab::spawnSourceSeedpoints() {
-	std::vector<double> distribution = { settings.intensityWeight, settings.edgeWeight};
-
-	int textureRows = source.texture->data.rows;
-	int textureCols = source.texture->data.cols;
-	cv::Mat mask(textureRows, textureCols, CV_8UC1, cv::Scalar(255));
-
-	for (auto& seedPoint : seedPoints) {
-		cv::Rect rect = seedPoint.targetBounds(target.texture).cv();
-		int patchRows = rect.height;
-		int patchCols = rect.width;
-
-		// Create all features
-		std::vector<cv::Mat> features(source.features.size());
-		//#pragma omp parallel for
-		for (int featureIndex = 0; featureIndex < source.features.size(); featureIndex++) {
-			cv::Mat patch(target.features[featureIndex]->data, rect);
-
-			cv::matchTemplate(source.features[featureIndex]->data, patch, features[featureIndex],
-			                  sourceSeedPointsMethod);
-			// Todo: check need
-			cv::normalize(features[featureIndex], features[featureIndex], 1.0, 0.0, cv::NORM_MINMAX);
-			//cv::imshow(std::to_string(featureIndex), features[featureIndex]);
-		}
-
-		// Merge features
-		int featureRows = textureRows - patchRows + 1;
-		int featureCols = textureCols - patchCols + 1;
-		cv::Mat output(featureRows, featureCols, CV_32F, cv::Scalar(0.0));
-		for (int i = 0; i < features.size(); i++)
-			cv::addWeighted(output, 1.0, features[i], distribution[i], 0.0, output);
-
-		//cv::imshow("d", output);
-
-		// Find brightest point
-		cv::Point point;
-		if (sourceSeedPointsMethod == cv::TM_SQDIFF || sourceSeedPointsMethod == cv::TM_SQDIFF_NORMED)
-			cv::minMaxLoc(output, nullptr, nullptr, &point, nullptr, mask(cv::Rect(0, 0, featureCols, featureRows)));
-		else
-			cv::minMaxLoc(output, nullptr, nullptr, nullptr, &point, mask(cv::Rect(0, 0, featureCols, featureRows)));
-
-		// Correct point
-		cv::Point center(point.x + patchCols / 2, point.y + patchRows / 2);
-
-		// Set mask
-		cv::circle(mask, center, sourceSeedPointInterDistance, cv::Scalar(0), -1);
-
-		// Move seedpoint
-		seedPoint.sourcePosition = Vec2(center.x, center.y);
-	}
+	sspGenerationMethod->mutateSeedPoints(source, target, seedPoints);
 }
 
 void SeedPointsTab::spawnPatches() {
 	for (auto& seedPoint : seedPoints) {
-		Vec2 sourceCenter(seedPoint.sourcePosition.x - seedPoint.textureSize / 2,
-		                  seedPoint.sourcePosition.y - seedPoint.textureSize / 2);
-		Vec2 targetCenter(seedPoint.targetPosition.x - seedPoint.textureSize / 2,
-		                  seedPoint.targetPosition.y - seedPoint.textureSize / 2);
-		seedPoint.patch = std::make_unique<MondriaanPatch>(
-			sourceCenter,
-			targetCenter,
-			Vec2(seedPoint.textureSize, seedPoint.textureSize)
-		);
+		Vec2 sourceCenter(seedPoint.sourcePosition.x - seedPoint.textureSize / 2, seedPoint.sourcePosition.y - seedPoint.textureSize / 2);
+		Vec2 targetCenter(seedPoint.targetPosition.x - seedPoint.textureSize / 2, seedPoint.targetPosition.y - seedPoint.textureSize / 2);
+		seedPoint.patch = std::make_unique<MondriaanPatch>(sourceCenter, targetCenter, Vec2(seedPoint.textureSize, seedPoint.textureSize));
 	}
 }
 
@@ -626,7 +503,7 @@ int SeedPointsTab::checkPatch(Patch* newPatch, Patch* oldPatch) {
 		if (patch == oldPatch)
 			continue;
 
-		if (newPatch->sourceBounds().ir().Overlaps(patch->sourceBounds().ir())) 
+		if (newPatch->sourceBounds().ir().Overlaps(patch->sourceBounds().ir()))
 			return 1;
 
 		if (newPatch->targetBounds().ir().Overlaps(patch->targetBounds().ir()))
@@ -643,12 +520,8 @@ int SeedPointsTab::checkPatch(Patch* newPatch, Patch* oldPatch) {
 }
 
 void SeedPointsTab::mutatePatches() {
-	std::vector sourceTextures = {
-		screen.editor.pipeline.sourceGrayscaleE->data, screen.editor.pipeline.sourceSobel->data
-	};
-	std::vector targetTextures = {
-		screen.editor.pipeline.wequalizedE->data, screen.editor.pipeline.targetSobel->data
-	};
+	std::vector sourceTextures = {screen.editor.pipeline.sourceGrayscaleE->data, screen.editor.pipeline.sourceSobel->data};
+	std::vector targetTextures = {screen.editor.pipeline.wequalizedE->data, screen.editor.pipeline.targetSobel->data};
 	std::vector<double> distribution = {settings.intensityWeight, settings.edgeWeight};
 
 	for (const SeedPoint& seedPoint : seedPoints) {
@@ -664,7 +537,12 @@ void SeedPointsTab::mutatePatches() {
 		for (std::size_t index = 0; index < mutations; index++) {
 			MondriaanPatch newPatch = patch->getMutation(indices[index], 5.0);
 
-			std::map<int, const char*> d = { {MondriaanPatch::BOTTOM, "Bottom"}, {MondriaanPatch::LEFT, "Left"}, {MondriaanPatch::RIGHT, "Right"}, {MondriaanPatch::TOP, "Top"}};
+			std::map<int, const char*> d = {
+			{MondriaanPatch::BOTTOM, "Bottom"},
+			{MondriaanPatch::LEFT, "Left"},
+			{MondriaanPatch::RIGHT, "Right"},
+			{MondriaanPatch::TOP, "Top"}
+			};
 			int error = checkPatch(&newPatch, patch);
 			if (error != 0) {
 				Log::debug("(%f, %f) %s: %d", seedPoint.sourcePosition.x, seedPoint.sourcePosition.y, d[indices[index]], error);
@@ -710,8 +588,7 @@ void SeedPointsTab::generateImage() {
 			cv::Mat intMatch;
 			cv::matchTemplate(sourceSobel, targetSobel, intMatch, cv::TM_CCORR);
 			cv::normalize(intMatch, intMatch, 1.0, 0.0, cv::NORM_MINMAX);
-			cv::Mat featureMatch = settings.edgeWeight * sobelMatch + settings.intensityWeight *
-				intMatch;
+			cv::Mat featureMatch = settings.edgeWeight * sobelMatch + settings.intensityWeight * intMatch;
 			cv::Point matchLoc;
 			cv::minMaxLoc(featureMatch, nullptr, nullptr, nullptr, &matchLoc);
 
@@ -733,7 +610,7 @@ void SeedPointsTab::onSourceChanged() {
 }
 
 void SeedPointsTab::onTargetChanged() {
-	target.texture = &settings.target;
+	target.texture = *settings.target;
 	target.aspect = static_cast<double>(target.texture->data.cols) / static_cast<double>(target.texture->data.rows);
 	target.features[Canvas::FEATURE_SOBEL] = screen.editor.pipeline.targetSobel.get();
 	target.features[Canvas::FEATURE_INT] = *screen.editor.pipeline.wequalizedE;

@@ -7,9 +7,6 @@ public:
 	URef<Texture> sourceHistogram;
 	URef<Texture> sourceCDF;
 
-	URef<Texture> targetHistogram;
-	URef<Texture> targetCDF;
-
 	ExtendedTexture sourceGrayscaleE;
 	ExtendedTexture targetGrayscaleE;
 

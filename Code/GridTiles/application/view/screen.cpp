@@ -17,8 +17,6 @@ void Screen::update() {
 }
 
 void Screen::render() {
-	ImGui::ShowDemoWindow();
-
 	editor.render();
 	settingsView.render();
 }
