@@ -109,11 +109,17 @@
 | 2021-12-18 | Presentation + bounds check while mutating   | 2    |
 | Totaal     |                                              | 14   | 
 
-| Blok       | Beschrijving                                     | Uren |
-| ---------- | ------------------------------------------------ | ---- |
-| 19-01-2022 | Image rotations                                  | 2    |
-| 20-01-2022 | Extended texture, collision grid                 | 3.5  |
-| 22-01-2022 | Collision grid insert / erase                    | 1    |
-| 22-01-2022 | Fixed incorrect move of texture objects          | 2    |
-| 12-02-2022 | Moved source&target seedpoint generation methods | 2    |
-| 12-02-2022 | More cleanup                                     | 2    | 
+| Blok       | Beschrijving                                         | Uren |
+| ---------- | ---------------------------------------------------- | ---- |
+| 2022-01-19 | Image rotations                                      | 2    |
+| 2022-01-20 | Extended texture, collision grid                     | 3.5  |
+| 2022-01-22 | Collision grid insert / erase                        | 1    |
+| 2022-01-22 | Fixed incorrect move of texture objects              | 2    |
+| 2022-02-12 | Moved source&target seedpoint generation methods     | 2    |
+| 2022-02-12 | More cleanup                                         | 2    |
+| 2022-02-13 | Added multiple TSPG & SSPG methods, played with SIFT | 3    |
+| Totaal     |                                                      | 15.5 | 
+
+| Week 12    | Beschrijving                                                | Uren |
+| ---------- | ----------------------------------------------------------- | ---- |
+| 2022-02-14 | Texture input and output settings, such as target dimension | 2.5  | 

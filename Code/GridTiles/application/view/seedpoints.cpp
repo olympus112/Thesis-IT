@@ -21,8 +21,8 @@
 
 void SeedPointsTab::init() {
 	generator = std::mt19937(std::random_device()());
-	tspGenerationMethod = std::make_unique<TSPG_Greedy>();
-	sspGenerationMethod = std::make_unique<SSPG_TemplateMatch>();
+	tspGenerationMethod = TSPGenerationMethod_Jittered;
+	sspGenerationMethod = SSPGenerationMethod_TemplateMatch;
 }
 
 void SeedPointsTab::update() {
@@ -366,24 +366,16 @@ void SeedPointsTab::renderTextures() {
 	ImGui::Separator();
 
 	// TSP generation method
-	static int tspMethod = TSPGenerationMethod_Greedy;
-	static const char* tspGenerationMethods[] = {
-		"Regular grid",
-		"Greedy"
-	};
+	{
+		static std::array methods = {
+			"Jittered",
+			"Greedy"
+		};
 
-	if (ImGui::Combo("Target seedpoint generation method", &tspMethod, tspGenerationMethods, 2)) {
-		switch (tspMethod) {
-			case TSPGenerationMethod_Greedy:
-				tspGenerationMethod = std::make_unique<TSPG_Greedy>();
-				break;
-			case TSPGenerationMethod_RegularGrid:
-				tspGenerationMethod = std::make_unique<TSPG_RegularGrid>();
-				break;
-		}
+		ImGui::Combo("TSPG method", &tspGenerationMethod, methods.data(), methods.size());
+
+		tspGenerationMethods[tspGenerationMethod]->renderSettings(source, target);
 	}
-
-	tspGenerationMethod->renderSettings(source, target);
 
 
 	// Source
@@ -392,27 +384,24 @@ void SeedPointsTab::renderTextures() {
 	
 
 	// SSP generation method
-	static int sspMethod = SSPGenerationMethod_TemplateMatch;
-	static const char* sspGenerationMethods[] = {
-		"Template Match"
-	};
+	{
+		static std::array methods = {
+			"Random",
+			"Template Match",
+			"SIFT"
+		};
 
-	if (ImGui::Combo("Source seedpoint generation method", &tspMethod, tspGenerationMethods, 2)) {
-		switch (sspMethod) {
-			case SSPGenerationMethod_TemplateMatch:
-				sspGenerationMethod = std::make_unique<SSPG_TemplateMatch>();
-				break;
-		}
+		ImGui::Combo("SSPG method", &sspGenerationMethod, methods.data(), methods.size());
+
+		sspGenerationMethods[sspGenerationMethod]->renderSettings(source, target);
 	}
-
-	sspGenerationMethod->renderSettings(source, target);
 
 	ImGui::NextColumn();
 	ImGui::Columns(1);
 
 	// Overlays
-	tspGenerationMethod->renderOverlay(source, target);
-	sspGenerationMethod->renderOverlay(source, target);
+	tspGenerationMethods[tspGenerationMethod]->renderOverlay(source, target);
+	sspGenerationMethods[sspGenerationMethod]->renderOverlay(source, target);
 
 	// Bounding boxes
 	ImGui::GetWindowDrawList()->AddRect(source.min().iv(), source.max().iv(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All, 2);
@@ -478,11 +467,11 @@ void SeedPointsTab::spawnTargetSeedpoints() {
 	seedPoints.clear();
 	resetSelection();
 
-	this->seedPoints = tspGenerationMethod->generate(source, target);
+	this->seedPoints = tspGenerationMethods[tspGenerationMethod]->generate(source, target);
 }
 
 void SeedPointsTab::spawnSourceSeedpoints() {
-	sspGenerationMethod->mutateSeedPoints(source, target, seedPoints);
+	sspGenerationMethods[sspGenerationMethod]->mutateSeedPoints(source, target, seedPoints);
 }
 
 void SeedPointsTab::spawnPatches() {
@@ -566,9 +555,8 @@ void SeedPointsTab::mutatePatches() {
 }
 
 void SeedPointsTab::generateImage() {
-	int size = settings.seedPointSize;
-	int cols = target.texture->data.cols / size;
-	int rows = target.texture->data.rows / size;
+	int cols = target.texture->data.cols / settings.minimumPatchDimension.x;
+	int rows = target.texture->data.rows / settings.minimumPatchDimension.y;
 
 	cv::Mat output(target.texture->data.rows, target.texture->data.cols, target.texture->data.type());
 	cv::Mat sourceSobel = source.features[Canvas::FEATURE_SOBEL]->data;
@@ -577,7 +565,7 @@ void SeedPointsTab::generateImage() {
 	for (int row = 0; row < rows; row++) {
 #pragma omp parallel for
 		for (int col = 0; col < cols; col++) {
-			cv::Rect rect(col * size, row * size, size, size);
+			cv::Rect rect(col * settings.minimumPatchDimension.x, row * settings.minimumPatchDimension.y, settings.minimumPatchDimension.x, settings.minimumPatchDimension.y);
 
 			cv::Mat targetSobel = target.features[Canvas::FEATURE_SOBEL]->data(rect);
 			cv::Mat targetInt = target.features[Canvas::FEATURE_INT]->data(rect);
@@ -593,7 +581,7 @@ void SeedPointsTab::generateImage() {
 			cv::minMaxLoc(featureMatch, nullptr, nullptr, nullptr, &matchLoc);
 
 			//cv::copyTo(target.texture->data(rect), output(rect), cv::Mat());
-			cv::copyTo(source.texture->data(cv::Rect(matchLoc.x, matchLoc.y, size, size)), output(rect), cv::Mat());
+			cv::copyTo(source.texture->data(cv::Rect(matchLoc.x, matchLoc.y, settings.minimumPatchDimension.x, settings.minimumPatchDimension.y)), output(rect), cv::Mat());
 		}
 	}
 

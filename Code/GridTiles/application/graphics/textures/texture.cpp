@@ -101,6 +101,10 @@ GLID Texture::generate(int target, int wrapS, int wrapT, int minFilter, int magF
 	return id;
 }
 
+float Texture::aspect() {
+	return static_cast<float>(data.cols) / static_cast<float>(data.rows);
+}
+
 ImTextureID Texture::it() const {
 	return reinterpret_cast<ImTextureID>(this->id);
 }

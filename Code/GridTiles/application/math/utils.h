@@ -2,6 +2,8 @@
 
 #include <numeric>
 
+#include "graphics/canvas.h"
+
 namespace Utils {
 
 	template <typename T> /*requires std::integral<T> || std::floating_point<T>*/
@@ -10,6 +12,14 @@ namespace Utils {
 		return Vector<T, 2>(
 			vector.x / inputDimension.x * outputDimension.x,
 			vector.y / inputDimension.y * outputDimension.y
+		);
+	}
+
+	template <typename T> /*requires std::integral<T> || std::floating_point<T>*/
+	constexpr Vector<T, 2> transform(const Vector<T, 2>& vector, const Canvas& source, const Canvas& target) {
+		return Vector<T, 2>(
+			vector.x / source.textureDimension().x * target.textureDimension().x,
+			vector.y / source.textureDimension().y * target.textureDimension().y
 		);
 	}
 

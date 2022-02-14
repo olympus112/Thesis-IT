@@ -15,11 +15,16 @@ bool ImGui::TexturePicker::render() {
 	bool result = false;
 
 	NewLine();
+	ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorU32(ImGuiCol_ButtonHovered));
 	Text("%s:", name.c_str());
+	ImGui::PopStyleColor();
 
 	if (texture) {
 		if (!path.empty())
 			TextDisabled(path.c_str());
+
+		ImGui::Text("Aspect: %f", texture->aspect());
+		ImGui::Text("Dimension: %d px X %d px", texture->data.cols, texture->data.rows);
 
 		float width = Utils::clamp(GetContentRegionAvailWidth() - GetStyle().FramePadding.x * 2, 100.0f, 300.0f);
 		if (ImageButton(reinterpret_cast<ImTextureID>(texture->id), ImVec2(width, width)))
@@ -32,7 +37,6 @@ bool ImGui::TexturePicker::render() {
 	hovered = ImGui::IsItemHovered();
 
 	NewLine();
-	Separator();
 
 	browser->Display();
 

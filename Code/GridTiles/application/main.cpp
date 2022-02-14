@@ -59,7 +59,7 @@ bool init() {
 	// Setup dark style
 	ImGui::StyleColorsDark();
 	setupImGuiStyle();
-	setHue(95.0f / 255.0f);
+	setHue(255.0f / 255.0f);
 
 	settings.init();
 	screen.init();

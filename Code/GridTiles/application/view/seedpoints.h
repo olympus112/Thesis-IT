@@ -9,12 +9,10 @@
 
 class SeedPointsTab {
 private:
-	URef<TSPGenerationMethod> tspGenerationMethod;
-	URef<SSPGenerationMethod> sspGenerationMethod;
+	TSPGenerationMethod tspGenerationMethod;
+	SSPGenerationMethod sspGenerationMethod;
 
 	bool showConnections = false;
-
-	int sourceSeedPointInterDistance = 100;
 
 	std::mt19937 generator;
 public:

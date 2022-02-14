@@ -63,7 +63,7 @@ void setHue(float hue) {
 void setupImGuiLayoutStyle(ImGuiStyle* style) {
     ImGuiIO& io = ImGui::GetIO();
 
-    io.Fonts->AddFontFromFileTTF("../res/fonts/droid.ttf", 15);
+    io.Fonts->AddFontFromFileTTF("../res/fonts/droid.ttf", 17);
 
     style->WindowPadding = ImVec2(14, 10);
     style->FramePadding = ImVec2(5, 5);
@@ -76,7 +76,7 @@ void setupImGuiLayoutStyle(ImGuiStyle* style) {
     style->WindowBorderSize = 0.0f;
     style->ChildBorderSize = 1.0f;
     style->FrameBorderSize = 0.0f;
-    style->PopupBorderSize = 0.0f;
+    style->PopupBorderSize = 1.0f;
     style->TabBorderSize = 0.0f;
 
     style->WindowRounding = 12.0f;
@@ -84,7 +84,7 @@ void setupImGuiLayoutStyle(ImGuiStyle* style) {
     style->FrameRounding = 12.0f;
     style->PopupRounding = 6.0f;
     style->ScrollbarRounding = 12.0f;
-    style->GrabRounding = 5.0f;
+    style->GrabRounding = 12.0f;
     style->TabRounding = 6.0f;
 
     style->WindowTitleAlign = ImVec2(0.5f, 0.5f);
