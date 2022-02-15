@@ -148,21 +148,20 @@ void SettingsView::render() {
 		ImGui::Spacing();
 
 		ImGui::Text("Actual source dimension");
-		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
 		if (ImGui::SliderFloat("##asdx", &settings.actualSourceDimension.x, 1.0, 10000, "%.0f mm")) {
 			settings.actualSourceDimension.y = settings.validateTextureAspect(&settings.actualSourceDimension.x, nullptr, settings.source->aspect());
 		}
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
 		ImGui::Text("X");
-		ImGui::PopItemWidth();
 		ImGui::SameLine();
 		if (ImGui::SliderFloat("##asdy", &settings.actualSourceDimension.y, 1.0, 10000, "%.0f mm")) {
 			settings.actualSourceDimension.x = settings.validateTextureAspect(nullptr, &settings.actualSourceDimension.y, settings.source->aspect());
 		}
 		ImGui::PopItemWidth();
 		if (sourceTexture.render()) {
-			settings.source = RotatedTextures(sourceTexture.path, settings.rotations);
+			settings.source = RotatedFeatureTextures(sourceTexture.path, settings.rotations);
 			screen.editor.pipeline.onSourceChanged(true);
 			screen.editor.seedpoints.onSourceChanged();
 		}
@@ -170,14 +169,35 @@ void SettingsView::render() {
 		if (sourceTexture.hovered) {
 			ImGui::BeginTooltip();
 
-			//ImGui::Columns(settings.source.textures.size());
 			for (const RotatedTexture& texture : settings.source.textures) {
-				std::string name = std::format("{:.2f} deg", texture.angle / CV_PI * 180);
-				ImGui::image(name.c_str(), texture.it(), ImVec2(100, 100));
-				ImGui::SameLine();
-				//ImGui::NextColumn();
+				
 			}
-			//ImGui::Columns(1);
+
+			for (std::size_t i = 0; i <= Feature::get.size(); i++) {
+				for (const RotatedFeatureTexture& texture : settings.source.textures) {
+					std::string name;
+					ImTextureID id;
+					if (i == Feature::get.size()) {
+						name = std::format("{:.2f} deg", texture.angle / CV_PI * 180);
+						id = texture.it();
+					} else {
+						name = "";
+						id = texture.features.features[i].it();
+					}
+
+					ImGui::image(name.c_str(), id, ImVec2(100, 100));
+					ImGui::SameLine();
+				}
+
+				std::string label;
+				if (i == Feature::get.size()) {
+					label = "Original";
+				} else {
+					label = Feature::get[i]->name();
+				}
+				ImGui::Text(label.c_str());
+				ImGui::NewLine();
+			}
 
 			ImGui::EndTooltip();
 		}

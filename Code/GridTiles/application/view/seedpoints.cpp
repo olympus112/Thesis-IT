@@ -21,8 +21,8 @@
 
 void SeedPointsTab::init() {
 	generator = std::mt19937(std::random_device()());
-	tspGenerationMethod = TSPGenerationMethod_Jittered;
-	sspGenerationMethod = SSPGenerationMethod_TemplateMatch;
+	tspGenerationMethod = TSPGIndex_Jittered;
+	sspGenerationMethod = SSPGIndex_TemplateMatch;
 }
 
 void SeedPointsTab::update() {
@@ -374,7 +374,7 @@ void SeedPointsTab::renderTextures() {
 
 		ImGui::Combo("TSPG method", &tspGenerationMethod, methods.data(), methods.size());
 
-		tspGenerationMethods[tspGenerationMethod]->renderSettings(source, target);
+		TSPG::get[tspGenerationMethod]->renderSettings(source, target);
 	}
 
 
@@ -393,15 +393,15 @@ void SeedPointsTab::renderTextures() {
 
 		ImGui::Combo("SSPG method", &sspGenerationMethod, methods.data(), methods.size());
 
-		sspGenerationMethods[sspGenerationMethod]->renderSettings(source, target);
+		TSPG::get[sspGenerationMethod]->renderSettings(source, target);
 	}
 
 	ImGui::NextColumn();
 	ImGui::Columns(1);
 
 	// Overlays
-	tspGenerationMethods[tspGenerationMethod]->renderOverlay(source, target);
-	sspGenerationMethods[sspGenerationMethod]->renderOverlay(source, target);
+	TSPG::get[tspGenerationMethod]->renderOverlay(source, target);
+	TSPG::get[sspGenerationMethod]->renderOverlay(source, target);
 
 	// Bounding boxes
 	ImGui::GetWindowDrawList()->AddRect(source.min().iv(), source.max().iv(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All, 2);
@@ -467,11 +467,11 @@ void SeedPointsTab::spawnTargetSeedpoints() {
 	seedPoints.clear();
 	resetSelection();
 
-	this->seedPoints = tspGenerationMethods[tspGenerationMethod]->generate(source, target);
+	this->seedPoints = TSPG::get[tspGenerationMethod]->generate(source, target);
 }
 
 void SeedPointsTab::spawnSourceSeedpoints() {
-	sspGenerationMethods[sspGenerationMethod]->mutateSeedPoints(source, target, seedPoints);
+	SSPG::get[sspGenerationMethod]->mutate(source, target, seedPoints);
 }
 
 void SeedPointsTab::spawnPatches() {

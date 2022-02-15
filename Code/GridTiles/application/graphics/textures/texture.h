@@ -47,5 +47,8 @@ public:
 	static GLID generate(int target, int wrapS, int wrapT, int minFilter, int magFilter);
 
 	float aspect();
+	int cols() const;
+	int rows() const;
+
 	ImTextureID it() const;
 };

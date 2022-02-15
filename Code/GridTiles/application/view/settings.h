@@ -5,7 +5,7 @@
 
 struct Settings {
 	// Array of `rotations` rotated source material textures
-	RotatedTextures source;
+	RotatedFeatureTextures source;
 	// The target texture
 	ExtendedTexture target;
 

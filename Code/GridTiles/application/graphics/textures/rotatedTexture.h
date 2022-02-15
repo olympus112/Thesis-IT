@@ -1,6 +1,9 @@
 #pragma once
 
+#include <opencv2/imgcodecs.hpp>
+
 #include "texture.h"
+#include "graphics/features/Feature.h"
 
 struct RotatedTexture : public Texture {
 	double angle;
@@ -11,27 +14,35 @@ struct RotatedTexture : public Texture {
 	RotatedTexture(const std::string& path, double angle);
 	RotatedTexture(Texture* texture, double angle);
 	RotatedTexture(cv::Mat texture, double angle);
+
+	static cv::Mat transform(cv::Mat texture, cv::Mat transformation, cv::Size size);
 };
 
-struct RotatedTextures {
-	std::vector<RotatedTexture> textures;
+struct RotatedFeatureTexture : public RotatedTexture {
+	FeatureVector features;
 
-	RotatedTextures();
-	RotatedTextures(const std::string& path, int rotations);
+	RotatedFeatureTexture();
+	RotatedFeatureTexture(const std::string& path, double angle);
+	RotatedFeatureTexture(Texture* baseTexture, const FeatureVector& baseFeatures, double angle);
+	RotatedFeatureTexture(cv::Mat baseTexture, const FeatureVector& baseFeatures, double angle);
+};
 
-	RotatedTextures(RotatedTextures&& other) noexcept;
-	RotatedTextures(const RotatedTextures& other) = delete;
-	RotatedTextures& operator=(RotatedTextures&& other) noexcept;
-	RotatedTextures& operator=(const RotatedTextures& other) = delete;
+struct RotatedFeatureTextures {
+	std::vector<RotatedFeatureTexture> textures;
 
-	std::size_t size() {
-		return textures.size();
-	}
+	RotatedFeatureTextures();
+	RotatedFeatureTextures(const std::string& path, int rotations);
 
-	bool empty() {
-		return textures.empty();
-	}
+	RotatedFeatureTextures(RotatedFeatureTextures&& other) noexcept;
+	RotatedFeatureTextures& operator=(RotatedFeatureTextures&& other) noexcept;
 
-	RotatedTexture* operator->();
-	RotatedTexture* operator*();
+	RotatedFeatureTextures(const RotatedFeatureTextures& other) = delete;
+	RotatedFeatureTextures& operator=(const RotatedFeatureTextures& other) = delete;
+
+	std::size_t size();
+	bool empty();
+
+	RotatedFeatureTexture& operator[](int index);
+	RotatedFeatureTexture* operator->();
+	RotatedFeatureTexture* operator*();
 };

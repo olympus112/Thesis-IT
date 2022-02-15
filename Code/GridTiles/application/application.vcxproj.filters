@@ -162,13 +162,37 @@
     <ClCompile Include="graphics\textures\extendedTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="view\SSPGeneration.cpp">
+    <ClCompile Include="generation\SSPG\SSPG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="view\TSPGeneration.cpp">
+    <ClCompile Include="generation\TSPG\TSPG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graphics\imgui\imguiStyle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generation\SSPG\SSPG_TemplateMatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generation\SSPG\SSPG_Sift.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generation\SSPG\SSPG_Random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generation\TSPG\TSPG_Greedy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generation\TSPG\TSPG_Jittered.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\features\Feature_Intensity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\features\Feature_Edge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\features\Feature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -335,7 +359,7 @@
     <ClInclude Include="graphics\imgui\imguiUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\opencv\features.h">
+    <ClInclude Include="graphics\features\Feature.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="view\settings.h">
@@ -356,13 +380,34 @@
     <ClInclude Include="util\list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="view\TSPGeneration.h">
+    <ClInclude Include="generation\TSPG\TSPG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="view\SSPGeneration.h">
+    <ClInclude Include="generation\SSPG\SSPG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphics\imgui\imguiStyle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\features\Feature_Intensity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\features\Feature_Edge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generation\SSPG\SSPG_TemplateMatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generation\SSPG\SSPG_Sift.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generation\SSPG\SSPG_Random.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generation\TSPG\TSPG_Greedy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generation\TSPG\TSPG_Jittered.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

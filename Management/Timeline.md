@@ -122,4 +122,5 @@
 
 | Week 12    | Beschrijving                                                | Uren |
 | ---------- | ----------------------------------------------------------- | ---- |
-| 2022-02-14 | Texture input and output settings, such as target dimension | 2.5  | 
+| 2022-02-14 | Texture input and output settings, such as target dimension | 2.5  |
+| 2022-02-15 | Rotated texture features, default features                  | 3.5  | 

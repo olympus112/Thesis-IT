@@ -122,8 +122,16 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="generation\SSPG\SSPG_Random.cpp" />
+    <ClCompile Include="generation\SSPG\SSPG_Sift.cpp" />
+    <ClCompile Include="generation\SSPG\SSPG_TemplateMatch.cpp" />
+    <ClCompile Include="generation\TSPG\TSPG_Greedy.cpp" />
+    <ClCompile Include="generation\TSPG\TSPG_Jittered.cpp" />
     <ClCompile Include="graphics\canvas.cpp" />
     <ClCompile Include="graphics\bounds.cpp" />
+    <ClCompile Include="graphics\features\Feature.cpp" />
+    <ClCompile Include="graphics\features\Feature_Edge.cpp" />
+    <ClCompile Include="graphics\features\Feature_Intensity.cpp" />
     <ClCompile Include="graphics\imgui\imguiStyle.cpp" />
     <ClCompile Include="graphics\opencv\canny.cpp" />
     <ClCompile Include="graphics\opencv\blur.cpp" />
@@ -189,8 +197,8 @@
     <ClCompile Include="util\stringUtil.cpp" />
     <ClCompile Include="util\terminalColor.cpp" />
     <ClCompile Include="view\screen.cpp" />
-    <ClCompile Include="view\SSPGeneration.cpp" />
-    <ClCompile Include="view\TSPGeneration.cpp" />
+    <ClCompile Include="generation\SSPG\SSPG.cpp" />
+    <ClCompile Include="generation\TSPG\TSPG.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\imgui\imconfig.h" />
@@ -202,8 +210,15 @@
     <ClInclude Include="..\include\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="generation\SSPG\SSPG_Random.h" />
+    <ClInclude Include="generation\SSPG\SSPG_Sift.h" />
+    <ClInclude Include="generation\SSPG\SSPG_TemplateMatch.h" />
+    <ClInclude Include="generation\TSPG\TSPG_Greedy.h" />
+    <ClInclude Include="generation\TSPG\TSPG_Jittered.h" />
     <ClInclude Include="graphics\canvas.h" />
     <ClInclude Include="graphics\bounds.h" />
+    <ClInclude Include="graphics\features\Feature_Edge.h" />
+    <ClInclude Include="graphics\features\Feature_Intensity.h" />
     <ClInclude Include="graphics\imgui\imguiStyle.h" />
     <ClInclude Include="graphics\imgui\imguiUtils.h" />
     <ClInclude Include="graphics\opencv\canny.h" />
@@ -212,7 +227,7 @@
     <ClInclude Include="graphics\opencv\equalization.h" />
     <ClInclude Include="graphics\opencv\cdf.h" />
     <ClInclude Include="core.h" />
-    <ClInclude Include="graphics\opencv\features.h" />
+    <ClInclude Include="graphics\features\Feature.h" />
     <ClInclude Include="graphics\opencv\histogram.h" />
     <ClInclude Include="graphics\opencv\grayscale.h" />
     <ClInclude Include="graphics\opencv\saliency\include\opencv2\saliency.hpp" />
@@ -255,8 +270,8 @@
     <ClInclude Include="util\terminalColor.h" />
     <ClInclude Include="util\typetraits.h" />
     <ClInclude Include="view\screen.h" />
-    <ClInclude Include="view\SSPGeneration.h" />
-    <ClInclude Include="view\TSPGeneration.h" />
+    <ClInclude Include="generation\SSPG\SSPG.h" />
+    <ClInclude Include="generation\TSPG\TSPG.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

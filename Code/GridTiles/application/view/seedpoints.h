@@ -2,15 +2,15 @@
 
 #include <random>
 
-#include "TSPGeneration.h"
-#include "SSPGeneration.h"
+#include "generation/TSPG/TSPG.h"
+#include "generation/SSPG/SSPG.h"
 #include "graphics/canvas.h"
 #include "graphics/seedPoint.h"
 
 class SeedPointsTab {
 private:
-	TSPGenerationMethod tspGenerationMethod;
-	SSPGenerationMethod sspGenerationMethod;
+	TSPGIndex tspGenerationMethod;
+	SSPGIndex sspGenerationMethod;
 
 	bool showConnections = false;
 

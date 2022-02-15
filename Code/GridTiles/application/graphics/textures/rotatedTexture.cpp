@@ -32,40 +32,97 @@ RotatedTexture::RotatedTexture(cv::Mat texture, double angle) {
 	this->transformationMatrix = computeTransformationMatrix(texture, angle);
 	cv::invertAffineTransform(this->transformationMatrix, this->inverseTransformationMatrix);
 
-	cv::warpAffine(texture, this->data, this->transformationMatrix, computeRotatedRect(texture, angle).size());
+	cv::Size bounds = computeRotatedRect(texture, angle).size();
+	this->data = transform(texture, this->transformationMatrix, bounds);
 
 	reloadGL(false);
 }
 
-RotatedTextures::RotatedTextures() = default;
+cv::Mat RotatedTexture::transform(cv::Mat texture, cv::Mat transformation, cv::Size size) {
+	cv::Mat result;
+	cv::warpAffine(texture, result, transformation, size);
 
-RotatedTextures::RotatedTextures(const std::string& path, int rotations) {
+	return result;
+}
+
+//! ---------------------------------------------------------------------------
+
+RotatedFeatureTexture::RotatedFeatureTexture() = default;
+
+RotatedFeatureTexture::RotatedFeatureTexture(const std::string& path, double angle) : RotatedTexture(path, angle) {
+	FeatureVector baseFeatures(this->data);
+	cv::Size bounds = computeRotatedRect(this->data, angle).size();
+
+	for (const Texture& feature : baseFeatures) {
+		cv::Mat rotatedFeature;
+		cv::warpAffine(feature.data, rotatedFeature, this->transformationMatrix, bounds);
+
+		this->features.add(rotatedFeature);
+	}
+
+	reloadGL();
+}
+
+RotatedFeatureTexture::RotatedFeatureTexture(Texture* texture, const FeatureVector& baseFeatures, double angle) : RotatedFeatureTexture(texture->data, baseFeatures, angle) {
+	
+}
+
+RotatedFeatureTexture::RotatedFeatureTexture(cv::Mat texture, const FeatureVector& baseFeatures, double angle) : RotatedTexture(texture, angle) {
+	cv::Size bounds = computeRotatedRect(texture, angle).size();
+	for (const Texture& feature : baseFeatures) {
+		cv::Mat rotatedFeature;
+		cv::warpAffine(feature.data, rotatedFeature, this->transformationMatrix, bounds);
+
+		this->features.add(rotatedFeature);
+	}
+
+	reloadGL(false);
+}
+
+//! ----------------------------------------------------------------------------------
+
+RotatedFeatureTextures::RotatedFeatureTextures() = default;
+
+RotatedFeatureTextures::RotatedFeatureTextures(const std::string& path, int rotations) {
 	cv::Mat texture = cv::imread(path);
+	FeatureVector featureVector(texture);
 	for (int rotation = 0; rotation < rotations; rotation++) {
 		double angle = CV_2PI / rotations * rotation;
 
-		textures.emplace_back(texture, angle);
+		textures.push_back(RotatedFeatureTexture(texture, featureVector, angle));
 	}
 }
 
-RotatedTextures::RotatedTextures(RotatedTextures&& other) noexcept {
+RotatedFeatureTextures::RotatedFeatureTextures(RotatedFeatureTextures&& other) noexcept {
 	this->textures = std::move(other.textures);
 }
 
-RotatedTextures& RotatedTextures::operator=(RotatedTextures&& other) noexcept {
+RotatedFeatureTextures& RotatedFeatureTextures::operator=(RotatedFeatureTextures&& other) noexcept {
 	this->textures = std::move(other.textures);
 
 	return *this;
 }
 
-RotatedTexture* RotatedTextures::operator->() {
+std::size_t RotatedFeatureTextures::size() {
+	return textures.size();
+}
+
+bool RotatedFeatureTextures::empty() {
+	return textures.empty();
+}
+
+RotatedFeatureTexture& RotatedFeatureTextures::operator[](int index) {
+	return this->textures[index];
+}
+
+RotatedFeatureTexture* RotatedFeatureTextures::operator->() {
 	if (textures.empty())
 		return nullptr;
 
 	return &textures.front();
 }
 
-RotatedTexture* RotatedTextures::operator*() {
+RotatedFeatureTexture* RotatedFeatureTextures::operator*() {
 	if (textures.empty())
 		return nullptr;
 

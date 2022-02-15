@@ -29,7 +29,7 @@ void Settings::init() {
 
 	std::string sourcePath = "../res/wood_sphere.jpg";
 	std::string targetPath = "../res/cliff_sphere.jpg";
-	source = RotatedTextures(sourcePath, rotations);
+	source = RotatedFeatureTextures(sourcePath, rotations);
 	target = ExtendedTexture("Target", targetPath);
 }
 

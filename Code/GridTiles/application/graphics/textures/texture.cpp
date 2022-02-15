@@ -105,6 +105,14 @@ float Texture::aspect() {
 	return static_cast<float>(data.cols) / static_cast<float>(data.rows);
 }
 
+int Texture::cols() const {
+	return data.cols;
+}
+
+int Texture::rows() const {
+	return data.rows;
+}
+
 ImTextureID Texture::it() const {
 	return reinterpret_cast<ImTextureID>(this->id);
 }
