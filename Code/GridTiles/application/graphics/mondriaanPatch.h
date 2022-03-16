@@ -1,19 +1,35 @@
 #pragma once
 #include "patch.h"
 
-class MondriaanPatch : public Patch {
+struct MondriaanPatch {
 public:
-	constexpr static int LEFT = 0;
-	constexpr static int RIGHT = 1;
-	constexpr static int TOP = 2;
-	constexpr static int BOTTOM = 3;
+	// Patch offset in the source texture
+	Vec2i sourceOffset;
+	// Patch offset in the target texture
+	Vec2i targetOffset;
+	// Dimension of the patch
+	Vec2 dimension_mm;
+
+	// Source rotation
+	double sourceRotation;
+	// Local rotated mask
+	cv::Mat mask;
 
 public:
-	MondriaanPatch(const Vec2& sourceOffset, const Vec2& targetOffset, const Vec2& dimension);
+	MondriaanPatch(const Vec2& sourceOffset, const Vec2& targetOffset, const Vec2& dimension, double sourceRotation);
 
-	void mutate(int mutation, double step);
-	MondriaanPatch getMutation(int mutation, double step) const;
+	void render(const Canvas& source, const Canvas& target, bool intersected, bool selected, bool showConnections, const Color& color) const;
 
-	static int mutations();
-	static Shape computeShape(const Vec2& dimension);
+	Bounds sourceBounds() const;
+	Bounds targetBounds() const;
+
+	Bounds sourceUV() const;
+	Bounds targetUV() const;
 };
+
+
+//void mutate(int mutation, double step);
+//MondriaanPatch getMutation(int mutation, double step) const;
+//
+//static int mutations();
+//static Shape computeShape(const Vec2& dimension);

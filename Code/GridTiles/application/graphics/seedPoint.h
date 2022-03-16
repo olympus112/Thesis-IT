@@ -6,6 +6,8 @@
 struct SeedPoint {
 	// Texture space, center aligned
 	Vec2 sourcePosition;
+	// Rotation index
+	std::size_t sourceRotation;
 	// Texture space, center aligned
 	Vec2 targetPosition;
 	// Texture space

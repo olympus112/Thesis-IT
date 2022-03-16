@@ -4,14 +4,14 @@
     "type": "split",
     "children": [
       {
-        "id": "c7cf09127501d0cf",
+        "id": "d2ec17cb7bd17113",
         "type": "leaf",
         "state": {
           "type": "markdown",
           "state": {
             "file": "Management/Timeline.md",
             "mode": "source",
-            "source": true
+            "source": false
           }
         }
       }
@@ -133,17 +133,17 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "c7cf09127501d0cf",
+  "active": "d2ec17cb7bd17113",
   "lastOpenFiles": [
     "Management/Timeline.md",
+    "Notes/Conversion diagram.svg",
+    "Notes/Conversions.md",
     "Meetings/21-10-2021.md",
+    "Notes/Stylised fabrication.md",
+    "Bespreking.md",
     "Management/Todo.md",
+    "Notes/Ideas.md",
     "Links/Papers.md",
-    "Links/Miscellaneous.md",
-    "Meetings/2-12-2021.md",
-    "Loren.md",
-    "Images/Quadtree.png",
-    "Meetings/9-12-2021.md",
-    "Meetings/4-11-2021.md"
+    "Links/Miscellaneous.md"
   ]
 }

@@ -1,0 +1,4 @@
+- De aspect ratios van actuele dimensies en virtuele dimensies zijn altijd gelijk.
+- De grootte van een unit (millimeter) in de actuele dimensie is gelijk voor de source en de target.
+- De grootte van de source en target textures komen niet perse overeen met de grootte van eenheden in de realiteit. Om Te voorkomen dat we elke patch gaan moeten schalen door de mismatch, zullen we de source of de target moeten prescalen zodat de pixel dimmensies overeenkomen, en de unit ratio in virtual space 1:1 is. We kiezen om de afbeelding met de kleinste oppervlakte te prescalen, zodat er geen informatie verloren gaat.
+![[Conversion diagram.svg]]

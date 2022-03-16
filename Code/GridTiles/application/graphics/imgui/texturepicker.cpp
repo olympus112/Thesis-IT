@@ -11,7 +11,7 @@ ImGui::TexturePicker::TexturePicker(const std::string& name) {
 	browser->SetTypeFilters({".png", ".jpg"});
 }
 
-bool ImGui::TexturePicker::render() {
+bool ImGui::TexturePicker::render(Texture* texture) {
 	bool result = false;
 
 	NewLine();
@@ -23,22 +23,20 @@ bool ImGui::TexturePicker::render() {
 		if (!path.empty())
 			TextDisabled(path.c_str());
 
-		ImGui::Text("Aspect: %f", texture->aspect());
-		ImGui::Text("Dimension: %d px X %d px", texture->data.cols, texture->data.rows);
-
 		float width = Utils::clamp(GetContentRegionAvailWidth() - GetStyle().FramePadding.x * 2, 100.0f, 300.0f);
-		if (ImageButton(reinterpret_cast<ImTextureID>(texture->id), ImVec2(width, width)))
+		if (ImageButton(reinterpret_cast<ImTextureID>(texture->id), ImVec2(width, width  / texture->aspect())))
 			browser->Open();
+
+		ImGui::Text("Aspect: %f", texture->aspect());
+		ImGui::Text("Texture dimension: %d px X %d px", texture->data.cols, texture->data.rows);
+
 	} else {
 		if (Button("Choose image"))
 			browser->Open();
 	}
 
 	hovered = ImGui::IsItemHovered();
-
-	NewLine();
-
-	browser->Display();
+		browser->Display();
 
 	if (browser->HasSelected()) {
 		path = browser->GetSelected().string();
@@ -48,11 +46,6 @@ bool ImGui::TexturePicker::render() {
 	}
 
 	return result;
-}
-
-void ImGui::TexturePicker::load(Texture* texture, const std::string& path) {
-	this->path = path;
-	this->texture = texture;
 }
 
 

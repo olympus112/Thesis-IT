@@ -9,6 +9,7 @@ public:
 
 	Mask() = default;
 	Mask(const Shape& shape);
+	Mask(const Vec2& dimension, double rotation);
 
 	cv::Range rowRange(int rowOffset) const;
 	cv::Range columnRange(int columnOffset) const;

@@ -4,12 +4,12 @@
 #include "bounds.h"
 
 Canvas::Canvas(Texture* texture, const Vec2& offset, double preferredSize) {
-	this->texture = texture;
 	this->offset = offset;
 	this->hover = false;
 	this->drag = false;
 
-	this->aspect = static_cast<double>(texture->data.cols) / static_cast<double>(texture->data.rows);
+	this->aspect = texture->aspect();
+	this->tdimension = texture->dimension();
 	this->dimension = computeDimension(textureDimension(), preferredSize);
 }
 
@@ -42,10 +42,7 @@ bool Canvas::covers(const Vec2& center, const Vec2& point) const {
 }
 
 Vec2 Canvas::textureDimension() const {
-	return Vec2(
-		this->texture->data.cols,
-		this->texture->data.rows
-	);
+	return tdimension;
 }
 
 Vec2 Canvas::screenDimension() const {
@@ -64,7 +61,7 @@ Vec2 Canvas::toAbsoluteScreenSpace(const Vec2& textureVector) const {
 	return offset + toRelativeScreenSpace(textureVector);
 }
 
-Bounds Canvas::bounds() const {
+Bounds Canvas::screenBounds() const {
 	return Bounds(
 		offset,
 		offset + dimension
@@ -79,7 +76,7 @@ Bounds Canvas::textureBounds() const {
 }
 
 Bounds Canvas::uv(const Bounds& subBounds) const {
-	return bounds().subBoundsUV(subBounds);
+	return screenBounds().subBoundsUV(subBounds);
 }
 
 Vec2 Canvas::computeDimension(const Vec2& textureDimension, double preferredSize) {

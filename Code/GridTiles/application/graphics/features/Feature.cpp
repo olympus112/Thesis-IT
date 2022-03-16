@@ -11,6 +11,10 @@ std::unordered_map<FeatureIndex, SRef<Feature>> Feature::get = {
 
 FeatureVector::FeatureVector() = default;
 
+FeatureVector::FeatureVector(Texture* texture) : FeatureVector(texture->data) {
+	
+}
+
 FeatureVector::FeatureVector(cv::Mat texture) {
 	add(Feature::get[FeatureIndex_Intensity]->compute(texture));
 	add(Feature::get[FeatureIndex_Edge]->compute(texture));
@@ -34,6 +38,14 @@ int FeatureVector::rows() const {
 
 int FeatureVector::cols() const {
 	return features.front().cols();
+}
+
+std::size_t FeatureVector::size() const {
+	return features.size();
+}
+
+bool FeatureVector::empty() const {
+	return features.empty();
 }
 
 Texture& FeatureVector::operator[](int index) {
@@ -70,4 +82,9 @@ std::vector<Texture>::const_iterator FeatureVector::begin() const {
 
 std::vector<Texture>::const_iterator FeatureVector::end() const {
 	return features.end();
+}
+
+void FeatureVector::resize(const Vec2i& size) {
+	for (Texture& feature : features)
+		feature.resize(size);
 }

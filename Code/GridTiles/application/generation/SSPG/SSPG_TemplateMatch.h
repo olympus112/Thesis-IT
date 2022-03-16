@@ -4,6 +4,7 @@
 struct SSPG_TemplateMatch : public SSPG {
 	inline static SSPGIndex ID = SSPGIndex_TemplateMatch;
 
+	int rotations = 5;
 	int interdistance = 100;
 	int metric = 1;
 
@@ -11,5 +12,5 @@ struct SSPG_TemplateMatch : public SSPG {
 
 	void renderSettings(Canvas& source, Canvas& target) override;
 
-	void mutate(Canvas& source, Canvas& target, std::vector<SeedPoint>& seedPoints) override;
+	void mutate(std::vector<MondriaanPatch>& patches) override;
 };

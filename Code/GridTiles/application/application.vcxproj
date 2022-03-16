@@ -83,6 +83,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -184,9 +185,8 @@
     <ClCompile Include="util\globals.cpp" />
     <ClCompile Include="view\settings.cpp" />
     <ClCompile Include="view\pipeline.cpp" />
-    <ClCompile Include="view\seedpoints.cpp" />
+    <ClCompile Include="view\editor.cpp" />
     <ClCompile Include="view\settingsView.cpp" />
-    <ClCompile Include="view\editorView.cpp" />
     <ClCompile Include="graphics\opengl\bindable.cpp" />
     <ClCompile Include="graphics\imgui\texturepicker.cpp" />
     <ClCompile Include="graphics\imgui\widgets.cpp" />
@@ -201,15 +201,20 @@
     <ClCompile Include="generation\TSPG\TSPG.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\imgui\fa_solid_900.h" />
+    <ClInclude Include="..\include\imgui\font_awesome_5.h" />
     <ClInclude Include="..\include\imgui\imconfig.h" />
     <ClInclude Include="..\include\imgui\imfilebrowser.h" />
     <ClInclude Include="..\include\imgui\imgui.h" />
     <ClInclude Include="..\include\imgui\imgui_impl_glfw.h" />
     <ClInclude Include="..\include\imgui\imgui_impl_opengl3.h" />
     <ClInclude Include="..\include\imgui\imgui_internal.h" />
+    <ClInclude Include="..\include\imgui\imgui_notify.h" />
     <ClInclude Include="..\include\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\include\imgui\tahoma.h" />
+    <ClInclude Include="..\include\thread_pool\thread_pool.hpp" />
     <ClInclude Include="generation\SSPG\SSPG_Random.h" />
     <ClInclude Include="generation\SSPG\SSPG_Sift.h" />
     <ClInclude Include="generation\SSPG\SSPG_TemplateMatch.h" />
@@ -251,9 +256,8 @@
     <ClInclude Include="util\sat.h" />
     <ClInclude Include="view\settings.h" />
     <ClInclude Include="view\pipeline.h" />
-    <ClInclude Include="view\seedpoints.h" />
+    <ClInclude Include="view\editor.h" />
     <ClInclude Include="view\settingsView.h" />
-    <ClInclude Include="view\editorView.h" />
     <ClInclude Include="graphics\opengl\bindable.h" />
     <ClInclude Include="graphics\color.h" />
     <ClInclude Include="graphics\imgui\texturepicker.h" />

@@ -12,10 +12,10 @@ void SSPG_Sift::renderSettings(Canvas& source, Canvas& target) {
 	SSPG::renderSettings(source, target);
 }
 
-void SSPG_Sift::mutate(Canvas& source, Canvas& target, std::vector<SeedPoint>& seedPoints) {
+void SSPG_Sift::mutate(std::vector<MondriaanPatch>& patches) {
 	cv::Mat descriptors;
 	std::vector<cv::KeyPoint> keyPoints;
-	cv::Mat gray = screen.editor.pipeline.targetGrayscaleE->data;
+	cv::Mat gray = screen.pipeline.targetGrayscale->data;
 	sift->detectAndCompute(gray, cv::Mat(), keyPoints, descriptors);
 	cv::Mat img;
 	cv::drawKeypoints(gray, keyPoints, img, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);

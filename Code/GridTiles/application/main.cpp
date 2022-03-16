@@ -7,6 +7,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+//#include "imgui/imgui_notify.h"
 
 Vec2i dimension;
 Screen screen;
@@ -60,6 +61,9 @@ bool init() {
 	ImGui::StyleColorsDark();
 	setupImGuiStyle();
 	setHue(255.0f / 255.0f);
+
+	// Load notifications
+	//ImGui::MergeIconsWithLatestFont(io.Fonts->ConfigData.back().SizePixels, true);
 
 	settings.init();
 	screen.init();
@@ -127,6 +131,13 @@ void render() {
 	screen.render();
 
 	ImGui::End();
+
+	// Render notifications
+	//ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 5.f);
+	//ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f));
+	//ImGui::RenderNotifications();
+	//ImGui::PopStyleVar(1);
+	//ImGui::PopStyleColor(1);
 
 	// Submit
 	ImGui::Render();

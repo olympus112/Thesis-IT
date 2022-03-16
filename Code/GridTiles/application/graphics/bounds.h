@@ -1,8 +1,8 @@
 #pragma once
 
-#include "canvas.h"
 #include "color.h"
 #include "imgui/imgui_internal.h"
+#include "canvas.h"
 #include "math/utils.h"
 
 template <typename T>
@@ -161,8 +161,9 @@ public:
 		);
 	}
 
+	// Render bounds in pixel space
 	void render(const Canvas& canvas, const Color& color = Colors::WHITE) const {
-		ImGui::GetWindowDrawList()->AddRect(canvas.offset + min().iv(), canvas.offset + max().iv(), color.u32(), 0,
+		ImGui::GetWindowDrawList()->AddRect(canvas.toAbsoluteScreenSpace(min()).iv(), canvas.toAbsoluteScreenSpace(max()).iv(), color.u32(), 0,
 		                                    ImDrawCornerFlags_All);
 	}
 

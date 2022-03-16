@@ -15,6 +15,21 @@ Mask::Mask(const Shape& shape) {
 	cv::fillConvexPoly(this->pixels, points.data(), static_cast<int>(shape.size()), cv::Scalar(255));
 }
 
+Mask::Mask(const Vec2& dimension, double rotation) {
+	cv::Point center(dimension.cv() / 2.0);
+	cv::Size size(dimension.cv());
+	cv::RotatedRect rotatedRect(center, size, static_cast<float>(rotation));
+
+	cv::Rect bounds = rotatedRect.boundingRect();
+	this->pixels = cv::Mat(bounds.size(), CV_8UC1);
+
+	cv::Point2f points[4];
+	rotatedRect.points(points);
+
+	cv::Point vertices[4] { points[0], points[1], points[2], points[3] };
+	cv::fillConvexPoly(this->pixels, vertices, 4, cv::Scalar(255));
+}
+
 cv::Range Mask::rowRange(int rowOffset) const {
 	return cv::Range(rowOffset, rowOffset + pixels.rows);
 }

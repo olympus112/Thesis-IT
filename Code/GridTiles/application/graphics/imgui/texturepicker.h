@@ -14,8 +14,7 @@ namespace ImGui {
 
 		TexturePicker(const std::string& name);
 
-		bool render();
-		void load(Texture* texture, const std::string& path = "");
+		bool render(Texture* texture);
 
 		ImTextureID it();
 	};

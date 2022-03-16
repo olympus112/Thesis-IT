@@ -5,6 +5,9 @@
 #include "../opengl/bindable.h"
 #include "imgui/imgui.h"
 
+template <typename>
+struct BoundsTemplate;
+
 class Texture : public Bindable {
 public:
 	// OpenCV
@@ -46,9 +49,16 @@ public:
 
 	static GLID generate(int target, int wrapS, int wrapT, int minFilter, int magFilter);
 
-	float aspect();
+	float aspect() const;
+	float surface() const;
+
 	int cols() const;
 	int rows() const;
 
+	Vec2 dimension() const;
+	BoundsTemplate<double> bounds() const;
+
 	ImTextureID it() const;
+
+	void resize(const Vec2i& size);
 };

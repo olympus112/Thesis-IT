@@ -1,10 +1,12 @@
 #pragma once
 
-#include "editorView.h"
+#include "editor.h"
+#include "pipeline.h"
 #include "settingsView.h"
 
 class Screen {
 public:
+	PipelineView pipeline;
 	EditorView editor;
 	SettingsView settingsView;
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "texture.h"
+#include "graphics/features/Feature.h"
 
 class ExtendedTexture {
 public:
@@ -26,7 +27,25 @@ public:
 	}
 
 	void reload();
+	void resize(const Vec2i& size);
 
 	Texture* operator->();
 	Texture* operator*();
+};
+
+class ExtendedFeatureTexture : public ExtendedTexture {
+public:
+	FeatureVector features;
+
+	ExtendedFeatureTexture();
+	ExtendedFeatureTexture& operator=(ExtendedFeatureTexture&& other) noexcept;
+	ExtendedFeatureTexture(ExtendedFeatureTexture&& other) noexcept;
+
+	ExtendedFeatureTexture(const std::string& name, const std::string& path, bool computeFeatures);
+	ExtendedFeatureTexture(const std::string& name, Texture* baseTexture, bool computeFeatures);
+	ExtendedFeatureTexture(const std::string& name, cv::Mat baseTexture, bool computeFeatures);
+
+	Texture& operator[](FeatureIndex feature);
+
+	void resize(const Vec2i& size);
 };

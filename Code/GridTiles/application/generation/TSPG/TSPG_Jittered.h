@@ -22,5 +22,5 @@ public:
 	void renderOverlay(Canvas& source, Canvas& target) override;
 	void renderSettings(Canvas& source, Canvas& target) override;
 
-	std::vector<SeedPoint> generate(Canvas& source, Canvas& target) override;
+	std::vector<MondriaanPatch> generate() override;
 };

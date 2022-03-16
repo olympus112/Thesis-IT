@@ -8,27 +8,16 @@
 static int pipeline = 0;
 static std::vector pipelines = {"Default", "Histogram", "CDF", "Blur", "Saliency"};
 
-PipelineTab::PipelineTab() = default;
+PipelineView::PipelineView() = default;
 
-void PipelineTab::init() {
-	sourceHistogram = std::make_unique<Texture>();
-	sourceCDF = std::make_unique<Texture>();
-	
-	targetBlur = std::make_unique<Texture>();
-	targetSobel = std::make_unique<Texture>();
-	targetCanny = std::make_unique<Texture>();
+void PipelineView::init() {
 
-	sourceBlur = std::make_unique<Texture>();
-	sourceSobel = std::make_unique<Texture>();
-	sourceCanny = std::make_unique<Texture>();
-
-	saliencyMap = std::make_unique<Texture>();
 }
 
-void PipelineTab::update() {
+void PipelineView::update() {
 }
 
-void PipelineTab::render() {
+void PipelineView::render() {
 	ImGui::Begin("Pipeline");
 
 	for (int index = 0; index < pipelines.size(); index++)
@@ -37,190 +26,180 @@ void PipelineTab::render() {
 
 	ImGui::Separator();
 
+	ImVec2 sourceSize = ImVec2(Globals::imageWidth, Globals::imageWidth / settings.source->aspect());
+	ImVec2 targetSize = ImVec2(Globals::imageWidth, Globals::imageWidth / settings.target->aspect());
+
 	// Default
 	if (pipeline == 0) {
-		ImGui::image("Target", settings.target->it());
+		ImGui::image("Target", settings.target->it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target int", targetGrayscaleE->it());
+		ImGui::image("Target int", targetGrayscale->it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Equalized", equalizedE->it());
+		ImGui::image("Equalized", equalized->it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Weighted equalization", wequalizedE->it());
+		ImGui::image("Weighted equalization", wequalized->it(), targetSize);
 		ImGui::NewLine();
-		ImGui::image("Source", settings.source->it());
+		ImGui::image("Source", settings.source->it(), sourceSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Source int", sourceGrayscaleE->it());
+		ImGui::image("Source int", sourceGrayscale->it(), sourceSize);
 		ImGui::SameLine();
 		ImGui::arrow({0, Globals::imageWidth / 2}, {Globals::arrowWidth, 0});
 	}
 
 	// Histogram
 	if (pipeline == 1) {
-		ImGui::image("Target hist", settings.target.histogram.it());
+		ImGui::image("Target hist", settings.target.histogram.it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target int hist", targetGrayscaleE.histogram.it());
+		ImGui::image("Target int hist", targetGrayscale.histogram.it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Equalized hist", equalizedE.histogram.it());
+		ImGui::image("Equalized hist", equalized.histogram.it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Weighted hist", wequalizedE.histogram.it());
+		ImGui::image("Weighted hist", wequalized.histogram.it(), targetSize);
 		ImGui::NewLine();
-		ImGui::image("Source hist", sourceHistogram->it());
+		ImGui::image("Source hist", sourceHistogram.it(), sourceSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Source int hist", sourceGrayscaleE.histogram.it());
+		ImGui::image("Source int hist", sourceGrayscale.histogram.it(), sourceSize);
 		ImGui::SameLine();
 		ImGui::arrow({0, Globals::imageWidth / 2}, {Globals::arrowWidth, 0});
 	}
 
 	// CDF
 	if (pipeline == 2) {
-		ImGui::image("Target cdf", settings.target.cdf.it());
+		ImGui::image("Target cdf", settings.target.cdf.it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target int cdf", targetGrayscaleE.cdf.it());
+		ImGui::image("Target int cdf", targetGrayscale.cdf.it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Equalized cdf", equalizedE.cdf.it());
+		ImGui::image("Equalized cdf", equalized.cdf.it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Weighted cdf", wequalizedE.cdf.it());
+		ImGui::image("Weighted cdf", wequalized.cdf.it(), targetSize);
 		ImGui::NewLine();
-		ImGui::image("Source cdf", sourceCDF->it());
+		ImGui::image("Source cdf", sourceCDF.it(), sourceSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Source int cdf", sourceGrayscaleE.cdf.it());
+		ImGui::image("Source int cdf", sourceGrayscale.cdf.it(), sourceSize);
 		ImGui::SameLine();
 		ImGui::arrow({0, Globals::imageWidth / 2}, {Globals::arrowWidth, 0});
 	}
 
 	// Edge
 	if (pipeline == 3) {
-		ImGui::image("Weight equalized", wequalizedE->it());
+		ImGui::image("Weight equalized", wequalized->it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target blur", targetBlur->it());
+		ImGui::image("Target blur", targetBlur.it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target Sobel", targetSobel->it());
+		ImGui::image("Target Sobel", targetSobel.it(), targetSize);
 		ImGui::SameLine();
-		ImGui::image("Target Canny", targetCanny->it());
+		ImGui::image("Target Canny", targetCanny.it(), targetSize);
 
-		ImGui::image("Source int", sourceGrayscaleE->it());
+		ImGui::image("Source int", sourceGrayscale->it(), sourceSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Source blur", sourceBlur->it());
+		ImGui::image("Source blur", sourceBlur.it(), sourceSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Source Sobel", sourceSobel->it());
+		ImGui::image("Source Sobel", sourceSobel.it(), sourceSize);
 		ImGui::SameLine();
-		ImGui::image("Source Canny", sourceCanny->it());
+		ImGui::image("Source Canny", sourceCanny.it(), sourceSize);
 	}
 
 	// Salience
 	if (pipeline == 4) {
-		ImGui::image("Target", settings.target->it());
+		ImGui::image("Target", settings.target->it(), targetSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
-		ImGui::image("Target salience", saliencyMap->it());
+		ImGui::image("Target salience", saliencyMap.it(), targetSize);
 	}
 
 	ImGui::End();
 
 }
 
-void PipelineTab::reload() {
-	onSourceChanged(false);
-	onTargetChanged(false);
-	onSourceOrTargetChanged(false);
-	onEqualizationWeightChanged(false);
-}
-
-void PipelineTab::onSourceChanged(bool propagate) {
-	// Source
-	ImageUtils::renderHistogram(*settings.source, sourceHistogram.get());
-	ImageUtils::renderCDF(*settings.source, sourceCDF.get());
+void PipelineView::reload() {
+	// Source histogram and cdf
+	ImageUtils::renderHistogram(*settings.source, &sourceHistogram);
+	ImageUtils::renderCDF(*settings.source, &sourceCDF);
 
 	// Source grayscale
-	Grayscale grayscale(*settings.source);
-	sourceGrayscaleE = ExtendedTexture("Source grayscale", grayscale.grayscale);
+	Grayscale sourceGrayscale(*settings.source);
+	this->sourceGrayscale = ExtendedTexture("Source grayscale", sourceGrayscale.grayscale);
 
-	if (propagate)
-		onSourceOrTargetChanged(propagate);
-}
-
-void PipelineTab::onTargetChanged(bool propagate) {
 	// Target grayscale
-	Grayscale grayscale(*settings.target);
-	targetGrayscaleE = ExtendedTexture("Target grayscale", grayscale.grayscale);
+	Grayscale targetGrayscale(*settings.target);
+	this->targetGrayscale = ExtendedTexture("Target grayscale", targetGrayscale.grayscale);
 
 	// Saliency
-	ImageUtils::renderSalience(*settings.target, saliencyMap.get());
+	ImageUtils::renderSalience(*settings.target, &saliencyMap);
 
-	if (propagate)
-		onSourceOrTargetChanged(propagate);
-}
-
-void PipelineTab::onSourceOrTargetChanged(bool propagate) {
 	// Calculate equalization
-	Equalization equalization(*targetGrayscaleE, *sourceGrayscaleE);
-	equalizedE = ExtendedTexture("Equalized", equalization.equalization);
+	Equalization equalization(*this->targetGrayscale, *this->sourceGrayscale);
+	this->equalized = ExtendedTexture("Equalized", equalization.equalization);
 
-	if (propagate)
-		onEqualizationWeightChanged(propagate);
-}
-
-
-void PipelineTab::onEqualizationWeightChanged(bool propagate) {
 	// Weighted equalization
 	cv::Mat wequalized;
-	cv::addWeighted(targetGrayscaleE->data, 1.0f - settings.equalizationWeight, equalizedE->data, settings.equalizationWeight, 0.0, wequalized);
-	this->wequalizedE = ExtendedTexture("Weight Equalized", wequalized);
+	cv::addWeighted(this->targetGrayscale->data, 1.0f - settings.equalizationWeight, this->equalized->data, settings.equalizationWeight, 0.0, wequalized);
+	this->wequalized = ExtendedTexture("Weight Equalized", wequalized);
 
-	onTargetBlurChanged(propagate);
-}
+	// Target Blur, Sobel and Canny
+	ImageUtils::renderBlur(*this->wequalized, &this->targetBlur);
+	ImageUtils::renderSobel(&this->targetBlur, &this->targetSobel);
+	ImageUtils::renderCanny(&this->targetBlur, &this->targetCanny);
 
-void PipelineTab::onTargetBlurChanged(bool propagate) {
-	// Blur
-	ImageUtils::renderBlur(*wequalizedE, targetBlur.get());
+	// Source Blur, Sobel and Canny
+	ImageUtils::renderBlur(*this->sourceGrayscale, &this->sourceBlur);
+	ImageUtils::renderSobel(&this->sourceBlur, &this->sourceSobel);
+	ImageUtils::renderCanny(&this->sourceBlur, &this->sourceCanny);
 
-	// Sobel
-	ImageUtils::renderSobel(targetBlur.get(), targetSobel.get());
+	// Set source features
+	if (settings.source.features.size() == 0) {
+		settings.source.features.add(this->sourceGrayscale->data.clone());
+		settings.source.features.add(this->sourceSobel.data.clone());
+	} else {
+		settings.source.features[FeatureIndex_Intensity].data = this->sourceGrayscale->data.clone();
+		settings.source.features[FeatureIndex_Edge].data = sourceSobel.data.clone();
+	}
 
-	// Canny
-	ImageUtils::renderCanny(targetBlur.get(), targetCanny.get());
-}
+	// Set target features
+	if (settings.target.features.size() == 0) {
+		settings.target.features.add(this->wequalized->data.clone());
+		settings.target.features.add(this->targetSobel.data.clone());
+	} else {
+		settings.target.features[FeatureIndex_Intensity].data = this->wequalized->data.clone();
+		settings.target.features[FeatureIndex_Edge].data = targetSobel.data.clone();
+	}
 
-void PipelineTab::onSourceBlurChanged(bool propagate) {
-	// Blur
-	ImageUtils::renderBlur(*sourceGrayscaleE, sourceBlur.get());
-
-	// Sobel
-	ImageUtils::renderSobel(sourceBlur.get(), sourceSobel.get());
-
-	// Canny
-	ImageUtils::renderCanny(sourceBlur.get(), sourceCanny.get());
+	// Reload target and source features
+	settings.target.features[FeatureIndex_Intensity].reloadGL();
+	settings.source.features[FeatureIndex_Intensity].reloadGL();
+	settings.target.features[FeatureIndex_Edge].reloadGL();
+	settings.source.features[FeatureIndex_Edge].reloadGL();
 }

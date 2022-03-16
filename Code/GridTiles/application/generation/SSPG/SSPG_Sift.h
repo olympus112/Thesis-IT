@@ -10,5 +10,5 @@ struct SSPG_Sift : public SSPG {
 
 	void renderSettings(Canvas& source, Canvas& target) override;
 
-	void mutate(Canvas& source, Canvas& target, std::vector<SeedPoint>& seedPoints) override;
+	void mutate(std::vector<MondriaanPatch>& patches) override;
 };

@@ -3,6 +3,9 @@
 
 #include <opencv2/core/mat.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
+
+#include "graphics/bounds.h"
 
 Texture::Texture(): Bindable(0) {
 }
@@ -101,8 +104,12 @@ GLID Texture::generate(int target, int wrapS, int wrapT, int minFilter, int magF
 	return id;
 }
 
-float Texture::aspect() {
+float Texture::aspect() const {
 	return static_cast<float>(data.cols) / static_cast<float>(data.rows);
+}
+
+float Texture::surface() const {
+	return data.rows * data.cols;
 }
 
 int Texture::cols() const {
@@ -113,6 +120,19 @@ int Texture::rows() const {
 	return data.rows;
 }
 
+Vec2 Texture::dimension() const {
+	return Vec2(data.cols, data.rows);
+}
+
+Bounds Texture::bounds() const {
+	return Bounds(0, 0, data.cols, data.rows);
+}
+
 ImTextureID Texture::it() const {
 	return reinterpret_cast<ImTextureID>(this->id);
+}
+
+void Texture::resize(const Vec2i& size) {
+	cv::resize(data, data, size.cv());
+	reloadGL();
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "graphics/canvas.h"
-#include "graphics/seedPoint.h"
+#include "graphics/mondriaanPatch.h"
 
 typedef int TSPGIndex;
 enum TSPGIndex_ {
@@ -17,6 +17,6 @@ public:
 
 	virtual void renderOverlay(Canvas& source, Canvas& target) {}
 	virtual void renderSettings(Canvas& source, Canvas& target) {}
-	virtual std::vector<SeedPoint> generate(Canvas& source, Canvas& target) = 0;
+	virtual std::vector<MondriaanPatch> generate() = 0;
 };
 

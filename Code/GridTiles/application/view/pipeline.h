@@ -2,39 +2,32 @@
 #include "graphics/textures/extendedTexture.h"
 #include "graphics/textures/texture.h"
 
-class PipelineTab {
+class PipelineView {
 public:
-	URef<Texture> sourceHistogram;
-	URef<Texture> sourceCDF;
+	Texture sourceHistogram;
+	Texture sourceCDF;
 
-	ExtendedTexture sourceGrayscaleE;
-	ExtendedTexture targetGrayscaleE;
+	ExtendedTexture sourceGrayscale;
+	ExtendedTexture targetGrayscale;
 
-	ExtendedTexture equalizedE;
-	ExtendedTexture wequalizedE;
+	ExtendedTexture equalized;
+	ExtendedTexture wequalized;
 
-	URef<Texture> targetBlur;
-	URef<Texture> targetSobel;
-	URef<Texture> targetCanny;
+	Texture targetBlur;
+	Texture targetSobel;
+	Texture targetCanny;
 
-	URef<Texture> sourceBlur;
-	URef<Texture> sourceSobel;
-	URef<Texture> sourceCanny;
+	Texture sourceBlur;
+	Texture sourceSobel;
+	Texture sourceCanny;
 
-	URef<Texture> saliencyMap;
+	Texture saliencyMap;
 
-	PipelineTab();
+	PipelineView();
 
 	void init();
 	void update();
 	void render();
 
 	void reload();
-	
-	void onSourceChanged(bool propagate);
-	void onTargetChanged(bool propagate);
-	void onSourceOrTargetChanged(bool propagate);
-	void onEqualizationWeightChanged(bool propagate);
-	void onTargetBlurChanged(bool propagate);
-	void onSourceBlurChanged(bool propagate);
 };

@@ -3,8 +3,10 @@
 
 #include "main.h"
 #include "screen.h"
+#include "graphics/imgui/imguiUtils.h"
 #include "graphics/imgui/texturepicker.h"
 #include "graphics/imgui/widgets.h"
+#include "imgui/imgui_notify.h"
 #include "util/stringUtil.h"
 
 static ImGui::TexturePicker sourceTexture("Source texture");
@@ -13,12 +15,8 @@ static ImGui::TexturePicker targetTexture("Target texture");
 SettingsView::SettingsView() = default;
 
 void SettingsView::init() {
-
-	sourceTexture.load(*settings.source);
-	targetTexture.load(*settings.target);
-
-	screen.editor.pipeline.reload();
-	screen.editor.seedpoints.reload();
+	screen.pipeline.reload();
+	screen.editor.reload();
 }
 
 void SettingsView::update() {
@@ -27,32 +25,42 @@ void SettingsView::update() {
 void SettingsView::render() {
 	ImGui::Begin("Settings");
 
+	if (ImGui::Button("Reload pipeline", ImVec2(ImGui::GetContentRegionAvailWidth(), 80))) {
+		ImGui::InsertNotification({ ImGuiToastType_Info, 3000, "Reloading pipeline..." });
+		settings.reloadPrescaledTextures();
+		screen.pipeline.reload();
+		screen.editor.reload();
+		ImGui::InsertNotification({ ImGuiToastType_Info, 3000, "Done." });
+	}
+
 	if (ImGui::CollapsingHeader("Global variables")) {
-		ImGui::Text("Source hover: %s", screen.editor.seedpoints.source.hover ? "Yes" : "No");
-		ImGui::Text("Source drag: %s", screen.editor.seedpoints.source.drag ? "Yes" : "No");
-		ImGui::Text("Target hover: %s", screen.editor.seedpoints.target.hover ? "Yes" : "No");
-		ImGui::Text("Target drag: %s", screen.editor.seedpoints.target.drag ? "Yes" : "No");
+		ImGui::Text("Source hover: %s", screen.editor.source.hover ? "Yes" : "No");
+		ImGui::Text("Source drag: %s", screen.editor.source.drag ? "Yes" : "No");
+		ImGui::Text("Target hover: %s", screen.editor.target.hover ? "Yes" : "No");
+		ImGui::Text("Target drag: %s", screen.editor.target.drag ? "Yes" : "No");
 
 		ImGui::Spacing();
 		ImGui::Separator();
 		ImGui::Spacing();
 
-		ImGui::Text("Intersected index: %d", screen.editor.seedpoints.intersectedIndex);
-		ImGui::Text("Intersected point: %s", Util::str(screen.editor.seedpoints.intersectedPoint).c_str());
-		ImGui::Text("Selected index: %d", screen.editor.seedpoints.intersectedIndex);
-		ImGui::Text("Selected point: %s", Util::str(screen.editor.seedpoints.selectedPoint).c_str());
+		ImGui::Text("Intersected index: %d", screen.editor.intersectedIndex);
+		ImGui::Text("Intersected point: %s", Util::str(screen.editor.intersectedPoint).c_str());
+		ImGui::Text("Selected index: %d", screen.editor.intersectedIndex);
+		ImGui::Text("Selected point: %s", Util::str(screen.editor.selectedPoint).c_str());
 	}
 
 	if (ImGui::CollapsingHeader("Feature settings")) {
+		// Intensity weight
 		if (ImGui::SliderFloat("Intensity weight", &settings.intensityWeight, 0.0f, 1.0f)) {
 			settings.edgeWeight = 1.0f - settings.intensityWeight;
 		}
+		// Edge weight
 		if (ImGui::SliderFloat("Edge weight", &settings.edgeWeight, 0.0f, 1.0f)) {
 			settings.intensityWeight = 1.0f - settings.edgeWeight;
 		}
-		if (ImGui::SliderFloat("Equalization weight", &settings.equalizationWeight, 0.0f, 1.0f)) {
-			screen.editor.pipeline.onEqualizationWeightChanged(true);
-		}
+
+		// Equalization weight
+		ImGui::SliderFloat("Equalization weight", &settings.equalizationWeight, 0.0f, 1.0f);
 
 		ImGui::Spacing();
 		ImGui::Separator();
@@ -90,91 +98,109 @@ void SettingsView::render() {
 		ImGui::SameLine();
 		ImGui::Text("Canny aperture");
 		blurChanged |= ImGui::Checkbox("Canny L2 gradient", &settings.cannyL2gradient);
-
-		if (blurChanged) {
-			screen.editor.pipeline.onTargetBlurChanged(true);
-			screen.editor.pipeline.onSourceBlurChanged(true);
-		}
 	}
 
 	if (ImGui::CollapsingHeader("Texture settings")) {
-		ImGui::Text("Rotations");
-		if (ImGui::SliderInt("##Rotations", &settings.rotations, 1, 30)) {
-			float interval = 360.0f / static_cast<float>(settings.rotations);
-			float distanceFromFloor = fmod(settings.sourceRotation, interval);
-			settings.sourceRotation -= distanceFromFloor < interval / 2.0f ? distanceFromFloor : -(interval - distanceFromFloor);
-		}
+		// Postscale
+		ImGui::DragFloat("Postscale", &settings.postscale, 0.1f, 0.1f, 1.5);
 
-		ImGui::Spacing();
-		ImGui::Separator();
-		ImGui::Spacing();
+		// Source to target pixel ratio
+		ImGui::Text("Source to target pixel ratio: %.2f", settings.sourceToTargetPixelRatio);
 
+		// Preferred patch range
 		ImGui::Text("Preferred patch range");
-		if (ImGui::DragIntRange2("##ppr", &settings.preferredPatchCountRange.x, &settings.preferredPatchCountRange.y, 1, 1)) {
-			settings.validateTextureSettings(Settings::SettingValidation_PreferredTargetDimension);
+		if (ImGui::DragIntRange2("##ppr", &settings.preferredPatchCountRange.x, &settings.preferredPatchCountRange.y, 1, 1, 1000)) {
+			settings.validateTextureSettings(Settings::SettingValidation_ActualTargetDimension);
 		}
+
+		// Minimum patch dimension
 		ImGui::Text("Minimum patch dimension");
-		if (ImGui::DragFloat2("##mps", settings.minimumPatchDimension.data)) {
-			settings.validateTextureSettings(Settings::SettingValidation_PreferredTargetDimension);
+		if (ImGui::DragFloat2("##mps", settings.minimumPatchDimension_mm.data)) {
+			settings.validateTextureSettings(Settings::SettingValidation_ActualTargetDimension);
 		}
 
 		ImGui::Spacing();
 		ImGui::Separator();
 		ImGui::Spacing();
 
-		ImGui::Text("Preferred target dimension");
-		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
-		if (ImGui::SliderFloat("##ptdx", &settings.preferredTargetDimension.x, 1.0, 10000, "%.0f mm")) {
-			settings.preferredTargetDimension.y = settings.validateTextureAspect(&settings.preferredTargetDimension.x, nullptr, settings.target->aspect());
-			settings.validateTextureSettings(Settings::SettingValidation_PreferredTargetDimension);
+		// Source texture
+		if (sourceTexture.render(*settings.source)) {
+			// Load new source and validate actual source dimension
+			settings.originalSource = Texture(sourceTexture.path);
+			settings.validateTextureSettings(Settings::SettingValidation_ActualSourceDimension);
+
+			// Reload prescaled textures
+			settings.reloadPrescaledTextures();
+
+			// Notify pipeline and editor
+			screen.pipeline.reload();
+			screen.editor.reload();
 		}
+
+		// Actual source dimension
+		ImGui::Text("Actual dimension");
+		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+		if (ImGui::DragFloat("##asdx", &settings.actualSourceDimension_mm.x, 1.0, 1.0, 10000.0, "%.0f mm")) {
+			settings.actualSourceDimension_mm.y = settings.validateTextureAspect(&settings.actualSourceDimension_mm.x, nullptr, settings.source->aspect());
+			settings.validateTextureSettings(Settings::SettingValidation_ActualSourceDimension);
+		}
+		ImGui::PopItemWidth();
 		ImGui::SameLine();
 		ImGui::Text("X");
-		ImGui::PopItemWidth();
 		ImGui::SameLine();
-		if (ImGui::SliderFloat("##ptdy", &settings.preferredTargetDimension.y, 1.0, 10000, "%.0f mm")) {
-			settings.preferredTargetDimension.x = settings.validateTextureAspect(nullptr, &settings.preferredTargetDimension.y, settings.target->aspect());
-			settings.validateTextureSettings(Settings::SettingValidation_PreferredTargetDimension);
+		if (ImGui::DragFloat("##asdy", &settings.actualSourceDimension_mm.y, 1.0, 1.0f, 10000.0f, "%.0f mm")) {
+			settings.actualSourceDimension_mm.x = settings.validateTextureAspect(nullptr, &settings.actualSourceDimension_mm.y, settings.source->aspect());
+			settings.validateTextureSettings(Settings::SettingValidation_ActualSourceDimension);
 		}
 		ImGui::PopItemWidth();
-		if (targetTexture.render()) {
-			settings.target = ExtendedTexture("Target", targetTexture.path);
-			screen.editor.pipeline.onTargetChanged(true);
-			screen.editor.seedpoints.onTargetChanged();
-		}
+
+		// Source mm2px ration
+		ImGui::Text("Source px to mm ratio: %.2f", settings.sourceMillimeterToPixelRatio);
 
 		ImGui::Spacing();
 		ImGui::Separator();
 		ImGui::Spacing();
 
-		ImGui::Text("Actual source dimension");
-		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
-		if (ImGui::SliderFloat("##asdx", &settings.actualSourceDimension.x, 1.0, 10000, "%.0f mm")) {
-			settings.actualSourceDimension.y = settings.validateTextureAspect(&settings.actualSourceDimension.x, nullptr, settings.source->aspect());
-		}
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-		ImGui::Text("X");
-		ImGui::SameLine();
-		if (ImGui::SliderFloat("##asdy", &settings.actualSourceDimension.y, 1.0, 10000, "%.0f mm")) {
-			settings.actualSourceDimension.x = settings.validateTextureAspect(nullptr, &settings.actualSourceDimension.y, settings.source->aspect());
-		}
-		ImGui::PopItemWidth();
-		if (sourceTexture.render()) {
-			settings.source = RotatedFeatureTextures(sourceTexture.path, settings.rotations);
-			screen.editor.pipeline.onSourceChanged(true);
-			screen.editor.seedpoints.onSourceChanged();
+		// Target texture
+		if (targetTexture.render(*settings.target)) {
+			// Load new target and validate actual target dimension
+			settings.originalTarget = Texture(targetTexture.path);
+			settings.validateTextureSettings(Settings::SettingValidation_ActualTargetDimension);
+
+			// Reload prescaled textures
+			settings.reloadPrescaledTextures();
+
+			// Notify pipeline and editor
+			screen.pipeline.reload();
+			screen.editor.reload();
 		}
 
+		// Actual target dimension
+		ImGui::Text("Preferred dimension");
+		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+		if (ImGui::DragFloat("##ptdx", &settings.actualTargetDimension_mm.x, 1.0f, 1.0f, 10000.0f, "%.0f mm")) {
+			settings.actualTargetDimension_mm.y = settings.validateTextureAspect(&settings.actualTargetDimension_mm.x, nullptr, settings.target->aspect());
+			settings.validateTextureSettings(Settings::SettingValidation_ActualTargetDimension);
+		}
+		ImGui::SameLine();
+		ImGui::Text("X");
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+		if (ImGui::DragFloat("##ptdy", &settings.actualTargetDimension_mm.y, 1.0f, 1.0f, 10000.0f, "%.0f mm")) {
+			settings.actualTargetDimension_mm.x = settings.validateTextureAspect(nullptr, &settings.actualTargetDimension_mm.y, settings.target->aspect());
+			settings.validateTextureSettings(Settings::SettingValidation_ActualTargetDimension);
+		}
+		ImGui::PopItemWidth();
+
+		// Target mm2px ratio
+		ImGui::Text("Target px to mm ratio: %.2f", settings.targetMillimeterToPixelRatio);
+
+		// Source tooltip
 		if (sourceTexture.hovered) {
 			ImGui::BeginTooltip();
 
-			for (const RotatedTexture& texture : settings.source.textures) {
-				
-			}
-
 			for (std::size_t i = 0; i <= Feature::get.size(); i++) {
-				for (const RotatedFeatureTexture& texture : settings.source.textures) {
+				/*for (const RotatedFeatureTexture& texture : settings.source.textures) {
 					std::string name;
 					ImTextureID id;
 					if (i == Feature::get.size()) {
@@ -196,7 +222,12 @@ void SettingsView::render() {
 					label = Feature::get[i]->name();
 				}
 				ImGui::Text(label.c_str());
-				ImGui::NewLine();
+				ImGui::NewLine();*/
+
+				if (i == Feature::get.size())
+					ImGui::image("Original", settings.source->it());
+				else
+					ImGui::image(Feature::get[i]->name().c_str(), settings.source[i].it());
 			}
 
 			ImGui::EndTooltip();

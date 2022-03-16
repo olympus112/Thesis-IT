@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <opencv2/core.hpp>
+#include "graphics/textures/texture.h"
 
 typedef int FeatureIndex;
 enum FeatureIndex_ {
@@ -24,6 +25,7 @@ public:
 	std::vector<Texture> features;
 
 	FeatureVector();
+	FeatureVector(Texture* texture);
 	FeatureVector(cv::Mat texture);
 	FeatureVector(const std::vector<cv::Mat>& features);
 
@@ -31,6 +33,9 @@ public:
 
 	int rows() const;
 	int cols() const;
+
+	std::size_t size() const;
+	bool empty() const;
 
 	Texture& operator[](int index);
 
@@ -41,4 +46,6 @@ public:
 	std::vector<Texture>::iterator end();
 	std::vector<Texture>::const_iterator begin() const;
 	std::vector<Texture>::const_iterator end() const;
+
+	void resize(const Vec2i& size);
 };

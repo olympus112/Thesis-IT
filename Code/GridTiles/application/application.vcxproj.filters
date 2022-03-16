@@ -69,9 +69,6 @@
     <ClCompile Include="graphics\imgui\widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="view\editorView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="view\settingsView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -81,7 +78,7 @@
     <ClCompile Include="view\pipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="view\seedpoints.cpp">
+    <ClCompile Include="view\editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graphics\opencv\histogram.cpp">
@@ -275,9 +272,6 @@
     <ClInclude Include="math\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="view\editorView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="view\settingsView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -290,7 +284,7 @@
     <ClInclude Include="util\imageUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="view\seedpoints.h">
+    <ClInclude Include="view\editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="view\pipeline.h">
@@ -408,6 +402,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generation\TSPG\TSPG_Jittered.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\fa_solid_900.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\font_awesome_5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\imgui_notify.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui\tahoma.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\thread_pool\thread_pool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -123,4 +123,17 @@
 | Week 12    | Beschrijving                                                | Uren |
 | ---------- | ----------------------------------------------------------- | ---- |
 | 2022-02-14 | Texture input and output settings, such as target dimension | 2.5  |
-| 2022-02-15 | Rotated texture features, default features                  | 3.5  | 
+| 2022-02-15 | Rotated texture features, default features                  | 3.5  |
+| 2022-02-28 | Work on features                                            | 1    |
+| 2022-03-01 | Tried to add rotations to ssp mutations                     | 3    |
+| 2022-03-03 | Meeting                                                     | 1    |
+|            |                                                             |      |
+
+| Week 13    | Beschrijving                                                               | Uren |
+| ---------- | -------------------------------------------------------------------------- | ---- |
+| 2022-03-12 | Rewrite of seedpoints and patches                                          | 4    |
+| 2022-03-13 | Rewrite of settings and validation                                         | 4    |
+| 2022-03-14 | Rewrite of pipeline reload                                                 | 3    |
+| 2022-03-15 | Rewrite of seedpoint template match with rotations, added postscale factor | 4    |
+| 2022-03-16 | Fixed template matching, fixed many bugs, added global mask                | 5    | 
+|            |                                                                            |      |
