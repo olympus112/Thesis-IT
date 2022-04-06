@@ -5,7 +5,7 @@
 
 class Mask {
 public:
-	cv::Mat pixels;
+	cv::Mat data;
 
 	Mask() = default;
 	Mask(const Shape& shape);
@@ -17,4 +17,6 @@ public:
 	static cv::Mat copy(const cv::Mat& texture, const Mask& mask, int rowOffset, int columnOffset);
 	static void cut(const cv::Mat& texture, const Mask& mask, int rowOffset, int columnOffset);
 	static void paste(const cv::Mat& texture, const Mask& mask, int rowOffset, int columnOffset, const Color& color = Colors::WHITE);
+	static cv::Mat fromPoints(const Bounds& bounds, const std::vector<Vec2>& points);
+	static cv::Mat rotated(const Vec2& dimension, double rotation);
 };

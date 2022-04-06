@@ -35,13 +35,13 @@ Vec2 Patch::dimension() const {
 Bounds Patch::targetBounds() const {
 	return Bounds(
 		targetOffset,
-		targetOffset + dimension()
+		dimension()
 	);
 }
 
 Bounds Patch::sourceBounds() const {
 	return Bounds(
 		sourceOffset,
-		sourceOffset + dimension()
+		dimension()
 	);
 }

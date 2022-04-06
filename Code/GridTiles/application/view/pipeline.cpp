@@ -11,7 +11,7 @@ static std::vector pipelines = {"Default", "Histogram", "CDF", "Blur", "Saliency
 PipelineView::PipelineView() = default;
 
 void PipelineView::init() {
-
+	reload();
 }
 
 void PipelineView::update() {

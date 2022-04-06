@@ -5,3 +5,7 @@
 - Normalization of template
 - Laplacian operator
 - Surfel gap filling
+- Add own implementation of matchtemplate
+	- ~~Box filter solution~~
+	- ~~Premultiplication~~
+- Preference to align with neighbours for mondriaan te verkrijgen

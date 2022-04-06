@@ -76,7 +76,7 @@ void Settings::reloadPrescaledTextures() {
 	}
 	
 	// Reset mask
-	mask.data = cv::Mat(source->cols(), source->rows(), CV_8UC1, cv::Scalar(255));
+	mask.data = cv::Mat(source->rows(), source->cols(), CV_8UC1, cv::Scalar(255));
 	mask.reloadGL();
 
 	// Recalculate source to target ratio, this should be 1

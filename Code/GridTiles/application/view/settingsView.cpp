@@ -15,8 +15,6 @@ static ImGui::TexturePicker targetTexture("Target texture");
 SettingsView::SettingsView() = default;
 
 void SettingsView::init() {
-	screen.pipeline.reload();
-	screen.editor.reload();
 }
 
 void SettingsView::update() {
@@ -25,7 +23,7 @@ void SettingsView::update() {
 void SettingsView::render() {
 	ImGui::Begin("Settings");
 
-	if (ImGui::Button("Reload pipeline", ImVec2(ImGui::GetContentRegionAvailWidth(), 80))) {
+	if (ImGui::Button("Reload pipeline", ImVec2(ImGui::GetContentRegionAvail().x, 80))) {
 		ImGui::InsertNotification({ ImGuiToastType_Info, 3000, "Reloading pipeline..." });
 		settings.reloadPrescaledTextures();
 		screen.pipeline.reload();

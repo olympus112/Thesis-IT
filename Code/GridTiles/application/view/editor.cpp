@@ -14,13 +14,22 @@
 #include "graphics/imgui/imguiUtils.h"
 #include "omp.h"
 #include "graphics/mondriaanPatch.h"
+#include "graphics/imgui/imguiUtils.h"
+
+#include "fade2D/Fade_2D.h"
 
 void EditorView::init() {
 	generator = std::mt19937(std::random_device()());
 	tspGenerationMethod = TSPGIndex_Jittered;
 	sspGenerationMethod = SSPGIndex_TemplateMatch;
 
-	patches.push_back(MondriaanPatch(Vec2(100, 100), Vec2(200, 200), Vec2(25, 25), 0));
+	reload();
+
+	grid.add(Vec2(100, 100), Vec2(200, 200), Vec2(25, 25), 25);
+	grid[0].computeTransformationMatrix();
+
+	nMutations = 2;
+	nMutatedPatches = Utils::min<int>(10, grid.size());
 }
 
 void EditorView::update() {
@@ -31,16 +40,21 @@ void EditorView::update() {
 		intersectedIndex = -1;
 		intersectedPoint = relativeOffset;
 
-		for (int index = 0; index < patches.size(); index++) {
-			MondriaanPatch& patch = patches[index];
+		for (int index = 0; index < grid.size(); index++) {
+			MondriaanPatch& patch = grid[index];
 
-			if (source.hover && patch.sourceBounds().contains(source.toTextureSpace(intersectedPoint))) {
+			Bounds sourceBounds = patch.sourceRotatedBounds();
+			Bounds targetBounds = patch.targetBounds();
+
+			Vec2 sourceIntersection = source.toTextureSpace(intersectedPoint);
+			Vec2 targetIntersection = target.toTextureSpace(intersectedPoint);
+
+			if (source.hover && sourceBounds.econtains(sourceIntersection)) {
 				intersectedIndex = index;
 				break;
 			}
 
-			// TODO rotation
-			if (target.hover && patch.targetBounds().contains(target.toTextureSpace(intersectedPoint))) {
+			if (target.hover && targetBounds.econtains(targetIntersection)) {
 				intersectedIndex = index;
 				break;
 			}
@@ -65,19 +79,41 @@ void EditorView::update() {
 	}
 
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && (source.hover || target.hover)) {
-		patches.emplace_back(source.toTextureSpace(relativeOffset), target.toTextureSpace(relativeOffset), settings.minimumPatchDimension_mm, 0);
+		grid.add(source.toTextureSpace(relativeOffset), target.toTextureSpace(relativeOffset), settings.minimumPatchDimension_mm, 0);
 	}
 
 	// Mouse drag
 	if ((source.drag || target.drag) && selectedIndex != -1) {
 		Vec2 delta = relativeOffset - selectedPoint;
-		if (source.drag)
-			patches[selectedIndex].sourceOffset += source.toTextureSpace(delta);
+		if (source.drag) {
+			Vec2 sourceDelta = source.toTextureSpace(delta);
+			Bounds oldSourceBounds = grid[selectedIndex].sourceRotatedBounds();
+			grid[selectedIndex].sourceOffset += sourceDelta;
+			// Check location
+			if (checkPatchSourceLocation(grid[selectedIndex])) {
+				Bounds newSourceBounds = grid[selectedIndex].sourceRotatedBounds();
+				grid.update(selectedIndex, oldSourceBounds, newSourceBounds, Type_Source);
+			} else {
+				// Undo change
+				grid[selectedIndex].sourceOffset -= sourceDelta;
+			}
+		}
 
-		if (target.drag)
-			patches[selectedIndex].targetOffset += target.toTextureSpace(delta);
+		if (target.drag) {
+			Vec2 targetDelta = target.toTextureSpace(delta);
+			Bounds oldTargetBounds = grid[selectedIndex].targetBounds();
+			grid[selectedIndex].targetOffset += targetDelta;
+			// Check location
+			if (checkPatchTargetLocation(grid[selectedIndex])) {
+				Bounds newTargetBounds = grid[selectedIndex].targetBounds();
+				grid.update(selectedIndex, oldTargetBounds, newTargetBounds, Type_Target);
+			} else {
+				// Undo change
+				grid[selectedIndex].targetOffset -= targetDelta;
+			}
+		}
 
-		selectedPoint += delta;
+		selectedPoint = relativeOffset;
 	}
 
 	// Mouse release
@@ -147,7 +183,7 @@ void EditorView::renderCursor() {
 void EditorView::renderTooltip() {
 	// Tooltip
 	if (intersectedIndex != -1 || selectedIndex != -1) {
-		const MondriaanPatch& patch = patches[intersectedIndex != -1 ? intersectedIndex : selectedIndex];
+		const MondriaanPatch& patch = grid[intersectedIndex != -1 ? intersectedIndex : selectedIndex];
 		auto tooltipPosition = intersectedIndex != -1 ? ImGui::GetCursorPos() : source.min() + patch.sourceOffset;
 
 		Bounds sourceUV = patch.sourceUV();
@@ -171,14 +207,18 @@ void EditorView::renderTooltip() {
 		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
 		ImGui::Text("X: %.0f", patch.sourceOffset.x);
 		ImGui::Text("Y: %.0f", patch.sourceOffset.y);
-		ImGui::image("Source", settings.source->it(), ImVec2(80, 80), sourceUV.min().iv(), sourceUV.max().iv());
+		ImGui::Text("W: %d", patch.mask.cols);
+		ImGui::Text("H: %d", patch.mask.rows);
+		ImGui::image("Source", settings.source->it(), ImVec2(80, 80), sourceUV.min().iv(), sourceUV.emax().iv());
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, 95);
 		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
 		ImGui::Text("X: %.0f", patch.targetOffset.x);
 		ImGui::Text("Y: %.0f", patch.targetOffset.y);
-		ImGui::image("Target", settings.target->it(), ImVec2(80, 80), targetUV.min().iv(), targetUV.max().iv());
+		ImGui::Text("W: %.0f", patch.targetDimension().x);
+		ImGui::Text("H: %.0f", patch.targetDimension().y);
+		ImGui::image("Target", settings.target->it(), ImVec2(80, 80), targetUV.min().iv(), targetUV.emax().iv());
 
 		ImGui::Columns(1);
 
@@ -191,70 +231,142 @@ void EditorView::renderTooltip() {
 void EditorView::renderPatchViewer() {
 	// Seedpoint viewer
 	ImGui::Begin("Patch viewer");
-	for (int index = 0; index < patches.size(); index++) {
-		const MondriaanPatch& patch = patches[index];
-		auto sourceScreenPosition = source.toAbsoluteScreenSpace(patch.sourceOffset);
-		auto targetScreenPosition = target.toAbsoluteScreenSpace(patch.targetOffset);
-		Bounds sourceUV = patch.sourceUV();
+	ImGui::Text("# Patches: %d", grid.size());
+
+	for (int index = 0; index < grid.size(); index++) {
+		ImGui::PushID(index);
+		MondriaanPatch& patch = grid[index];
+
+		Vec2 sourceRotatedDimension = patch.sourceRotatedDimension2f();
+		Bounds rotatedSourceUV = patch.sourceRotatedUV();
 		Bounds targetUV = patch.targetUV();
 
 		float size = 80.0f;
+		ImVec2 sourceSize = Canvas::computeDimension(sourceRotatedDimension, size).iv();
+		ImVec2 targetSize = Canvas::computeDimension(patch.targetDimension(), size).iv();
+
 		ImGui::TextColored(Colors::BLUE.iv4(), "Patch #%d", index + 1);
 		ImGui::Separator();
-		ImGui::Text("Width: %.2f", patch.dimension_mm.x);
-		ImGui::Text("Height: %.2f", patch.dimension_mm.y);
-		ImGui::Text("Rotation: %.2f", patch.sourceRotation);
+		ImGui::DragFloat("Width", &patch.dimension_mm.x, 0.1f, 0.1f, 50.0f, "%.2f mm");
+		ImGui::DragFloat("Height", &patch.dimension_mm.y, 0.1f, 0.1f, 50.0f, "%.2f mm");
+		ImGui::DragFloat("Rotation", &patch.sourceRotation, 1.0f, 0.0f, 360.0f, "%.2f");
+		ImGui::Text("Match: %.6f", static_cast<float>(patch.match));
+
+		if (ImGui::Button("Show mask"))
+			cv::imshow("Mask", patch.mask);
+		ImGui::SameLine();
+		if (ImGui::Button("Reload mask"))
+			patch.mask = Mask(patch.sourceDimension(), patch.sourceRotation).data;
+		if (ImGui::Button("Add to global mask")) {
+			patch.addToGlobalMask();
+			settings.mask.reloadGL();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Remove from global mask")) {
+			patch.removeFromGlobalMask();
+			settings.mask.reloadGL();
+		}
+		if (ImGui::Button("Reload match")) {
+			patch.computeTransformationMatrix();
+			patch.computeMatch();
+		}
 
 		ImGui::Columns(4, 0, false);
 		ImGui::SetColumnWidth(-1, size + 10);
 		ImGui::TextColored(Colors::BLUE.iv4(), "Source");
-		ImGui::Image(settings.source->it(), ImVec2(size, size), sourceUV.min().iv(), sourceUV.max().iv());
+
+		auto drawRotatedQuad = [&patch, &sourceSize, &sourceRotatedDimension] (const ImVec2& offset) {
+			std::vector<Vec2> points = patch.sourceRotatedPointsRelative2f();
+
+			ImGui::GetWindowDrawList()->AddQuad(
+				offset + (Utils::transform(points[0], sourceRotatedDimension, Vec2(sourceSize))).iv(),
+				offset + (Utils::transform(points[1], sourceRotatedDimension, Vec2(sourceSize))).iv(),
+				offset + (Utils::transform(points[2], sourceRotatedDimension, Vec2(sourceSize))).iv(),
+				offset + (Utils::transform(points[3], sourceRotatedDimension, Vec2(sourceSize))).iv(),
+				Colors::RGB_R.u32()
+			);
+		};
+
+		ImVec2 sourcePos = ImGui::GetCursorScreenPos();
+		ImGuiUtils::ImageNoSpacing(settings.source->it(), sourceSize, rotatedSourceUV.min().iv(), rotatedSourceUV.emax().iv());
+		drawRotatedQuad(sourcePos);
+
 		ImGui::NextColumn();
 		ImGui::Text("");
-		ImGui::Text("X: %.0f", patch.sourceOffset.x);
-		ImGui::Text("Y: %.0f", patch.sourceOffset.y);
+		ImGui::DragFloat("X##sourceX", &patch.sourceOffset.x, 1.0f, 0.0f, settings.source->dimension().x, "%.1f");
+		ImGui::DragFloat("Y##sourceY", &patch.sourceOffset.y, 1.0f, 0.0f, settings.source->dimension().y, "%.1f");
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 		ImGui::TextColored(Colors::BLUE.iv4(), "Target");
-		ImGui::Image(settings.target->it(), ImVec2(size, size), targetUV.min().iv(), targetUV.max().iv());
+		ImGuiUtils::ImageNoSpacing(settings.target->it(), targetSize, targetUV.min().iv(), targetUV.emax().iv());
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 		ImGui::Text("");
-		ImGui::Text("X: %.0f", patch.targetOffset.x);
-		ImGui::Text("Y: %.0f", patch.targetOffset.y);
+		ImGui::DragFloat("X##targetX", &patch.targetOffset.x, 1.0f, 0.0f, settings.target->dimension().x, "%.1f");
+		ImGui::DragFloat("Y##targetY", &patch.targetOffset.y, 1.0f, 0.0f, settings.target->dimension().y, "%.1f");
 
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
 
-		ImGui::Image(settings.source[FeatureIndex_Intensity].it(), ImVec2(size, size), sourceUV.min().iv(), sourceUV.max().iv());
+		ImVec2 intensityPos = ImGui::GetCursorScreenPos();
+		ImGuiUtils::ImageNoSpacing(settings.source[FeatureIndex_Intensity].it(), sourceSize, rotatedSourceUV.min().iv(), rotatedSourceUV.emax().iv());
+		drawRotatedQuad(intensityPos);
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
-		ImGui::Image(settings.source[FeatureIndex_Edge].it(), ImVec2(size, size), sourceUV.min().iv(), sourceUV.max().iv());
+		ImVec2 edgePos = ImGui::GetCursorScreenPos();
+		ImGuiUtils::ImageNoSpacing(settings.source[FeatureIndex_Edge].it(), sourceSize, rotatedSourceUV.min().iv(), rotatedSourceUV.emax().iv());
+		drawRotatedQuad(edgePos);
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
-		ImGui::Image(settings.target[FeatureIndex_Intensity].it(), ImVec2(size, size), targetUV.min().iv(), targetUV.max().iv());
+		ImGuiUtils::ImageNoSpacing(settings.target[FeatureIndex_Intensity].it(), targetSize, targetUV.min().iv(), targetUV.emax().iv());
 		ImGui::NextColumn();
 		ImGui::SetColumnWidth(-1, size + 10);
-		ImGui::Image(settings.target[FeatureIndex_Edge].it(), ImVec2(size, size), targetUV.min().iv(), targetUV.max().iv());
+		ImGuiUtils::ImageNoSpacing(settings.target[FeatureIndex_Edge].it(), targetSize, targetUV.min().iv(), targetUV.emax().iv());
 		ImGui::NextColumn();
 
 		ImGui::Columns(1);
 
 		ImGui::Separator();
+		ImGui::PopID();
 	}
 	ImGui::End();
 }
 
 void EditorView::renderPatches() {
+	std::set<std::size_t> targetNeighbours;
+	std::set<std::size_t> sourceNeighbours;
+	if (selectedIndex != -1) {
+		targetNeighbours = grid.neighbours(selectedIndex, Type_Target);
+		sourceNeighbours = grid.neighbours(selectedIndex, Type_Source);
+	}
+
 	// Render seedpoints
-	for (int index = 0; index < patches.size(); index++)
-		patches[index].render(source,
-		                      target,
-		                      intersectedIndex == index,
-		                      selectedIndex == index,
-		                      showConnections,
-		                      Color::blend(Colors::YELLOW, Colors::RGB_R, static_cast<float>(index + 1) / static_cast<float>(patches.size())));
+	for (int patchIndex = 0; patchIndex < grid.size(); patchIndex++) {
+		Color targetColor = Color::blend(Colors::YELLOW, Colors::RED, static_cast<float>(patchIndex + 1) / static_cast<float>(grid.size()));
+		Color sourceColor = targetColor;
+
+		if (targetNeighbours.find(patchIndex) != targetNeighbours.end())
+			targetColor = Colors::RGB_B;
+
+		if (sourceNeighbours.find(patchIndex) != sourceNeighbours.end())
+			sourceColor = Colors::RGB_B;
+
+		if (grid.overlaps(grid[patchIndex], Type_Target))
+			targetColor = Colors::RGB_G;
+
+		if (grid.overlaps(grid[patchIndex], Type_Source))
+			sourceColor = Colors::RGB_G;
+
+		grid[patchIndex].render(source,
+		                        target,
+		                        intersectedIndex == patchIndex,
+		                        selectedIndex == patchIndex,
+		                        showConnections,
+		                        sourceColor,
+		                        targetColor);
+	}
+
 }
 
 void EditorView::renderTextures() {
@@ -301,8 +413,10 @@ void EditorView::renderSettings() {
 	ImGui::SetColumnWidth(2, target.dimension.iv().x + 20);
 
 	ImGuiUtils::pushButtonColor(0.0);
-	if (ImGui::Button("Delete patches", ImVec2(source.dimension.x, height)))
-		patches.clear();
+	if (ImGui::Button("Delete patches", ImVec2(source.dimension.x, height))) {
+		grid.clear();
+		resetSelection();
+	}
 	ImGuiUtils::popButtonColor();
 
 	ImGuiUtils::pushButtonColor(0.28);
@@ -310,29 +424,40 @@ void EditorView::renderSettings() {
 		mutateSourcePatches();
 	ImGuiUtils::popButtonColor();
 
+	if (ImGui::ButtonEx("Mutate", ImVec2(source.dimension.x, height), ImGuiButtonFlags_Repeat))
+		mutatePatches();
+
 	ImGui::Checkbox("Show connections", &showConnections);
+	ImGui::SameLine();
+	ImGui::Checkbox("Show grid", &showRegularGrid);
 	if (ImGui::Button("Generate image"))
 		generateImage();
 
 	ImGui::NextColumn();
 
 	ImGuiUtils::pushButtonColor(0.0);
-	if (ImGui::Button("Delete selected patch", ImVec2(target.dimension.x, height)))
+	if (ImGui::Button("Delete selected patch", ImVec2(target.dimension.x, height))) {
 		if (selectedIndex != -1)
-			patches.erase(patches.begin() + selectedIndex);
+			grid.erase(selectedIndex);
+
+		resetSelection();
+	}
 	ImGuiUtils::popButtonColor();
 
 	ImGuiUtils::pushButtonColor(0.28);
-	if(ImGui::Button("Spawn target patches", ImVec2(target.dimension.x, height)))
+	if (ImGui::Button("Spawn target patches", ImVec2(target.dimension.x, height)))
 		spawnTargetPatches();
 	ImGuiUtils::popButtonColor();
+
+	if (ImGui::Button("Spawn new patch", ImVec2(target.dimension.x, height)))
+		spawnNewPatch();
 
 	ImGui::NextColumn();
 
 	// TSP generation method
 	ImGui::TextColored(Colors::BLUE.iv4(), "Target seedpoints");
 	{
-		static std::array methods = { "Jittered", "Greedy" };
+		static std::array methods = {"Jittered", "Greedy"};
 
 		ImGui::Combo("TSPG method", &tspGenerationMethod, methods.data(), methods.size());
 
@@ -343,12 +468,22 @@ void EditorView::renderSettings() {
 	// SSP generation method
 	ImGui::TextColored(Colors::BLUE.iv4(), "Source seedpoints");
 	{
-		static std::array methods = { "Random", "Template Match", "SIFT" };
+		static std::array methods = {"Random", "Template Match", "SIFT"};
 
 		ImGui::Combo("SSPG method", &sspGenerationMethod, methods.data(), methods.size());
 
 		SSPG::get[sspGenerationMethod]->renderSettings(source, target);
 	}
+
+	// Mutations
+	{
+		ImGui::TextColored(Colors::BLUE.iv4(), "Mutations");
+		ImGui::DragInt("# mutations", &nMutations, 1, 1, MondriaanPatch::mutations - 1);
+		ImGui::DragInt("# mutated patches", &nMutatedPatches, 1, 1, grid.size());
+		static std::array<const char*, 6> metrics = {"SQDIFF", "SQDIFF_NORMED", "CCORR", "CCORR_NORMED", "CCOEFF", "CCOEFF_NORMED",};
+		ImGui::Combo("Distance metric##Mutations", &metric, metrics.data(), metrics.size());
+	}
+
 
 	ImGui::NextColumn();
 	ImGui::Columns(1);
@@ -362,6 +497,12 @@ void EditorView::render() {
 	renderSettings();
 	renderCursor();
 	renderTooltip();
+	renderVoronoi();
+
+	if (showRegularGrid) {
+		grid.render(target, Type_Target);
+		grid.render(source, Type_Source);
+	}
 
 	ImGui::End();
 
@@ -369,129 +510,221 @@ void EditorView::render() {
 }
 
 void EditorView::spawnTargetPatches() {
-	patches.clear();
+	grid.clear();
 	resetSelection();
 
-	this->patches = TSPG::get[tspGenerationMethod]->generate();
+	this->grid = RegularGrid<10>(TSPG::get[tspGenerationMethod]->generate(), source.tdimension, target.tdimension);
 }
 
 void EditorView::mutateSourcePatches() {
-	SSPG::get[sspGenerationMethod]->mutate(patches);
+	SSPG::get[sspGenerationMethod]->mutate(this->grid.patches);
 }
 
-std::size_t mutations = 3;
-std::vector indices = {0, 1, 2, 3};
-int EditorView::checkPatch(MondriaanPatch* newPatch, MondriaanPatch* oldPatch) {
-	/*for (MondriaanPatch& patch : patches) {
-		if (&patch == oldPatch)
-			continue;
+bool EditorView::checkPatchSourceLocation(const MondriaanPatch& newPatch) {
+	if (!settings.source->bounds().icontains(newPatch.sourceRotatedBounds()))
+		return false;
 
-		if (newPatch->sourceBounds().ir().Overlaps(patch->sourceBounds().ir()))
-			return 1;
+	return true;
+}
 
-		if (newPatch->targetBounds().ir().Overlaps(patch->targetBounds().ir()))
-			return 2;
+bool EditorView::checkPatchTargetLocation(const MondriaanPatch& newPatch) {
+	if (!settings.target->bounds().icontains(newPatch.targetBounds()))
+		return false;
 
-		if (!source.textureBounds().ir().Contains(newPatch->sourceBounds().ir()))
-			return 3;
+	return true;
+}
 
-		if (!target.textureBounds().ir().Contains(newPatch->targetBounds().ir()))
-			return 4;
-	}*/
+bool EditorView::checkPatchOverlap(const MondriaanPatch& patch, const MondriaanPatch& oldPatch) {
+	if (grid.overlaps(patch, Type_Target | Type_Source, &oldPatch))
+		return false;
 
-	return 0;
+	return true;
+}
+
+
+bool EditorView::checkPatch(const MondriaanPatch& newPatch, const MondriaanPatch& oldPatch) {
+	if (!checkPatchTargetLocation(newPatch))
+		return false;
+
+	if (!checkPatchSourceLocation(newPatch))
+		return false;
+
+	if (!checkPatchOverlap(newPatch, oldPatch))
+		return false;
+
+	// TODO original source location
+	// TODO original target location
+
+	return true;
 }
 
 void EditorView::mutatePatches() {
-	//std::vector sourceTextures = {screen.editor.pipeline.sourceGrayscaleE->data, screen.editor.pipeline.sourceSobel->data};
-	//std::vector targetTextures = {screen.editor.pipeline.wequalizedE->data, screen.editor.pipeline.targetSobel->data};
-	//std::vector<double> distribution = {settings.intensityWeight, settings.edgeWeight};
+	std::vector<std::size_t> patchIndices = Utils::nUniqueRandomSizeTypesInRange(generator, nMutatedPatches, 0, grid.size());
+	for (std::size_t patchIndex : patchIndices) {
+		MondriaanPatch& currentPatch = grid[patchIndex];
 
-	//for (const SeedPoint& seedPoint : seedPoints) {
-	//	MondriaanPatch* patch = reinterpret_cast<MondriaanPatch*>(seedPoint.patch.get());
-	//	if (patch == nullptr)
-	//		continue;
+		MondriaanPatch bestPatch;
+		bestPatch.match = std::numeric_limits<double>::max();
 
-	//	//double currentDistance = Match(patch, sourceTextures, targetTextures, distribution).distance;
+		std::vector<MondriaanPatch::Mutation> mutationIndices = Utils::nUniqueRandomIntegersInRange(
+			generator,
+			nMutations,
+			0,
+			MondriaanPatch::mutations);
 
-	//	int bestMutation = -1;
-	//	double bestDistance = std::numeric_limits<double>::max();
-	//	std::ranges::shuffle(indices, generator);
-	//	for (std::size_t index = 0; index < mutations; index++) {
-	//		MondriaanPatch newPatch = patch->getMutation(indices[index], 5.0);
+		for (int mutationIndex : mutationIndices) {
+			Log::print("Patch %d: ", patchIndex);
+			MondriaanPatch mutatedPatch = currentPatch.mutated(mutationIndex, currentPatch.step(generator, mutationIndex));
 
-	//		std::map<int, const char*> d = {
-	//		{MondriaanPatch::BOTTOM, "Bottom"},
-	//		{MondriaanPatch::LEFT, "Left"},
-	//		{MondriaanPatch::RIGHT, "Right"},
-	//		{MondriaanPatch::TOP, "Top"}
-	//		};
-	//		int error = checkPatch(&newPatch, patch);
-	//		if (error != 0) {
-	//			Log::debug("(%f, %f) %s: %d", seedPoint.sourcePosition.x, seedPoint.sourcePosition.y, d[indices[index]], error);
-	//			continue;
-	//		}
+			if (!checkPatch(mutatedPatch, currentPatch)) {
+				Log::error("rejected");
+				continue;
+			}
 
-	//		double newDistance = Match(patch, sourceTextures, targetTextures, distribution).distance;
+			mutatedPatch.computeBestMatch(static_cast<cv::TemplateMatchModes>(metric));
+			Log::print(" and match %.5f\n", mutatedPatch.match);
 
-	//		if (newDistance < bestDistance) {
-	//			bestDistance = newDistance;
-	//			bestMutation = indices[index];
-	//		}
-	//	}
+			if (mutatedPatch.match < bestPatch.match)
+				bestPatch = mutatedPatch;
+		}
 
-	//	if (bestMutation == -1) {
-	//		continue;
-	//	}
+		if (bestPatch.match != std::numeric_limits<double>::max()) {
+			Boundsi oldTargetBounds = currentPatch.targetBounds();
+			Boundsi oldSourceRotatedBounds = currentPatch.sourceRotatedBounds();
 
-	//	patch->mutate(bestMutation, 1.0);
-	//}
+			currentPatch.removeFromGlobalMask();
+			currentPatch = bestPatch;
+			currentPatch.addToGlobalMask();
+
+			grid.update(patchIndex, oldTargetBounds, currentPatch.targetBounds(), Type_Target);
+			grid.update(patchIndex, oldSourceRotatedBounds, currentPatch.sourceRotatedBounds(), Type_Source);
+		}
+	}
+
+	settings.mask.reloadGL();
 }
 
-//void EditorView::generateImage() {
-//	int cols = target.texture->data.cols / settings.minimumPatchDimension.x;
-//	int rows = target.texture->data.rows / settings.minimumPatchDimension.y;
-//
-//	cv::Mat output(target.texture->data.rows, target.texture->data.cols, target.texture->data.type());
-//	cv::Mat sourceSobel = source.features[Canvas::FEATURE_SOBEL]->data;
-//	cv::Mat sourceInt = source.features[Canvas::FEATURE_INT]->data;
-//#pragma omp parallel for
-//	for (int row = 0; row < rows; row++) {
-//#pragma omp parallel for
-//		for (int col = 0; col < cols; col++) {
-//			cv::Rect rect(col * settings.minimumPatchDimension.x,
-//			              row * settings.minimumPatchDimension.y,
-//			              settings.minimumPatchDimension.x,
-//			              settings.minimumPatchDimension.y);
-//
-//			cv::Mat targetSobel = target.features[Canvas::FEATURE_SOBEL]->data(rect);
-//			cv::Mat targetInt = target.features[Canvas::FEATURE_INT]->data(rect);
-//
-//			cv::Mat sobelMatch;
-//			cv::matchTemplate(sourceSobel, targetSobel, sobelMatch, cv::TM_CCORR);
-//			cv::normalize(sourceSobel, sourceSobel, 1.0, 0.0, cv::NORM_MINMAX);
-//			cv::Mat intMatch;
-//			cv::matchTemplate(sourceSobel, targetSobel, intMatch, cv::TM_CCORR);
-//			cv::normalize(intMatch, intMatch, 1.0, 0.0, cv::NORM_MINMAX);
-//			cv::Mat featureMatch = settings.edgeWeight * sobelMatch + settings.intensityWeight * intMatch;
-//			cv::Point matchLoc;
-//			cv::minMaxLoc(featureMatch, nullptr, nullptr, nullptr, &matchLoc);
-//
-//			//cv::copyTo(target.texture->data(rect), output(rect), cv::Mat());
-//			cv::copyTo(source.texture->data(cv::Rect(matchLoc.x, matchLoc.y, settings.minimumPatchDimension.x, settings.minimumPatchDimension.y)),
-//			           output(rect),
-//			           cv::Mat());
-//		}
-//	}
-//
-//	cv::imshow("Output", output);
-//}
+void EditorView::mutatePatchesRandom() {
+	std::vector<int> patchIndices = Utils::nUniqueRandomIntegersInRange(generator, nMutatedPatches, 0, grid.size());
+	for (int patchIndex : patchIndices) {
+		MondriaanPatch& currentPatch = grid[patchIndex];
+
+		MondriaanPatch bestPatch;
+		bestPatch.match = std::numeric_limits<double>::max();
+		std::vector<MondriaanPatch::Mutation> mutationIndices = Utils::nUniqueRandomIntegersInRange(
+			generator,
+			nMutations,
+			0,
+			MondriaanPatch::mutations);
+		for (int mutationIndex : mutationIndices) {
+			Log::print("Patch %d: ", patchIndex);
+			MondriaanPatch mutatedPatch = currentPatch.mutated(mutationIndex, currentPatch.step(generator, mutationIndex));
+
+			if (!checkPatch(mutatedPatch, currentPatch)) {
+				Log::error("rejected");
+				continue;
+			}
+
+			mutatedPatch.computeMatch();
+			Log::print(" and match %.5f\n", mutatedPatch.match);
+
+			if (mutatedPatch.match < bestPatch.match)
+				bestPatch = mutatedPatch;
+		}
+
+		if (bestPatch.match != std::numeric_limits<double>::max()) {
+			Boundsi oldBounds = currentPatch.targetBounds();
+			currentPatch = bestPatch;
+
+			grid.update(patchIndex, oldBounds, currentPatch.targetBounds(), Type_Target);
+		}
+	}
+}
+
+GEOM_FADE2D::Fade_2D dt;
+std::vector<GEOM_FADE2D::VoroCell2*> cells;
+
+void EditorView::renderVoronoi() {
+	using namespace GEOM_FADE2D;
+	for (VoroCell2* cell : cells) {
+		std::vector<Point2> boundaries;
+		cell->getBoundaryPoints(boundaries);
+
+		if (!boundaries.empty()) {
+			std::vector<ImVec2> points;
+			for (const Point2& point : boundaries)
+				points.push_back(target.toAbsoluteScreenSpace(Vec2(point.x(), point.y())).iv());
+
+			ImGui::GetWindowDrawList()->AddPolyline(points.data(), points.size(), Colors::GREEN.u32(), true, 1.0);
+		}
+	}
+}
+
+void EditorView::computeVoronoi() {
+	using namespace GEOM_FADE2D;
+	std::vector<Point2> vPoints;
+	for (const MondriaanPatch& patch : grid.patches) {
+		Vec2 center = patch.targetBounds().center();
+		vPoints.push_back(Point2(center.x, center.y));
+	}
+
+	dt.enableMultithreading();
+	dt.insert(vPoints);
+
+	cells.clear();
+	Voronoi2* pVoro(dt.getVoronoiDiagram());
+	pVoro->getVoronoiCells(cells);
+}
+
+void EditorView::spawnNewPatch() {
+	int bestRow = 0;
+	int bestCol = 0;
+	double bestCoverage = std::numeric_limits<double>::max();
+	for (int col = 0; col < grid.cols; col++) {
+		for (int row = 0; row < grid.rows; row++) {
+			double dx = grid.targetDimension.x / static_cast<double>(grid.cols);
+			double dy = grid.targetDimension.y / static_cast<double>(grid.rows);
+			double x = col * dx;
+			double y = row * dy;
+			Bounds bounds(x, y, x + dx, y + dy);
+
+			double coverage = 0;
+			std::set<std::size_t>& patches = grid.targetCells[row, col, Type_Target];
+			for (std::size_t patchIndex : patches) {
+				MondriaanPatch& patch = grid[patchIndex];
+				Bounds targetBounds = patch.targetBounds();
+				// Todo fix
+				Bounds overlap(Utils::max(bounds.minX(), targetBounds.minX()),
+				               Utils::max(bounds.minY(), targetBounds.minY()),
+				               Utils::min(bounds.imaxX(), targetBounds.imaxX()),
+				               Utils::min(bounds.imaxY(), targetBounds.imaxY()));
+				coverage += overlap.width() * overlap.height();
+			}
+
+			if (coverage < bestCoverage) {
+				bestCoverage = coverage;
+				bestRow = row;
+				bestCol = col;
+			}
+		}
+	}
+
+	Log::debug("Found new spot: %d, %d, %f", bestCol, bestRow, bestCoverage);
+
+	double dx = grid.targetDimension.x / static_cast<double>(grid.cols);
+	double dy = grid.targetDimension.y / static_cast<double>(grid.rows);
+	double x = bestCol * dx;
+	double y = bestRow * dy;
+	Vec2 targetDimension = settings.tmm2px(settings.minimumPatchDimension_mm);
+	Vec2 targetOffset(x + (dx - targetDimension.x) / 2.0, y + (dy - targetDimension.y) / 2.0);
+	grid.add(targetOffset, Utils::transform(targetOffset, target.tdimension, source.tdimension), settings.minimumPatchDimension_mm, 0.0);
+}
 
 void EditorView::generateImage() {
 	cv::Mat outputTarget(settings.target->rows(), settings.target->cols(), settings.target->data.type(), cv::Scalar(0));
 	cv::Mat outputSource(settings.target->rows(), settings.target->cols(), settings.source->data.type(), cv::Scalar(0));
 
-	for (MondriaanPatch& patch : patches) {
+	for (MondriaanPatch& patch : grid.patches) {
 		Vec2i alignedPatchDimension(settings.smm2px(patch.dimension_mm));
 
 		cv::Mat whiteMask = cv::Mat(alignedPatchDimension.cv(), CV_8UC1, cv::Scalar(255));
@@ -532,6 +765,9 @@ void EditorView::reload() {
 	target.aspect = settings.target->aspect();
 	target.tdimension = settings.target->dimension();
 	target.dimension = Canvas::computeDimension(target.tdimension, 350);
+
+	RegularGrid<10, 10> newGrid(grid.patches, source.tdimension, target.tdimension);
+	this->grid = newGrid;
 }
 
 void EditorView::resetSelection() {

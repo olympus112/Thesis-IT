@@ -192,6 +192,9 @@
     <ClCompile Include="graphics\features\Feature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\include\imgui\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -365,7 +368,7 @@
     <ClInclude Include="graphics\textures\extendedTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\collisionGrid.h">
+    <ClInclude Include="util\regularGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="util\sat.h">
@@ -404,19 +407,16 @@
     <ClInclude Include="generation\TSPG\TSPG_Jittered.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\imgui\fa_solid_900.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\imgui\font_awesome_5.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\imgui\imgui_notify.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\imgui\tahoma.h">
+    <ClInclude Include="..\include\thread_pool\thread_pool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\thread_pool\thread_pool.hpp">
+    <ClInclude Include="..\include\voronoi\jc_voronoi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\voronoi\jc_voronoi_clip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

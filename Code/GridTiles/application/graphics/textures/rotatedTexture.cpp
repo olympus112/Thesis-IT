@@ -8,6 +8,10 @@ cv::Rect RotatedTexture::computeRotatedRect(const cv::Size& size, float degrees)
 	return cv::RotatedRect(cv::Point2f(), size, degrees).boundingRect();
 }
 
+cv::Rect2f RotatedTexture::computeRotatedRect2f(const cv::Size& size, float degrees) {
+	return cv::RotatedRect(cv::Point2f(), size, degrees).boundingRect2f();
+}
+
 cv::Mat RotatedTexture::computeTransformationMatrix(const cv::Size& size, float degrees) {
 	const cv::Rect bounds = computeRotatedRect(size, degrees);
 	cv::Point2f center(0.5f * static_cast<float>(size.width - 1), 0.5f * static_cast<float>(size.height - 1));

@@ -4,14 +4,12 @@
     "type": "split",
     "children": [
       {
-        "id": "d2ec17cb7bd17113",
+        "id": "0322afc225a5f3e1",
         "type": "leaf",
         "state": {
-          "type": "markdown",
+          "type": "diagram",
           "state": {
-            "file": "Management/Timeline.md",
-            "mode": "source",
-            "source": false
+            "file": "Notes/Conversion diagram.svg"
           }
         }
       }
@@ -77,7 +75,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Management/Timeline.md",
+                "file": "Notes/Conversion diagram.svg",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -105,7 +103,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Management/Timeline.md"
+                "file": "Notes/Conversion diagram.svg"
               }
             }
           },
@@ -133,17 +131,17 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "d2ec17cb7bd17113",
+  "active": "0322afc225a5f3e1",
   "lastOpenFiles": [
-    "Management/Timeline.md",
     "Notes/Conversion diagram.svg",
     "Notes/Conversions.md",
-    "Meetings/21-10-2021.md",
-    "Notes/Stylised fabrication.md",
-    "Bespreking.md",
+    "Management/Timeline.md",
     "Management/Todo.md",
     "Notes/Ideas.md",
-    "Links/Papers.md",
-    "Links/Miscellaneous.md"
+    "InformatieVisualisatie.md",
+    "Bespreking.md",
+    "Meetings/16-12-2021.md",
+    "Links/Miscellaneous.md",
+    "Links/Papers.md"
   ]
 }

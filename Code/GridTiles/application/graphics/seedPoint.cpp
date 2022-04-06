@@ -11,14 +11,14 @@ SeedPoint::SeedPoint(const Vec2& sourcePosition, const Vec2& targetPosition, int
 }
 
 Bounds SeedPoint::sourceBounds(const Texture* source) const {
-	return Bounds::clamped(
+	return Bounds::eclamped(
 		Bounds(sourcePosition, textureSize),
 		Bounds(0, 0, source->data.cols, source->data.rows)
 	);
 }
 
 Bounds SeedPoint::targetBounds(const Texture* target) const {
-	return Bounds::clamped(
+	return Bounds::eclamped(
 		Bounds(targetPosition, textureSize),
 		Bounds(0, 0, target->data.cols, target->data.rows)
 	);

@@ -38,7 +38,7 @@ double Canvas::maxY() const {
 }
 
 bool Canvas::covers(const Vec2& center, const Vec2& point) const {
-	return Bounds(center, 5).contains(point);
+	return Bounds(center, 5).econtains(point);
 }
 
 Vec2 Canvas::textureDimension() const {
@@ -64,7 +64,7 @@ Vec2 Canvas::toAbsoluteScreenSpace(const Vec2& textureVector) const {
 Bounds Canvas::screenBounds() const {
 	return Bounds(
 		offset,
-		offset + dimension
+		screenDimension()
 	);
 }
 

@@ -65,8 +65,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;$(OPENCV_DIR)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;opencv_world454d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;$(OPENCV_DIR)\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;fade2D_x64_v142_Debug.lib;opencv_world454d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -91,7 +91,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;$(OPENCV_DIR)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;opencv_world454.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;fade2D_x64_v142_Release.lib;opencv_world454.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -118,6 +118,9 @@
     <ClCompile Include="..\include\imgui\imgui_impl_opengl3.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\include\imgui\imgui_tables.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\include\imgui\imgui_widgets.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -201,8 +204,6 @@
     <ClCompile Include="generation\TSPG\TSPG.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\imgui\fa_solid_900.h" />
-    <ClInclude Include="..\include\imgui\font_awesome_5.h" />
     <ClInclude Include="..\include\imgui\imconfig.h" />
     <ClInclude Include="..\include\imgui\imfilebrowser.h" />
     <ClInclude Include="..\include\imgui\imgui.h" />
@@ -213,8 +214,9 @@
     <ClInclude Include="..\include\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
-    <ClInclude Include="..\include\imgui\tahoma.h" />
     <ClInclude Include="..\include\thread_pool\thread_pool.hpp" />
+    <ClInclude Include="..\include\voronoi\jc_voronoi.h" />
+    <ClInclude Include="..\include\voronoi\jc_voronoi_clip.h" />
     <ClInclude Include="generation\SSPG\SSPG_Random.h" />
     <ClInclude Include="generation\SSPG\SSPG_Sift.h" />
     <ClInclude Include="generation\SSPG\SSPG_TemplateMatch.h" />
@@ -249,7 +251,7 @@
     <ClInclude Include="graphics\match.h" />
     <ClInclude Include="graphics\seedPoint.h" />
     <ClInclude Include="graphics\textures\rotatedTexture.h" />
-    <ClInclude Include="util\collisionGrid.h" />
+    <ClInclude Include="util\regularGrid.h" />
     <ClInclude Include="util\globals.h" />
     <ClInclude Include="util\imageUtils.h" />
     <ClInclude Include="util\list.h" />

@@ -27,7 +27,7 @@ struct ColorTemplate {
 	constexpr ColorTemplate(const T& r, const T& g, const T& b, const T& a) : r(r)
 	                                            , g(g)
 	                                            , b(b)
-	                                            , a(static_cast<T>(1)) { }
+	                                            , a(a) { }
 
 	constexpr ColorTemplate(const T& value) : r(value)
 	                                 , g(value)

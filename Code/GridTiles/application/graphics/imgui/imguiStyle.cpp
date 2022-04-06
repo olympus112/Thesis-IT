@@ -67,7 +67,7 @@ void setupImGuiLayoutStyle(ImGuiStyle* style) {
 
     style->WindowPadding = ImVec2(14, 10);
     style->FramePadding = ImVec2(5, 5);
-    style->ItemSpacing = ImVec2(15, 8);
+    style->ItemSpacing = ImVec2(9, 8);
     style->ItemInnerSpacing = ImVec2(6, 6);
     style->IndentSpacing = 20.0f;
     style->ScrollbarSize = 15.0f;

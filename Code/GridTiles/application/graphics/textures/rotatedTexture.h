@@ -4,7 +4,7 @@
 #include "graphics/features/Feature.h"
 
 struct RotatedTexture : public Texture {
-	double angle;
+	double angle = 0.0;
 	cv::Mat transformationMatrix;
 	cv::Mat inverseTransformationMatrix;
 
@@ -20,6 +20,7 @@ struct RotatedTexture : public Texture {
 	static cv::Mat transform(cv::Mat texture, cv::Mat transformation, cv::Size size);
 	static cv::Mat computeTransformationMatrix(const cv::Size& size, float degrees);
 	static cv::Rect computeRotatedRect(const cv::Size& size, float degrees);
+	static cv::Rect2f computeRotatedRect2f(const cv::Size& size, float degrees);
 };
 
 struct RotatedFeatureTexture : public RotatedTexture {

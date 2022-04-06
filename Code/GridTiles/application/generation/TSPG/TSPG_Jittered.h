@@ -10,12 +10,15 @@ public:
 	enum JitterMethod_ {
 		JitterMethod_Random,
 		JitterMethod_Center,
-		JitterMethod_Salience
+		JitterMethod_Salience,
+		JitterMethod_Start
 	};
 
 	JitterMethod jitterMethod = JitterMethod_Salience;
 	int divisions = 10;
-	bool showGrid = true;
+	bool showGrid = false;
+	bool contain = true;
+
 
 	TSPG_Jittered() = default;
 

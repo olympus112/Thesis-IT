@@ -23,7 +23,7 @@ bool ImGui::TexturePicker::render(Texture* texture) {
 		if (!path.empty())
 			TextDisabled(path.c_str());
 
-		float width = Utils::clamp(GetContentRegionAvailWidth() - GetStyle().FramePadding.x * 2, 100.0f, 300.0f);
+		float width = Utils::clamp(GetContentRegionAvail().x - GetStyle().FramePadding.x * 2, 100.0f, 300.0f);
 		if (ImageButton(reinterpret_cast<ImTextureID>(texture->id), ImVec2(width, width  / texture->aspect())))
 			browser->Open();
 

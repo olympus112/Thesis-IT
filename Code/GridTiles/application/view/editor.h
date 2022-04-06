@@ -6,6 +6,7 @@
 #include "generation/SSPG/SSPG.h"
 #include "graphics/canvas.h"
 #include "graphics/mondriaanPatch.h"
+#include "util/regularGrid.h"
 
 class EditorView {
 private:
@@ -13,13 +14,18 @@ private:
 	SSPGIndex sspGenerationMethod;
 
 	bool showConnections = false;
+	bool showRegularGrid = false;
+
+	int nMutations;
+	int nMutatedPatches;
+	int metric;
 
 	std::mt19937 generator;
 public:
 	Canvas source;
 	Canvas target;
 
-	std::vector<MondriaanPatch> patches;
+	RegularGrid<10, 10> grid;
 
 	int intersectedIndex = -1;
 	int selectedIndex = -1;
@@ -39,13 +45,23 @@ public:
 	void renderTextures();
 	void renderSettings();
 
+	void renderVoronoi();
+	void computeVoronoi();
+
 	void resetSelection();
 
 	void spawnTargetPatches();
 	void mutateSourcePatches();
-	void mutatePatches();
-	int checkPatch(MondriaanPatch* newPatch, MondriaanPatch* oldPatch);
 	void generateImage();
+
+	void mutatePatches();
+	void mutatePatchesRandom();
+
+	void spawnNewPatch();
+	bool checkPatch(const MondriaanPatch& oldPatch, const MondriaanPatch& newPatch);
+	bool checkPatchSourceLocation(const MondriaanPatch& patch);
+	bool checkPatchTargetLocation(const MondriaanPatch& patch);
+	bool checkPatchOverlap(const MondriaanPatch& patch, const MondriaanPatch& oldPatch);
 
 	void reload();
 };

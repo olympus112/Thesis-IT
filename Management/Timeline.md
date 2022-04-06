@@ -127,13 +127,38 @@
 | 2022-02-28 | Work on features                                            | 1    |
 | 2022-03-01 | Tried to add rotations to ssp mutations                     | 3    |
 | 2022-03-03 | Meeting                                                     | 1    |
-|            |                                                             |      |
+| Totaal     |                                                             | 11   | 
 
-| Week 13    | Beschrijving                                                               | Uren |
+| Week 13    | Beschrijving                       | Uren |
+| ---------- | ---------------------------------- | ---- |
+| 2022-03-12 | Rewrite of seedpoints and patches  | 4    |
+| 2022-03-13 | Rewrite of settings and validation | 4    |
+| Totaal     |                                    | 8    | 
+
+| Week 14    | Beschrijving                                                               | Uren |
 | ---------- | -------------------------------------------------------------------------- | ---- |
-| 2022-03-12 | Rewrite of seedpoints and patches                                          | 4    |
-| 2022-03-13 | Rewrite of settings and validation                                         | 4    |
 | 2022-03-14 | Rewrite of pipeline reload                                                 | 3    |
 | 2022-03-15 | Rewrite of seedpoint template match with rotations, added postscale factor | 4    |
-| 2022-03-16 | Fixed template matching, fixed many bugs, added global mask                | 5    | 
-|            |                                                                            |      |
+| 2022-03-16 | Fixed template matching, fixed many bugs, added global mask                | 5    |
+| 2022-03-16 | Added output generation                                                    | 2    |
+| 2022-03-17 | Fixed jittered sspg bugs                                                   | 2    |
+| 2022-03-18 | Added start jitter method                                                  | 1    |
+| 2022-03-20 | Fixed visual elements such as rotation, added regular grid to editor       | 4    |
+| 2022-03-20 | Added mutations and mutation loop                                          | 5    |
+| Totaal     |                                                                            | 26   | 
+
+| Week 15    | Beschrijving                                        | Uren |
+| ---------- | --------------------------------------------------- | ---- |
+| 2022-03-21 | Meeting                                             | 1    |
+| 2022-03-23 | Verdere bugfixes aan template matching mask         | 3    |
+| 2022-03-25 | Testen van mutaties en hun kwaliteit                | 2.5  |
+| 2022-03-26 | Testen van andere manier om source mutaties te doen | 3    |
+| Totaal     |                                                     | 9.5  | 
+
+
+| Week 15    | Beschrijving                                                                | Uren |
+| ---------- | --------------------------------------------------------------------------- | ---- |
+| 2022-04-01 | Regular grid voor source en target, moven van patch lijst naar regular grid | 4    |
+| 2022-04-04 | Work on constraints, updated mutation match, bounds                         | 6    |
+| 2022-04-05 | Bounds rework, mask fixes, additon and removal of mask from global mask     | 5    |
+| 2022-04-05 | Worked way too long on rotated bounds preview                               | 2    | 
