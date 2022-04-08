@@ -56,6 +56,13 @@ cv::Mat RotatedTexture::transform(cv::Mat texture, cv::Mat transformation, cv::S
 	return result;
 }
 
+cv::Mat RotatedTexture::rotate(cv::Mat texture, double angle) {
+	cv::Mat tranformationMatrix = computeTransformationMatrix(cv::Size(texture.cols, texture.rows), angle);
+	cv::Size bounds = computeRotatedRect(cv::Size(texture.cols, texture.rows), angle).size();
+
+	return transform(texture, tranformationMatrix, bounds);
+}
+
 void RotatedTexture::resize(const Vec2i& size) {
 	Texture::resize(size);
 }

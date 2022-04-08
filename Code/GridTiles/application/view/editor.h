@@ -18,6 +18,7 @@ private:
 
 	int nMutations;
 	int nMutatedPatches;
+	int nSplits;
 	int metric;
 
 	std::mt19937 generator;
@@ -56,6 +57,7 @@ public:
 
 	void mutatePatches();
 	void mutatePatchesRandom();
+	void splitPatches();
 
 	void spawnNewPatch();
 	bool checkPatch(const MondriaanPatch& oldPatch, const MondriaanPatch& newPatch);

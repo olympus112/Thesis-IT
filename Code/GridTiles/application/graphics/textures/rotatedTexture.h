@@ -17,6 +17,7 @@ struct RotatedTexture : public Texture {
 
 	void resize(const Vec2i& size);
 
+	static cv::Mat rotate(cv::Mat texture, double degrees);
 	static cv::Mat transform(cv::Mat texture, cv::Mat transformation, cv::Size size);
 	static cv::Mat computeTransformationMatrix(const cv::Size& size, float degrees);
 	static cv::Rect computeRotatedRect(const cv::Size& size, float degrees);

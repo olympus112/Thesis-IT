@@ -328,6 +328,20 @@ public:
 	Vector<T, 2> center() {
 		return Vector<T, 2>(minX() + width() / 2.0, minY() + height() / 2.0);
 	}
+
+	BoundsTemplate<T> rotated(const Vec2& reference, double degrees) {
+		Vec2 tl = this->tl().rotated(degrees, reference);
+		Vec2 tr = this->etr().rotated(degrees, reference);
+		Vec2 bl = this->ebl().rotated(degrees, reference);
+		Vec2 br = this->ebr().rotated(degrees, reference);
+
+		double minX = std::min({tl.x, tr.x, bl.x, br.x});
+		double minY = std::min({tl.y, tr.y, bl.y, br.y});
+		double maxX = std::max({tl.x, tr.x, bl.x, br.x});
+		double maxY = std::max({tl.y, tr.y, bl.y, br.y});
+
+		return BoundsTemplate<T>(minX, minY, maxX - minX, maxY - minY);
+	}
 };
 
 typedef BoundsTemplate<double> Bounds;

@@ -213,9 +213,9 @@ void MondriaanPatch::computeBestMatch(cv::TemplateMatchModes metric) {
 	double value;
 	cv::Point point;
 
-	cv::Mat filteredMaskRegion;
-	cv::boxFilter(settings.mask.data, filteredMaskRegion, -1, sourceRotatedDimension.cv(), cv::Point(0, 0), true, cv::BORDER_ISOLATED);
-	cv::threshold(filteredMaskRegion, filteredMaskRegion, 254, 255, cv::THRESH_BINARY);
+	//cv::Mat filteredMaskRegion;
+	//cv::boxFilter(settings.mask.data, filteredMaskRegion, -1, sourceRotatedDimension.cv(), cv::Point(0, 0), true, cv::BORDER_ISOLATED);
+	//cv::threshold(filteredMaskRegion, filteredMaskRegion, 254, 255, cv::THRESH_BINARY);
 
 	//cv::imshow("mask", settings.mask.data);
 	//cv::imshow("filteredMaskRegion", filteredMaskRegion);
@@ -228,20 +228,22 @@ void MondriaanPatch::computeBestMatch(cv::TemplateMatchModes metric) {
 		              &value,
 		              nullptr,
 		              &point,
-		              nullptr,
-		              filteredMaskRegion(cv::Rect(0, 0, weightedResponse.cols, weightedResponse.rows)));
+		              nullptr
+		              //filteredMaskRegion(cv::Rect(0, 0, weightedResponse.cols, weightedResponse.rows))
+		);
 	} else {
 		cv::minMaxLoc(weightedResponse,
 		              nullptr,
 		              &value,
 		              nullptr,
-		              &point,
-		              filteredMaskRegion(cv::Rect(0, 0, weightedResponse.cols, weightedResponse.rows)));
+		              &point
+		              //filteredMaskRegion(cv::Rect(0, 0, weightedResponse.cols, weightedResponse.rows))
+			);
 	}
 
 	if (point.x == -1 && point.y == -1) {
 		Log::error("No patches available");
-		cv::imshow("Mask", settings.mask.data);
+		/*cv::imshow("Mask", settings.mask.data);
 		cv::Mat filteredMaskRegion;
 		cv::boxFilter(settings.mask.data,
 		              filteredMaskRegion,
@@ -252,7 +254,7 @@ void MondriaanPatch::computeBestMatch(cv::TemplateMatchModes metric) {
 		              cv::BORDER_ISOLATED);
 		cv::threshold(filteredMaskRegion, filteredMaskRegion, 254, 255, cv::THRESH_BINARY);
 		cv::imshow("Filtered mask", filteredMaskRegion);
-		cv::waitKey();
+		cv::waitKey();*/
 
 		return;
 	}

@@ -182,19 +182,31 @@ void PipelineView::reload() {
 	// Set source features
 	if (settings.source.features.size() == 0) {
 		settings.source.features.add(this->sourceGrayscale->data.clone());
-		settings.source.features.add(this->sourceSobel.data.clone());
+		if (settings.edgeMethod == Settings::EdgeMethod_Sobel)
+			settings.source.features.add(this->sourceSobel.data.clone());
+		else if (settings.edgeMethod == Settings::EdgeMethod_Canny)
+			settings.source.features.add(this->sourceCanny.data.clone());
 	} else {
 		settings.source.features[FeatureIndex_Intensity].data = this->sourceGrayscale->data.clone();
-		settings.source.features[FeatureIndex_Edge].data = sourceSobel.data.clone();
+		if (settings.edgeMethod == Settings::EdgeMethod_Sobel)
+			settings.source.features[FeatureIndex_Edge].data = sourceSobel.data.clone();
+		else if (settings.edgeMethod == Settings::EdgeMethod_Canny)
+			settings.source.features[FeatureIndex_Edge].data = sourceCanny.data.clone();
 	}
 
 	// Set target features
 	if (settings.target.features.size() == 0) {
 		settings.target.features.add(this->wequalized->data.clone());
-		settings.target.features.add(this->targetSobel.data.clone());
+		if (settings.edgeMethod == Settings::EdgeMethod_Sobel)
+			settings.target.features.add(this->targetSobel.data.clone());
+		else if (settings.edgeMethod == Settings::EdgeMethod_Canny)
+			settings.target.features.add(this->targetCanny.data.clone());
 	} else {
 		settings.target.features[FeatureIndex_Intensity].data = this->wequalized->data.clone();
-		settings.target.features[FeatureIndex_Edge].data = targetSobel.data.clone();
+		if (settings.edgeMethod == Settings::EdgeMethod_Sobel)
+			settings.target.features[FeatureIndex_Edge].data = targetCanny.data.clone();
+		else if (settings.edgeMethod == Settings::EdgeMethod_Canny)
+			settings.target.features[FeatureIndex_Edge].data = targetCanny.data.clone();
 	}
 
 	// Reload target and source features

@@ -64,43 +64,49 @@ void SettingsView::render() {
 		ImGui::Separator();
 		ImGui::Spacing();
 
-		bool blurChanged = false;
-		blurChanged |= ImGui::RadioButton("X", &settings.sobelType, 0);
+		{
+			static std::array edgeMethods = { "Sobel", "Canny" };
+			ImGui::Combo("Edge method", &settings.edgeMethod, edgeMethods.data(), edgeMethods.size());
+		}
+
+		ImGui::TextColored(Colors::BLUE.iv4(), "Sobel");
+		ImGui::RadioButton("X", &settings.sobelType, 0);
 		ImGui::SameLine();
-		blurChanged |= ImGui::RadioButton("Y", &settings.sobelType, 1);
+		ImGui::RadioButton("Y", &settings.sobelType, 1);
 		ImGui::SameLine();
-		blurChanged |= ImGui::RadioButton("XY", &settings.sobelType, 2);
+		ImGui::RadioButton("XY", &settings.sobelType, 2);
 		ImGui::SameLine();
 		ImGui::Text("Sobel type");
 
-		blurChanged |= ImGui::RadioButton("1##sobel", &settings.sobelSize, 1);
+		ImGui::RadioButton("1##sobel", &settings.sobelSize, 1);
 		ImGui::SameLine();
-		blurChanged |= ImGui::RadioButton("3##sobel", &settings.sobelSize, 3);
+		ImGui::RadioButton("3##sobel", &settings.sobelSize, 3);
 		ImGui::SameLine();
-		blurChanged |= ImGui::RadioButton("5##sobel", &settings.sobelSize, 5);
+	    ImGui::RadioButton("5##sobel", &settings.sobelSize, 5);
 		ImGui::SameLine();
-		blurChanged |= ImGui::RadioButton("7##sobel", &settings.sobelSize, 7);
+		ImGui::RadioButton("7##sobel", &settings.sobelSize, 7);
 		ImGui::SameLine();
 		ImGui::Text("Sobel size");
-		blurChanged |= ImGui::SliderInt("Sobel derivative", &settings.sobelDerivative, 1, 5);
+		ImGui::SliderInt("Sobel derivative", &settings.sobelDerivative, 1, 5);
 
 		ImGui::Separator();
 
-		blurChanged |= ImGui::SliderFloat("Canny T1", &settings.cannyThreshold1, 0, settings.cannyThreshold2);
-		blurChanged |= ImGui::SliderFloat("Canny T2", &settings.cannyThreshold2, settings.cannyThreshold1, 1000);
-		blurChanged |= ImGui::RadioButton("3##canny", &settings.cannyAperture, 3);
+		ImGui::TextColored(Colors::BLUE.iv4(), "Canny");
+		ImGui::SliderFloat("Canny T1", &settings.cannyThreshold1, 0, settings.cannyThreshold2);
+		ImGui::SliderFloat("Canny T2", &settings.cannyThreshold2, settings.cannyThreshold1, 1000);
+		ImGui::RadioButton("3##canny", &settings.cannyAperture, 3);
 		ImGui::SameLine();
-		blurChanged |= ImGui::RadioButton("5##canny", &settings.cannyAperture, 5);
+		ImGui::RadioButton("5##canny", &settings.cannyAperture, 5);
 		ImGui::SameLine();
-		blurChanged |= ImGui::RadioButton("7##canny", &settings.cannyAperture, 7);
+		ImGui::RadioButton("7##canny", &settings.cannyAperture, 7);
 		ImGui::SameLine();
 		ImGui::Text("Canny aperture");
-		blurChanged |= ImGui::Checkbox("Canny L2 gradient", &settings.cannyL2gradient);
+		ImGui::Checkbox("Canny L2 gradient", &settings.cannyL2gradient);
 	}
 
 	if (ImGui::CollapsingHeader("Texture settings")) {
 		// Postscale
-		ImGui::DragFloat("Postscale", &settings.postscale, 0.1f, 0.1f, 1.5);
+		ImGui::DragFloat("Postscale", &settings.postscale, 0.01f, 0.05f, 1.5);
 
 		// Source to target pixel ratio
 		ImGui::Text("Source to target pixel ratio: %.2f", settings.sourceToTargetPixelRatio);
@@ -198,34 +204,24 @@ void SettingsView::render() {
 			ImGui::BeginTooltip();
 
 			for (std::size_t i = 0; i <= Feature::get.size(); i++) {
-				/*for (const RotatedFeatureTexture& texture : settings.source.textures) {
-					std::string name;
-					ImTextureID id;
-					if (i == Feature::get.size()) {
-						name = std::format("{:.2f} deg", texture.angle / CV_PI * 180);
-						id = texture.it();
-					} else {
-						name = "";
-						id = texture.features.features[i].it();
-					}
-
-					ImGui::image(name.c_str(), id, ImVec2(100, 100));
-					ImGui::SameLine();
-				}
-
-				std::string label;
-				if (i == Feature::get.size()) {
-					label = "Original";
-				} else {
-					label = Feature::get[i]->name();
-				}
-				ImGui::Text(label.c_str());
-				ImGui::NewLine();*/
-
 				if (i == Feature::get.size())
 					ImGui::image("Original", settings.source->it());
 				else
 					ImGui::image(Feature::get[i]->name().c_str(), settings.source[i].it());
+			}
+
+			ImGui::EndTooltip();
+		}
+
+		// Source tooltip
+		if (targetTexture.hovered) {
+			ImGui::BeginTooltip();
+
+			for (std::size_t i = 0; i <= Feature::get.size(); i++) {
+				if (i == Feature::get.size())
+					ImGui::image("Original", settings.target->it());
+				else
+					ImGui::image(Feature::get[i]->name().c_str(), settings.target[i].it());
 			}
 
 			ImGui::EndTooltip();

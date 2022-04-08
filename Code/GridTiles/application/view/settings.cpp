@@ -7,12 +7,12 @@
 Settings::Settings() = default;
 
 void Settings::init() {
-	actualSourceDimension_mm = Vec2i(500, 500);
-	actualTargetDimension_mm = Vec2i(500, 250);
+	actualSourceDimension_mm = Vec2i(1000, 1000);
+	actualTargetDimension_mm = Vec2i(500, 500);
 	preferredPatchCountRange = Vec2(4, 100);
 	minimumPatchDimension_mm = Vec2i(10, 10);
 
-	postscale = 0.5;
+	postscale = 1.0;
 
 	sobelDerivative = 1;
 	sobelSize = 5;
@@ -27,8 +27,8 @@ void Settings::init() {
 	intensityWeight = 0.5f;
 	equalizationWeight = 0.5f;
 
-	std::string sourcePath = "../res/voronoi.png";
-	std::string targetPath = "../res/eye.jpg";
+	std::string sourcePath = "../res/wood_multiple_1.jpg";
+	std::string targetPath = "../res/beethoven.png";
 
 	originalSource = Texture(sourcePath);
 	originalTarget = Texture(targetPath);

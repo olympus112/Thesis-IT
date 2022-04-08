@@ -5,6 +5,22 @@
 
 struct Settings {
 
+	typedef int SettingValidation;
+	enum SettingValidation_ {
+		SettingValidation_None = 0 << 0,
+		SettingValidation_ActualTargetDimension = 1 << 0,
+		SettingValidation_ActualSourceDimension = 1 << 1,
+		SettingValidation_TargetMillimeterToPixelRatio = 1 << 2,
+		SettingValidation_SourceMillimeterToPixelRatio = 1 << 3,
+		SettingValidation_SourceToTargetPixelRatio = 1 << 4
+	};
+
+	typedef int EdgeMethod;
+	enum EdgeMethod_ {
+		EdgeMethod_Sobel,
+		EdgeMethod_Canny
+	};
+
 	// The original non prescaled source image
 	Texture originalSource;
 	// The original non prescaled target image
@@ -44,6 +60,8 @@ struct Settings {
 	int cannyAperture;
 	bool cannyL2gradient;
 
+	EdgeMethod edgeMethod;
+
 	float intensityWeight;
 	float edgeWeight;
 	float equalizationWeight;
@@ -51,16 +69,6 @@ struct Settings {
 	Settings();
 
 	void init();
-
-	typedef int SettingValidation;
-	enum SettingValidation_ {
-		SettingValidation_None							= 0 << 0,
-		SettingValidation_ActualTargetDimension		= 1 << 0,
-		SettingValidation_ActualSourceDimension			= 1 << 1,
-		SettingValidation_TargetMillimeterToPixelRatio	= 1 << 2,
-		SettingValidation_SourceMillimeterToPixelRatio	= 1 << 3,
-		SettingValidation_SourceToTargetPixelRatio		= 1 << 4
-	};
 
 	void validateTextureSettings(SettingValidation settingValidation);
 	float validateTextureAspect(float* width, float* height, float aspect);

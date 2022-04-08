@@ -161,4 +161,5 @@
 | 2022-04-01 | Regular grid voor source en target, moven van patch lijst naar regular grid | 4    |
 | 2022-04-04 | Work on constraints, updated mutation match, bounds                         | 6    |
 | 2022-04-05 | Bounds rework, mask fixes, additon and removal of mask from global mask     | 5    |
-| 2022-04-05 | Worked way too long on rotated bounds preview                               | 2    | 
+| 2022-04-05 | Worked way too long on rotated bounds preview                               | 2    |
+| 2022-04-06 | Mask fix, patch splitting                                                   | 6    | 

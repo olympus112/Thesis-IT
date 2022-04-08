@@ -26,6 +26,7 @@ bool ImGui::TexturePicker::render(Texture* texture) {
 		float width = Utils::clamp(GetContentRegionAvail().x - GetStyle().FramePadding.x * 2, 100.0f, 300.0f);
 		if (ImageButton(reinterpret_cast<ImTextureID>(texture->id), ImVec2(width, width  / texture->aspect())))
 			browser->Open();
+		hovered = ImGui::IsItemHovered();
 
 		ImGui::Text("Aspect: %f", texture->aspect());
 		ImGui::Text("Texture dimension: %d px X %d px", texture->data.cols, texture->data.rows);
@@ -35,8 +36,7 @@ bool ImGui::TexturePicker::render(Texture* texture) {
 			browser->Open();
 	}
 
-	hovered = ImGui::IsItemHovered();
-		browser->Display();
+	browser->Display();
 
 	if (browser->HasSelected()) {
 		path = browser->GetSelected().string();

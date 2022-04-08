@@ -4,6 +4,7 @@
 #include <opencv2/highgui.hpp>
 
 #include "graphics/imgui/imguiStyle.h"
+#include "graphics/opencv/grayscale.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -180,25 +181,101 @@ int startApplication() {
 	return 0;
 }
 
+void rotatedImageEqualityTest() {
+	cv::Mat beethoven = cv::imread("../res/beethoven.png");
+	cv::Mat alignedImage = Grayscale(beethoven).grayscale;
+	//cv::Canny(alignedImage, alignedImage, 100, 150);
+	cv::Mat rotatedImage = RotatedTexture::rotate(alignedImage, 45);
+	cv::Rect patch(150, 250, 30, 30);
+	cv::Mat rotatedTemplate = rotatedImage(patch);
+	cv::Mat alignedTemplate = RotatedTexture::rotate(rotatedTemplate, -45);
+	cv::Mat rotatedImageMask = RotatedTexture::rotate(cv::Mat(alignedImage.rows, alignedImage.cols, CV_8UC1, cv::Scalar(255)), 45);
+	cv::Mat alignedTemplateMask = RotatedTexture::rotate(cv::Mat(rotatedTemplate.rows, rotatedTemplate.cols, CV_8UC1, cv::Scalar(255)), -45);
+	cv::Mat itran = RotatedTexture::computeTransformationMatrix(cv::Size(patch.width, patch.height), -45);
+
+	cv::Mat alignedResult;
+	cv::matchTemplate(alignedImage, alignedTemplate, alignedResult, cv::TemplateMatchModes::TM_SQDIFF_NORMED, alignedTemplateMask.clone());
+
+	cv::Mat rotatedResult;
+	cv::matchTemplate(rotatedImage, rotatedTemplate, rotatedResult, cv::TemplateMatchModes::TM_SQDIFF_NORMED);
+
+	double alignedMax;
+	cv::Point alignedPoint;
+	cv::minMaxLoc(alignedResult, &alignedMax, nullptr, &alignedPoint, nullptr);
+	cv::rectangle(alignedImage, alignedPoint, alignedPoint + cv::Point(alignedTemplate.cols, alignedTemplate.rows), Colors::RGB_R.cv());
+	cv::rectangle(alignedResult, alignedPoint, alignedPoint + cv::Point(alignedTemplate.cols, alignedTemplate.rows), Colors::RGB_R.cv());
+
+	double rotatedMax;
+	cv::Point rotatedPoint;
+	cv::minMaxLoc(rotatedResult, &rotatedMax, nullptr, &rotatedPoint, nullptr, rotatedImageMask(cv::Rect(0, 0, rotatedResult.cols, rotatedResult.rows)));
+	cv::rectangle(rotatedImage, rotatedPoint, rotatedPoint + cv::Point(rotatedTemplate.cols, rotatedTemplate.rows), Colors::WHITE.cv());
+	cv::rectangle(rotatedResult, rotatedPoint, rotatedPoint + cv::Point(rotatedTemplate.cols, rotatedTemplate.rows), Colors::WHITE.cv());
+
+	std::vector<cv::Point2f> in = { rotatedPoint };
+	cv::perspectiveTransform(in, in, itran);
+
+	alignedPoint = cv::Point(in[0]);
+	cv::rectangle(alignedImage, alignedPoint, alignedPoint + cv::Point(alignedTemplate.cols, alignedTemplate.rows), Colors::RGB_G.cv());
+	cv::rectangle(alignedResult, alignedPoint, alignedPoint + cv::Point(alignedTemplate.cols, alignedTemplate.rows), Colors::RGB_G.cv());
+
+	printf("%f, %f", alignedMax, rotatedMax);
+
+	cv::imshow("Aligned Image", alignedImage);
+	cv::imshow("Aligned Template", alignedTemplate);
+	cv::imshow("Rotated Image", rotatedImage);
+	cv::imshow("Rotated Template", rotatedTemplate);
+	cv::imshow("Rotated Image Mask", rotatedImageMask);
+	cv::imshow("Aligned Template Mask", alignedTemplateMask);
+	cv::imshow("Aligned Result", alignedResult);
+	cv::imshow("Rotated Result", rotatedResult);
+
+	cv::waitKey();  
+}
+
+void rotatedMaskEqualityTest() {
+	cv::Mat beethoven = cv::imread("../res/beethoven.png");
+	cv::Mat beethovenGray = Grayscale(beethoven).grayscale;
+	cv::Mat alignedImage;
+	cv::Canny(beethovenGray, alignedImage, 100, 150);
+	cv::Mat alignedTemplate = alignedImage(cv::Rect(150, 250, 20, 30));
+	cv::Mat rotatedTemplate = RotatedTexture::rotate(alignedTemplate, 45);
+	cv::Mat rotatedImage = RotatedTexture::rotate(alignedImage, 45);
+	cv::Mat rotatedImageMask = RotatedTexture::rotate(cv::Mat(alignedImage.rows, alignedImage.cols, CV_8UC1, cv::Scalar(255)), 15);
+	cv::Mat rotatedTemplateMask = RotatedTexture::rotate(cv::Mat(alignedTemplate.rows, alignedTemplate.cols, CV_8UC1, cv::Scalar(255)), 15);
+
+	cv::Mat alignedResult;
+	cv::matchTemplate(alignedImage, alignedTemplate, alignedResult, cv::TemplateMatchModes::TM_SQDIFF_NORMED);
+
+	cv::Mat rotatedResult;
+	cv::matchTemplate(rotatedImage, rotatedTemplate, rotatedResult, cv::TemplateMatchModes::TM_SQDIFF_NORMED, rotatedTemplateMask.clone());
+
+	double alignedMax;
+	cv::Point alignedPoint;
+	cv::minMaxLoc(alignedResult, &alignedMax, nullptr, &alignedPoint, nullptr);
+	cv::rectangle(alignedImage, alignedPoint, alignedPoint + cv::Point(alignedTemplate.cols, alignedTemplate.rows), Colors::WHITE.cv());
+	cv::rectangle(alignedResult, alignedPoint, alignedPoint + cv::Point(alignedTemplate.cols, alignedTemplate.rows), Colors::WHITE.cv());
+
+	double rotatedMax;
+	cv::Point rotatedPoint;
+	cv::minMaxLoc(rotatedResult, &rotatedMax, nullptr, &rotatedPoint, nullptr, rotatedImageMask(cv::Rect(0, 0, rotatedResult.cols, rotatedResult.rows)));
+	cv::rectangle(rotatedImage, rotatedPoint, rotatedPoint + cv::Point(rotatedTemplate.cols, rotatedTemplate.rows), Colors::WHITE.cv());
+	cv::rectangle(rotatedResult, rotatedPoint, rotatedPoint + cv::Point(rotatedTemplate.cols, rotatedTemplate.rows), Colors::WHITE.cv());
+	printf("%f, %f", alignedMax, rotatedMax);
+
+	cv::imshow("Aligned Image", alignedImage);
+	cv::imshow("Aligned Template", alignedTemplate);
+	cv::imshow("Rotated Image", rotatedImage);
+	cv::imshow("Rotated Template", rotatedTemplate);
+	cv::imshow("Rotated Image Mask", rotatedImageMask);
+	cv::imshow("Rotated Template Mask", rotatedTemplateMask);
+	cv::imshow("Aligned Result", alignedResult);
+	cv::imshow("Rotated Result", rotatedResult);
+
+	cv::waitKey();
+}
+
 int main(int, char**) {
 	startApplication();
-	/*std::vector points = {
-		Vec2(40, 30),
-		Vec2(0, 50),
-		Vec2(0, 0),
-	};
 
-	Shape shape(points);
-
-	Patch patch(shape);
-
-	cv::Mat image = cv::imread("../res/wood.jpg");
-	cv::Mat cut = Mask::copy(image, patch.mask, patch.shape.bounds.minX, patch.shape.bounds.minY);
-	Mask::paste(image, patch.mask, patch.shape.bounds.minX, patch.shape.bounds.minY, Colors::RED);
-
-	cv::imshow("Image", image);
-	cv::imshow("Patch", patch.mask.pixels);
-	cv::imshow("Cut", cut);
-
-	cv::waitKey(0);*/
+	//rotatedImageEqualityTest();
 }

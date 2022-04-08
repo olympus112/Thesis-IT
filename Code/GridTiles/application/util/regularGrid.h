@@ -355,8 +355,8 @@ public:
 		GridCell max = cell(bounds.imax(), type);
 
 		return GridRegion(
-			GridRange(min.x, max.x),
-			GridRange(min.y, max.y)
+			GridRange(Utils::max<int>(0, min.x), Utils::min<int>(max.x, cols - 1)),
+			GridRange(Utils::max<int>(0, min.y), Utils::min<int>(max.y, rows - 1))
 		);
 	}
 
