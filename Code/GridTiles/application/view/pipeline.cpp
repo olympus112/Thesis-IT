@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "graphics/imgui/widgets.h"
+#include "graphics/textures/sourceTexture.h"
 #include "util/imageUtils.h"
 
 static int pipeline = 0;
@@ -180,12 +181,19 @@ void PipelineView::reload() {
 	ImageUtils::renderCanny(&this->sourceBlur, &this->sourceCanny);
 
 	// Set source features
+	FeatureVector sourceFeatures;
+	sourceFeatures.add(this->sourceGrayscale->data.clone());
+	sourceFeatures.add(settings.edgeMethod == Settings::EdgeMethod_Sobel ? this->sourceSobel.data.clone() : this->sourceCanny.data.clone());
+	settings.sourcer.setFeatures(sourceFeatures);
+
+	// Set source features
 	if (settings.source.features.size() == 0) {
 		settings.source.features.add(this->sourceGrayscale->data.clone());
-		if (settings.edgeMethod == Settings::EdgeMethod_Sobel)
+		if (settings.edgeMethod == Settings::EdgeMethod_Sobel) {
 			settings.source.features.add(this->sourceSobel.data.clone());
-		else if (settings.edgeMethod == Settings::EdgeMethod_Canny)
+		} else if (settings.edgeMethod == Settings::EdgeMethod_Canny) {
 			settings.source.features.add(this->sourceCanny.data.clone());
+		}
 	} else {
 		settings.source.features[FeatureIndex_Intensity].data = this->sourceGrayscale->data.clone();
 		if (settings.edgeMethod == Settings::EdgeMethod_Sobel)
@@ -210,6 +218,7 @@ void PipelineView::reload() {
 	}
 
 	// Reload target and source features
+	settings.sourcer.reloadTextures();
 	settings.target.features[FeatureIndex_Intensity].reloadGL();
 	settings.source.features[FeatureIndex_Intensity].reloadGL();
 	settings.target.features[FeatureIndex_Edge].reloadGL();

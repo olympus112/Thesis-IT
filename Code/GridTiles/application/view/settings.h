@@ -2,6 +2,7 @@
 
 #include "graphics/textures/extendedTexture.h"
 #include "graphics/textures/rotatedTexture.h"
+#include "graphics/textures/sourceTexture.h"
 
 struct Settings {
 
@@ -27,9 +28,12 @@ struct Settings {
 	Texture originalTarget;
 
 	// Array of `rotations` rotated source material textures
+	SourceTexture sourcer;
 	ExtendedFeatureTexture source;
 	// The target texture
 	ExtendedFeatureTexture target;
+	// The puzzle
+	Texture puzzle;
 
 	// The global source mask to indicate what material has been reserved
 	Texture mask;
@@ -50,6 +54,8 @@ struct Settings {
 	float sourceToTargetPixelRatio;
 	// Postscale factor
 	float postscale;
+	// Number of rotations
+	int rotations;
 
 	int sobelDerivative;
 	int sobelSize;

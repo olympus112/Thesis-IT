@@ -4,7 +4,7 @@
     "type": "split",
     "children": [
       {
-        "id": "0322afc225a5f3e1",
+        "id": "64e1f572dc3b74d1",
         "type": "leaf",
         "state": {
           "type": "markdown",
@@ -61,7 +61,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 218
+    "width": 282
   },
   "right": {
     "id": "ece90af34884dcac",
@@ -133,17 +133,17 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "0322afc225a5f3e1",
+  "active": "64e1f572dc3b74d1",
   "lastOpenFiles": [
     "Management/Timeline.md",
-    "Notes/Conversion diagram.svg",
     "Notes/Conversions.md",
-    "Management/Todo.md",
+    "Notes/Conversion diagram.svg",
+    "Notes/WoodPixel.md",
+    "Notes/Stylised fabrication.md",
+    "Notes/Sobel filter.md",
+    "Notes/Intensity filter.md",
     "Notes/Ideas.md",
-    "InformatieVisualisatie.md",
-    "Bespreking.md",
-    "Meetings/16-12-2021.md",
-    "Links/Miscellaneous.md",
-    "Links/Papers.md"
+    "Management/Todo.md",
+    "Papers/RollingGuidanceFilter.pdf"
   ]
 }

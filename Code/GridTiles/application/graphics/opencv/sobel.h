@@ -5,7 +5,8 @@
 enum class SobelType {
 	X,
 	Y,
-	XY
+	XY,
+	MAGNITUDE
 };
 
 class Sobel {
@@ -13,7 +14,7 @@ public:
 	cv::Mat sobel;
 	SobelType type;
 
-	Sobel(const cv::Mat& texture, const SobelType& type, int derivative = 1, int size = 5);
+	Sobel(const cv::Mat& texture, const SobelType& type, int derivative = 1, int size = 3);
 
 	static cv::Mat computeSobel(const cv::Mat& source, const SobelType& type, int derivative, int size);
 };

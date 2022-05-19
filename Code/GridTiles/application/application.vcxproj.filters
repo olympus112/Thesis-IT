@@ -198,6 +198,15 @@
     <ClCompile Include="math\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\include\rolling_guidance\RollingGuidanceFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\textures\sourceTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\gabor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -410,9 +419,6 @@
     <ClInclude Include="generation\TSPG\TSPG_Jittered.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\imgui\imgui_notify.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\thread_pool\thread_pool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -420,6 +426,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\voronoi\jc_voronoi_clip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\rolling_guidance\RollingGuidanceFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\rolling_guidance\permutohedral\Image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\rolling_guidance\permutohedral\macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\rolling_guidance\permutohedral\permutohedral.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\textures\sourceTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opencv\gabor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

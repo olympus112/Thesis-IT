@@ -9,3 +9,5 @@
 	- ~~Box filter solution~~
 	- ~~Premultiplication~~
 - Preference to align with neighbours for mondriaan te verkrijgen
+- Source == target, of source is licht gewijzigde target, etc
+- Schaakbord vs 10° gedraaid schaakbord als source

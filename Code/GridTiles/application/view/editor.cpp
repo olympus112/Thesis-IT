@@ -369,41 +369,6 @@ void EditorView::renderPatches() {
 
 }
 
-void EditorView::renderTextures() {
-	ImGui::Columns(3, nullptr, false);
-	ImGui::SetColumnWidth(0, source.dimension.iv().x + 20);
-	ImGui::SetColumnWidth(1, target.dimension.iv().x + 20);
-	ImGui::SetColumnWidth(2, target.dimension.iv().x + 20);
-
-	// Source image
-	ImGui::image("Source", settings.source->it(), source.dimension.iv());
-	source.offset = ImGui::GetItemRectMin();
-	source.hover = ImGui::IsItemHovered();
-
-	ImGui::NextColumn();
-
-	// Target image
-	ImGui::image("Target", settings.target->it(), target.dimension.iv());
-	target.offset = ImGui::GetItemRectMin();
-	target.hover = ImGui::IsItemHovered();
-
-	ImGui::NextColumn();
-
-	// Mask
-	ImGui::image("Mask", settings.mask.it(), source.dimension.iv());
-
-	ImGui::NextColumn();
-	ImGui::Columns(1);
-
-	// Overlays
-	TSPG::get[tspGenerationMethod]->renderOverlay(source, target);
-	TSPG::get[sspGenerationMethod]->renderOverlay(source, target);
-
-	// Bounding boxes
-	ImGui::GetWindowDrawList()->AddRect(source.min().iv(), source.max().iv(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All, 2);
-	ImGui::GetWindowDrawList()->AddRect(target.min().iv(), target.max().iv(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All, 2);
-}
-
 void EditorView::renderSettings() {
 	float height = 30.0f;
 
@@ -411,6 +376,26 @@ void EditorView::renderSettings() {
 	ImGui::SetColumnWidth(0, source.dimension.iv().x + 20);
 	ImGui::SetColumnWidth(1, target.dimension.iv().x + 20);
 	ImGui::SetColumnWidth(2, target.dimension.iv().x + 20);
+
+	//
+	// Column 1
+	//
+
+	// Source image
+	ImGui::image("Source", settings.source->it(), source.dimension.iv());
+	source.offset = ImGui::GetItemRectMin();
+	source.hover = ImGui::IsItemHovered();
+
+	// Target image
+	ImGui::image("Target", settings.target->it(), target.dimension.iv());
+	target.offset = ImGui::GetItemRectMin();
+	target.hover = ImGui::IsItemHovered();
+
+	// Clear mask
+	if (ImGui::Button("Clear mask", ImVec2(target.dimension.x, height))) {
+		settings.mask.data = cv::Mat(settings.mask.rows(), settings.mask.cols(), CV_8UC1, cv::Scalar(255));
+		settings.mask.reloadGL();
+	}
 
 	// Delete patches
 	ImGuiUtils::pushButtonColor(0.0);
@@ -438,8 +423,29 @@ void EditorView::renderSettings() {
 	// Generate image
 	if (ImGui::Button("Generate image"))
 		generateImage();
+	if (ImGui::Button("Generate regular matching"))
+		pool.push_task([this] { generateRegularPatches(); });
 
+
+	//
+	// Column 2
+	//
 	ImGui::NextColumn();
+
+	// Mask
+	ImGui::image("Mask", settings.mask.it(), source.dimension.iv());
+
+	// Puzzle
+	ImGui::image("Puzzle", settings.puzzle.it(), target.dimension.iv());
+
+	// Reload mask
+	if (ImGui::Button("Reload mask", ImVec2(target.dimension.x, height))) {
+		settings.mask.data = cv::Mat(settings.mask.rows(), settings.mask.cols(), CV_8UC1, cv::Scalar(255));
+		for (const MondriaanPatch& patch : grid.patches) {
+			patch.addToGlobalMask();
+		}
+		settings.mask.reloadGL();
+	}
 
 	// Delete patch
 	ImGuiUtils::pushButtonColor(0.0);
@@ -466,30 +472,16 @@ void EditorView::renderSettings() {
 		grid.add(MondriaanPatch(Vec2(), Vec2(), settings.spx2mm(settings.target->dimension() - Vec2(1, 1)), 0));
 	}
 
+	//
+	// Column 3
+	//
 	ImGui::NextColumn();
 
-	// Mask settings
-	if (ImGui::Button("Clear mask", ImVec2(target.dimension.x, height))) {
-		settings.mask.data = cv::Mat(settings.mask.rows(), settings.mask.cols(), CV_8UC1, cv::Scalar(255));
-		settings.mask.reloadGL();
-	}
-
-	if (ImGui::Button("Reload mask", ImVec2(target.dimension.x, height))) {
-		settings.mask.data = cv::Mat(settings.mask.rows(), settings.mask.cols(), CV_8UC1, cv::Scalar(255));
-		for (const MondriaanPatch& patch : grid.patches) {
-			patch.addToGlobalMask();
-		}
-		settings.mask.reloadGL();
-	}
-
-	ImGui::NewLine();
-	ImGui::NewLine();
-	ImGui::NewLine();
 
 	// TSP generation method
 	ImGui::TextColored(Colors::BLUE.iv4(), "Target seedpoints");
 	{
-		static std::array methods = {"Jittered", "Greedy"};
+		static std::array methods = { "Jittered", "Greedy" };
 
 		ImGui::Combo("TSPG method", &tspGenerationMethod, methods.data(), methods.size());
 
@@ -500,7 +492,7 @@ void EditorView::renderSettings() {
 	// SSP generation method
 	ImGui::TextColored(Colors::BLUE.iv4(), "Source seedpoints");
 	{
-		static std::array methods = {"Random", "Template Match", "SIFT"};
+		static std::array methods = { "Random", "Template Match", "SIFT" };
 
 		ImGui::Combo("SSPG method", &sspGenerationMethod, methods.data(), methods.size());
 
@@ -512,7 +504,7 @@ void EditorView::renderSettings() {
 		ImGui::TextColored(Colors::BLUE.iv4(), "Mutations");
 		ImGui::DragInt("# mutations", &nMutations, 1, 1, MondriaanPatch::mutations - 1);
 		ImGui::DragInt("# mutated patches", &nMutatedPatches, 1, 1, grid.size());
-		static std::array<const char*, 6> metrics = {"SQDIFF", "SQDIFF_NORMED", "CCORR", "CCORR_NORMED", "CCOEFF", "CCOEFF_NORMED",};
+		static std::array<const char*, 6> metrics = { "SQDIFF", "SQDIFF_NORMED", "CCORR", "CCORR_NORMED", "CCOEFF", "CCOEFF_NORMED", };
 		ImGui::Combo("Distance metric##Mutations", &metric, metrics.data(), metrics.size());
 	}
 
@@ -522,16 +514,27 @@ void EditorView::renderSettings() {
 		ImGui::DragInt("# Splits", &nSplits, 1, 1, MondriaanPatch::mutations - 1);
 	}
 
+	//
+	// End column
+	//
 	ImGui::NextColumn();
 	ImGui::Columns(1);
+
+	// Overlays
+	TSPG::get[tspGenerationMethod]->renderOverlay(source, target);
+	TSPG::get[sspGenerationMethod]->renderOverlay(source, target);
+
+	// Bounding boxes
+	ImGui::GetWindowDrawList()->AddRect(source.min().iv(), source.max().iv(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All, 2);
+	ImGui::GetWindowDrawList()->AddRect(target.min().iv(), target.max().iv(), Colors::WHITE.u32(), 0, ImDrawCornerFlags_All, 2);
 }
 
 void EditorView::render() {
 	ImGui::Begin("SeedPoints", 0, ImGuiWindowFlags_AlwaysAutoResize);
 
-	renderTextures();
-	renderPatches();
+	//renderTextures();
 	renderSettings();
+	renderPatches();
 	renderCursor();
 	renderTooltip();
 	renderVoronoi();
@@ -711,7 +714,10 @@ void EditorView::splitPatches() {
 		MondriaanPatch bestPatchB;
 		double bestTotalMatch = std::numeric_limits<double>::max();
 
-		std::vector<int> fractionIndices = Utils::nUniqueRandomIntegersInRange(generator, std::min<int>(4, splitFractions.size()), 0, splitFractions.size());
+		std::vector<int> fractionIndices = Utils::nUniqueRandomIntegersInRange(generator,
+		                                                                       std::min<int>(4, splitFractions.size()),
+		                                                                       0,
+		                                                                       splitFractions.size());
 
 		for (int fractionIndex : fractionIndices) {
 			//Log::print("Patch %d: ", patchIndex);
@@ -812,6 +818,29 @@ void EditorView::splitPatches() {
 
 			// Insert new patch
 			grid.add(bestPatchB);
+		}
+	}
+}
+
+void EditorView::generateRegularPatches() {
+	int width = settings.target->cols();
+	int height = settings.target->rows();
+
+	settings.target->data.copyTo(settings.puzzle.data);
+	settings.puzzle.reloadGL();
+
+	int size = 15;
+//#pragma omp parallel fordd
+	for (int col = 0; col < width; col += size) {
+//#pragma omp parallel fordd
+		for (int row = 0; row < height; row += size) {
+			cv::Rect patch = cv::Rect(col, row, std::min(size, width - col), std::min(size, height - row));
+
+			auto[rotationIndex, sourcePosition] = Utils::computeBestMatch(patch, cv::TM_CCORR_NORMED);
+			cv::Rect sourcePatch(sourcePosition.x, sourcePosition.y, patch.width, patch.height);
+
+			settings.sourcer.textures[rotationIndex].data(sourcePatch).copyTo(settings.puzzle.data(patch));
+			settings.puzzle.reloadGL();
 		}
 	}
 }

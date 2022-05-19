@@ -52,6 +52,11 @@ Texture& FeatureVector::operator[](int index) {
 	return features[index];
 }
 
+const Texture& FeatureVector::operator[](int index) const {
+	return features[index];
+}
+
+
 FeatureVector FeatureVector::operator()(const cv::Rect& rect) const {
 	FeatureVector featureVector;
 	for (const Texture& feature : features)
@@ -82,6 +87,11 @@ std::vector<Texture>::const_iterator FeatureVector::begin() const {
 
 std::vector<Texture>::const_iterator FeatureVector::end() const {
 	return features.end();
+}
+
+void FeatureVector::reloadTextures() {
+	for (Texture& feature : features)
+		feature.reloadGL();
 }
 
 void FeatureVector::resize(const Vec2i& size) {

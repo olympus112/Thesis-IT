@@ -8,7 +8,7 @@ std::string Feature_Edge::name() {
 }
 
 cv::Mat Feature_Edge::compute(cv::Mat texture) {
-	Sobel sobel(texture, SobelType::XY);
+	Sobel sobel(texture, SobelType::MAGNITUDE, 1, 3);
 
 	return sobel.sobel;
 }

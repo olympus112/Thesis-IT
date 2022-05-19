@@ -33,6 +33,10 @@ Texture::Texture(Texture&& other) noexcept {
 	this->magFilter = other.magFilter;
 }
 
+Texture::Texture(const Texture& other) noexcept {
+	__debugbreak();
+};
+
 Texture& Texture::operator=(Texture&& other) noexcept {
 	this->id = std::exchange(other.id, 0);
 	this->data = other.data;

@@ -14,9 +14,11 @@ void Settings::init() {
 
 	postscale = 1.0;
 
+	rotations = 5;
+
 	sobelDerivative = 1;
-	sobelSize = 5;
-	sobelType = 0;
+	sobelSize = 3;
+	sobelType = 3;
 
 	cannyThreshold1 = 100;
 	cannyThreshold2 = 200;
@@ -27,8 +29,8 @@ void Settings::init() {
 	intensityWeight = 0.5f;
 	equalizationWeight = 0.5f;
 
-	std::string sourcePath = "../res/wood_multiple_1.jpg";
-	std::string targetPath = "../res/beethoven.png";
+	std::string sourcePath = "../res/wood_3.png";
+	std::string targetPath = "../res/eye_2.png";
 
 	originalSource = Texture(sourcePath);
 	originalTarget = Texture(targetPath);
@@ -59,6 +61,8 @@ void Settings::reloadPrescaledTextures() {
 		source = ExtendedFeatureTexture("Source", resizedSource, false);
 		validateTextureSettings(SettingValidation_SourceMillimeterToPixelRatio);
 
+		// Load prescaled source and recalculate ratio
+		sourcer = SourceTexture(resizedSource, rotations);
 	} else {
 		// Load source and recalculate ratio
 		cv::Mat resizedSource;
@@ -73,6 +77,9 @@ void Settings::reloadPrescaledTextures() {
 		cv::resize(originalTarget.data, resizedTarget, newTargetDimension.cv());
 		target = ExtendedFeatureTexture("Target", resizedTarget, false);
 		validateTextureSettings(SettingValidation_TargetMillimeterToPixelRatio);
+
+		// Load prescaled source and recalculate ratio
+		sourcer = SourceTexture(resizedSource, rotations);
 	}
 	
 	// Reset mask

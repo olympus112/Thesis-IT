@@ -6,7 +6,6 @@
 #include "graphics/imgui/imguiUtils.h"
 #include "graphics/imgui/texturepicker.h"
 #include "graphics/imgui/widgets.h"
-#include "imgui/imgui_notify.h"
 #include "util/stringUtil.h"
 
 static ImGui::TexturePicker sourceTexture("Source texture");
@@ -24,11 +23,9 @@ void SettingsView::render() {
 	ImGui::Begin("Settings");
 
 	if (ImGui::Button("Reload pipeline", ImVec2(ImGui::GetContentRegionAvail().x, 80))) {
-		ImGui::InsertNotification({ ImGuiToastType_Info, 3000, "Reloading pipeline..." });
 		settings.reloadPrescaledTextures();
 		screen.pipeline.reload();
 		screen.editor.reload();
-		ImGui::InsertNotification({ ImGuiToastType_Info, 3000, "Done." });
 	}
 
 	if (ImGui::CollapsingHeader("Global variables")) {
@@ -75,6 +72,8 @@ void SettingsView::render() {
 		ImGui::RadioButton("Y", &settings.sobelType, 1);
 		ImGui::SameLine();
 		ImGui::RadioButton("XY", &settings.sobelType, 2);
+		ImGui::SameLine();
+		ImGui::RadioButton("MAG", &settings.sobelType, 3);
 		ImGui::SameLine();
 		ImGui::Text("Sobel type");
 
@@ -203,17 +202,46 @@ void SettingsView::render() {
 		if (sourceTexture.hovered) {
 			ImGui::BeginTooltip();
 
-			for (std::size_t i = 0; i <= Feature::get.size(); i++) {
+			/*for (std::size_t i = 0; i <= Feature::get.size(); i++) {
 				if (i == Feature::get.size())
 					ImGui::image("Original", settings.source->it());
 				else
 					ImGui::image(Feature::get[i]->name().c_str(), settings.source[i].it());
+			}*/
+
+			for (int i = 0; i < settings.sourcer.textures.size(); i++) {
+				ImVec2 size(Globals::imageWidth, Globals::imageWidth / settings.sourcer.textures[i].aspect());
+				ImGui::image(std::to_string(settings.sourcer.textures[i].id).c_str(), settings.sourcer.textures[i].it(), size);
+
+				if (i != settings.sourcer.textures.size() - 1)
+					ImGui::SameLine();
+			}
+
+			if (!settings.sourcer.features.empty()) {
+				for (int f = 0; f < Feature::get.size(); f++) {
+					for (int r = 0; r < settings.sourcer.rotations; r++) {
+						ImVec2 size(Globals::imageWidth, Globals::imageWidth / settings.sourcer.features[r][f].aspect());
+						ImGui::image(std::to_string(settings.sourcer.features[r][f].id).c_str(), settings.sourcer.features[r][f].it(), size);
+
+						if (r != settings.sourcer.textures.size() - 1)
+							ImGui::SameLine();
+					}
+				}
+			}
+
+			for (int i = 0; i < settings.sourcer.masks.size(); i++) {
+				ImVec2 size(Globals::imageWidth, Globals::imageWidth / settings.sourcer.masks[i].aspect());
+				ImGui::image(std::to_string(360.0 / settings.sourcer.rotations * i).c_str(), settings.sourcer.masks[i].it(), size);
+
+				if (i != settings.sourcer.masks.size() - 1)
+					ImGui::SameLine();
+
 			}
 
 			ImGui::EndTooltip();
 		}
 
-		// Source tooltip
+		// Target tooltip
 		if (targetTexture.hovered) {
 			ImGui::BeginTooltip();
 

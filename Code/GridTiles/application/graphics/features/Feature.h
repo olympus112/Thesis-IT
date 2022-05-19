@@ -1,7 +1,6 @@
 #pragma once
 
 #include <unordered_map>
-#include <opencv2/core.hpp>
 #include "graphics/textures/texture.h"
 
 typedef int FeatureIndex;
@@ -38,6 +37,7 @@ public:
 	bool empty() const;
 
 	Texture& operator[](int index);
+	const Texture& operator[](int index) const;
 
 	FeatureVector operator()(const cv::Rect& rect) const;
 	FeatureVector operator()(const cv::Range& rowRange, const cv::Range& colRange) const;
@@ -46,6 +46,8 @@ public:
 	std::vector<Texture>::iterator end();
 	std::vector<Texture>::const_iterator begin() const;
 	std::vector<Texture>::const_iterator end() const;
+
+	void reloadTextures();
 
 	void resize(const Vec2i& size);
 };

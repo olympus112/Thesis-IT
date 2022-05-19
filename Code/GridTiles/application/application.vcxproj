@@ -127,6 +127,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\include\rolling_guidance\RollingGuidanceFilter.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="generation\SSPG\SSPG_Random.cpp" />
     <ClCompile Include="generation\SSPG\SSPG_Sift.cpp" />
     <ClCompile Include="generation\SSPG\SSPG_TemplateMatch.cpp" />
@@ -147,6 +151,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="graphics\opencv\gabor.cpp" />
     <ClCompile Include="graphics\opencv\histogram.cpp" />
     <ClCompile Include="graphics\opencv\saliency\src\motionSaliency.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">precomp.hpp</PrecompiledHeaderFile>
@@ -186,6 +191,7 @@
     <ClCompile Include="graphics\seedPoint.cpp" />
     <ClCompile Include="graphics\textures\extendedTexture.cpp" />
     <ClCompile Include="graphics\textures\rotatedTexture.cpp" />
+    <ClCompile Include="graphics\textures\sourceTexture.cpp" />
     <ClCompile Include="math\utils.cpp" />
     <ClCompile Include="util\globals.cpp" />
     <ClCompile Include="view\settings.cpp" />
@@ -212,10 +218,13 @@
     <ClInclude Include="..\include\imgui\imgui_impl_glfw.h" />
     <ClInclude Include="..\include\imgui\imgui_impl_opengl3.h" />
     <ClInclude Include="..\include\imgui\imgui_internal.h" />
-    <ClInclude Include="..\include\imgui\imgui_notify.h" />
     <ClInclude Include="..\include\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\include\rolling_guidance\permutohedral\Image.h" />
+    <ClInclude Include="..\include\rolling_guidance\permutohedral\macros.h" />
+    <ClInclude Include="..\include\rolling_guidance\permutohedral\permutohedral.h" />
+    <ClInclude Include="..\include\rolling_guidance\RollingGuidanceFilter.h" />
     <ClInclude Include="..\include\thread_pool\thread_pool.hpp" />
     <ClInclude Include="..\include\voronoi\jc_voronoi.h" />
     <ClInclude Include="..\include\voronoi\jc_voronoi_clip.h" />
@@ -237,6 +246,7 @@
     <ClInclude Include="graphics\opencv\cdf.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="graphics\features\Feature.h" />
+    <ClInclude Include="graphics\opencv\gabor.h" />
     <ClInclude Include="graphics\opencv\histogram.h" />
     <ClInclude Include="graphics\opencv\grayscale.h" />
     <ClInclude Include="graphics\opencv\saliency\include\opencv2\saliency.hpp" />
@@ -244,6 +254,7 @@
     <ClInclude Include="graphics\opencv\saliency\include\opencv2\saliency\saliencySpecializedClasses.hpp" />
     <ClInclude Include="graphics\opencv\saliency\src\precomp.hpp" />
     <ClInclude Include="graphics\textures\extendedTexture.h" />
+    <ClInclude Include="graphics\textures\sourceTexture.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="graphics\opencv\sobel.h" />
     <ClInclude Include="graphics\patch.h" />

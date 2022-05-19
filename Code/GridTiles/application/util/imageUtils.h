@@ -50,7 +50,7 @@ namespace ImageUtils {
 	}
 
 	inline void renderSobel(Texture* source, Texture* destination) {
-		SobelType sobelTypes[] = {SobelType::X, SobelType::Y, SobelType::XY};
+		SobelType sobelTypes[] = {SobelType::X, SobelType::Y, SobelType::XY, SobelType::MAGNITUDE};
 		Sobel sobel(source->data, sobelTypes[settings.sobelType], settings.sobelDerivative, settings.sobelSize);
 		
 		destination->data = sobel.sobel;

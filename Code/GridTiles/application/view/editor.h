@@ -6,10 +6,13 @@
 #include "generation/SSPG/SSPG.h"
 #include "graphics/canvas.h"
 #include "graphics/mondriaanPatch.h"
+#include "thread_pool/thread_pool.hpp"
 #include "util/regularGrid.h"
 
 class EditorView {
 private:
+	thread_pool pool;
+
 	TSPGIndex tspGenerationMethod;
 	SSPGIndex sspGenerationMethod;
 
@@ -43,7 +46,6 @@ public:
 	void renderTooltip();
 	void renderPatchViewer();
 	void renderPatches();
-	void renderTextures();
 	void renderSettings();
 
 	void renderVoronoi();
@@ -58,6 +60,7 @@ public:
 	void mutatePatches();
 	void mutatePatchesRandom();
 	void splitPatches();
+	void generateRegularPatches();
 
 	void spawnNewPatch();
 	bool checkPatch(const MondriaanPatch& oldPatch, const MondriaanPatch& newPatch);

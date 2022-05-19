@@ -28,7 +28,7 @@ public:
 	Texture(const cv::Mat& texture);
 
 	Texture(Texture&& other) noexcept;
-	Texture(const Texture& other) = delete;
+	Texture(const Texture& other) noexcept;
 	Texture& operator=(Texture&& other) noexcept;
 	Texture& operator=(const Texture& other) = delete;
 
