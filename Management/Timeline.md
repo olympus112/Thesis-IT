@@ -169,9 +169,25 @@
 | ---------- | -------------------------------------------- | ---- |
 | 2022-04-22 | Work on kdtree split                         | 4    |
 | 2022-04-23 | Testing of various line detection algorithms | 6    |
-| 2022-04-23 | Meeting                                      | 1    | 
+| 2022-04-23 | Meeting                                      | 1    |
+| Totaal     |                                              | 11   | 
 
-| Week 21    | Beschrijving          | Uren |
-| ---------- | --------------------- | ---- |
-| 2022-05-18 | Fixing color matching | 4    |
-|            |                       |      |
+| Week 21    | Beschrijving               | Uren |
+| ---------- | -------------------------- | ---- |
+| 2022-05-18 | Fixing color matching      | 4    |
+| 2022-05-19 | Work on rgb color matching | 5    |
+| 2022-05-20 | Meeting                    | 1    |
+| 2022-05-22 | Refactoring                | 3    |
+| Totaal     |                            | 13   | 
+
+| Week 24    | Beschrijving                                                        | Uren |
+| ---------- | ------------------------------------------------------------------- | ---- |
+| 2022-06-10 | Added rotations to new color matching + gabor filter implementation | 4    |
+| Totaal     |                                                                     | 4    | 
+
+| Week 25    | Beschrijving                                            | Uren |
+| ---------- | ------------------------------------------------------- | ---- |
+| 2022-06-13 | Split patch selection                                   | 4    |
+| 2022-06-14 | Split position selection                                | 3    |
+| 2022-06-15 | Updating editor with latest changes + regular grid tree | 9    |
+| 2022-06-16 |                                                         |      |

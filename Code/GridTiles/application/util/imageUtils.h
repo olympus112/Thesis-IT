@@ -14,14 +14,14 @@
 namespace ImageUtils {
 
 	inline void renderHistogram(Texture* source, Texture* destination) {
-		Histogram histogram(source->data);
+		Histogram histogram(source->data.clone());
 		
 		destination->data = histogram.drawLines();
 		destination->reloadGL(true);
 	}
 
 	inline void renderCDF(Texture* source, Texture* destination) {
-		Histogram histogram(source->data);
+		Histogram histogram(source->data.clone());
 		CDF cdf(histogram);
 		
 		destination->data = cdf.draw();
@@ -29,21 +29,21 @@ namespace ImageUtils {
 	}
 
 	inline void renderGrayscale(Texture* source, Texture* destination) {
-		Grayscale grayscale(source->data);
+		Grayscale grayscale(source->data.clone());
 		
 		destination->data = grayscale.grayscale;
 		destination->reloadGL();
 	}
 
 	inline void renderEqualization(Texture* source, Texture* reference, Texture* destination) {
-		Equalization equalization(source->data, reference->data);
+		Equalization equalization(source->data.clone(), reference->data.clone());
 		
 		destination->data = equalization.equalization;
 		destination->reloadGL();
 	}
 
 	inline void renderBlur(Texture* source, Texture* destination) {
-		Blur blur(source->data);
+		Blur blur(source->data.clone());
 		
 		destination->data = blur.blur;
 		destination->reloadGL();
@@ -51,14 +51,14 @@ namespace ImageUtils {
 
 	inline void renderSobel(Texture* source, Texture* destination) {
 		SobelType sobelTypes[] = {SobelType::X, SobelType::Y, SobelType::XY, SobelType::MAGNITUDE};
-		Sobel sobel(source->data, sobelTypes[settings.sobelType], settings.sobelDerivative, settings.sobelSize);
+		Sobel sobel(source->data.clone(), sobelTypes[settings.sobelType], settings.sobelDerivative, settings.sobelSize);
 		
 		destination->data = sobel.sobel;
 		destination->reloadGL(false);
 	}
 
 	inline void renderCanny(Texture* source, Texture* destination) {
-		Canny canny(source->data, settings.cannyThreshold1, settings.cannyThreshold2, settings.cannyAperture, settings.cannyL2gradient);
+		Canny canny(source->data.clone(), settings.cannyThreshold1, settings.cannyThreshold2, settings.cannyAperture, settings.cannyL2gradient);
 		
 		destination->data = canny.canny;
 		destination->reloadGL();
@@ -66,7 +66,7 @@ namespace ImageUtils {
 
 	inline auto saliency = cv::saliency::StaticSaliencyFineGrained::create();
 	inline void renderSalience(Texture* source, Texture* destination) {
-		saliency->computeSaliency(source->data, destination->data);
+		saliency->computeSaliency(source->data.clone(), destination->data);
 		destination->reloadGL(false, GL_RGB32F, GL_LUMINANCE, GL_FLOAT);
 	}
 

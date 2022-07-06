@@ -6,7 +6,7 @@
 #include "view/screen.h"
 #include "view/settings.h"
 
-
+extern std::mutex MUTEX_RENDER;
 extern Settings settings;
 extern Screen screen;
 extern GLFWwindow* window;

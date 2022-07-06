@@ -264,7 +264,8 @@
     <ClInclude Include="graphics\match.h" />
     <ClInclude Include="graphics\seedPoint.h" />
     <ClInclude Include="graphics\textures\rotatedTexture.h" />
-    <ClInclude Include="util\regularGrid.h" />
+    <ClInclude Include="math\btree.h" />
+    <ClInclude Include="util\RegularTree.h" />
     <ClInclude Include="util\globals.h" />
     <ClInclude Include="util\imageUtils.h" />
     <ClInclude Include="util\list.h" />

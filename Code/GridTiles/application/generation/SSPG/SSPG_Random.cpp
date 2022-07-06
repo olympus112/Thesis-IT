@@ -11,7 +11,7 @@ void SSPG_Random::renderSettings(Canvas& source, Canvas& target) {
 }
 
 void SSPG_Random::mutate(std::vector<MondriaanPatch>& patches) {
-	cv::Mat mask(settings.source->dimension().cv(), CV_8U, cv::Scalar(255));
+	cv::Mat mask(settings.sourcer->dimension().cv(), CV_8U, cv::Scalar(255));
 
 	for (MondriaanPatch& patch : patches) {
 		std::vector<cv::Point> nonZero;

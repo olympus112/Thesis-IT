@@ -84,7 +84,7 @@ std::vector<std::size_t> Utils::nUniqueSampledSizeTypesInRange(std::mt19937& gen
 	for (std::size_t i = 0; i < n; i++) {
 		std::size_t value = static_cast<std::size_t>(static_cast<float>(start) + pdf(
 			Utils::randomUnsignedFloatInRange(generator, 0.0f, 1.0f) * static_cast<float>(end - start)));
-		result.push_back(value);
+		result[i] = value;
 	}
 
 	return result;

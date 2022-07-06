@@ -107,6 +107,9 @@ void SettingsView::render() {
 		// Postscale
 		ImGui::DragFloat("Postscale", &settings.postscale, 0.01f, 0.05f, 1.5);
 
+		// Rotations
+		ImGui::DragInt("Rotations", &settings.rotations, 1, 1, 10);
+
 		// Source to target pixel ratio
 		ImGui::Text("Source to target pixel ratio: %.2f", settings.sourceToTargetPixelRatio);
 
@@ -127,7 +130,7 @@ void SettingsView::render() {
 		ImGui::Spacing();
 
 		// Source texture
-		if (sourceTexture.render(*settings.source)) {
+		if (sourceTexture.render(*settings.sourcer)) {
 			// Load new source and validate actual source dimension
 			settings.originalSource = Texture(sourceTexture.path);
 			settings.validateTextureSettings(Settings::SettingValidation_ActualSourceDimension);
@@ -144,7 +147,7 @@ void SettingsView::render() {
 		ImGui::Text("Actual dimension");
 		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
 		if (ImGui::DragFloat("##asdx", &settings.actualSourceDimension_mm.x, 1.0, 1.0, 10000.0, "%.0f mm")) {
-			settings.actualSourceDimension_mm.y = settings.validateTextureAspect(&settings.actualSourceDimension_mm.x, nullptr, settings.source->aspect());
+			settings.actualSourceDimension_mm.y = settings.validateTextureAspect(&settings.actualSourceDimension_mm.x, nullptr, settings.sourcer->aspect());
 			settings.validateTextureSettings(Settings::SettingValidation_ActualSourceDimension);
 		}
 		ImGui::PopItemWidth();
@@ -152,7 +155,7 @@ void SettingsView::render() {
 		ImGui::Text("X");
 		ImGui::SameLine();
 		if (ImGui::DragFloat("##asdy", &settings.actualSourceDimension_mm.y, 1.0, 1.0f, 10000.0f, "%.0f mm")) {
-			settings.actualSourceDimension_mm.x = settings.validateTextureAspect(nullptr, &settings.actualSourceDimension_mm.y, settings.source->aspect());
+			settings.actualSourceDimension_mm.x = settings.validateTextureAspect(nullptr, &settings.actualSourceDimension_mm.y, settings.sourcer->aspect());
 			settings.validateTextureSettings(Settings::SettingValidation_ActualSourceDimension);
 		}
 		ImGui::PopItemWidth();

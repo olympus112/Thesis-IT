@@ -1,6 +1,7 @@
 #include <core.h>
 #include "texture.h"
 
+#include <opencv2/highgui.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
@@ -17,6 +18,7 @@ Texture::Texture(const std::string& path) {
 
 Texture::Texture(const cv::Mat& texture) {
 	texture.copyTo(data);
+	//cv::imshow("data", data); cv::waitKey();
 	reloadGL(false);
 }
 
@@ -53,7 +55,10 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 }
 
 Texture::~Texture() {
+	if (id == 0)
+		return;
 	unbind();
+	Log::error("Deleted texure %d", id);
 	glDeleteTextures(1, &id);
 	this->id = 0;
 }
@@ -87,6 +92,9 @@ void Texture::unbind() {
 }
 
 void Texture::reloadGL(bool linear, int internalFormat, int extenalFormat, int dataType) {
+	if (data.dims != 2 || data.size[0] == 0 || data.size[1] == 0)
+		return;
+
 	auto internalFormat_ = internalFormat != 0 ? internalFormat : data.channels() == 1 ? GL_LUMINANCE : data.channels() == 3 ? GL_RGB : GL_RGBA;
 	auto externalFormat_ = extenalFormat != 0 ? extenalFormat : data.channels() == 1 ? GL_LUMINANCE : data.channels() == 3 ? GL_BGR : GL_BGRA;
 	auto dataType_ = dataType != 0 ? dataType : GL_UNSIGNED_BYTE;
@@ -96,9 +104,9 @@ void Texture::reloadGL(bool linear, int internalFormat, int extenalFormat, int d
 }
 
 GLID Texture::generate(int target, int wrapS, int wrapT, int minFilter, int magFilter) {
-	GLID id;
-
+	GLID id = 0;
 	glGenTextures(1, &id);
+	Log::debug("Created texure %d", id);
 	glBindTexture(target, id);
 	glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
 	glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);

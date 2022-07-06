@@ -22,6 +22,8 @@ public:
 	Texture sourceCanny;
 
 	Texture saliencyMap;
+	Texture rollingGuidance;
+	Texture cannyLevels;
 
 	PipelineView();
 

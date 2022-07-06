@@ -14,6 +14,7 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "rolling_guidance/RollingGuidanceFilter.h"
 
+std::mutex MUTEX_RENDER;
 Vec2i dimension;
 Screen screen;
 GLFWwindow* window;
@@ -48,6 +49,54 @@ bool init() {
 		return false;
 	}
 
+	// Opengl error
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback([](GLenum source,
+	                          GLenum type,
+	                          GLuint id,
+	                          GLenum severity,
+	                          GLsizei length,
+	                          const GLchar* message,
+	                          const void* userParameters) {
+		                       const char* typeString = "UNKNOWN";
+		                       switch (type) {
+		                       case GL_DEBUG_TYPE_ERROR:
+			                       typeString = "ERROR";
+			                       break;
+		                       case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+			                       typeString = "DEPRECATED_BEHAVIOR";
+			                       break;
+		                       case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+			                       typeString = "UNDEFINED_BEHAVIOR";
+			                       break;
+		                       case GL_DEBUG_TYPE_PORTABILITY:
+			                       typeString = "PORTABILITY";
+			                       break;
+		                       case GL_DEBUG_TYPE_PERFORMANCE:
+			                       typeString = "PERFORMANCE";
+			                       break;
+		                       case GL_DEBUG_TYPE_OTHER:
+			                       typeString = "OTHER";
+			                       break;
+		                       }
+
+		                       const char* severityString = "UNKNOWN";
+		                       switch (severity) {
+		                       case GL_DEBUG_SEVERITY_LOW:
+			                       severityString = "LOW";
+			                       break;
+		                       case GL_DEBUG_SEVERITY_MEDIUM:
+			                       severityString = "MEDIUM";
+			                       break;
+		                       case GL_DEBUG_SEVERITY_HIGH:
+			                       severityString = "HIGH";
+			                       break;
+		                       }
+
+		                       Log::error("GL CALLBACK: type = %s, severity = %s, message = %s\n", typeString, severityString, message);
+	                       },
+	                       0);
+
 	// GLFW Settings
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -62,7 +111,7 @@ bool init() {
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 130");
+	ImGui_ImplOpenGL3_Init("#version 330");
 
 	// Setup dark style
 	ImGui::StyleColorsDark();
@@ -148,9 +197,9 @@ void render() {
 	// Submit
 	ImGui::Render();
 	glfwGetFramebufferSize(window, &dimension.x, &dimension.y);
-	glViewport(0, 0, dimension.x, dimension.y);
-	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glCall(glViewport(0, 0, dimension.x, dimension.y));
+	glCall(glClearColor(1, 1, 1, 1));
+	glCall(glClear(GL_COLOR_BUFFER_BIT));
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	// Swap
@@ -324,8 +373,6 @@ cv::Mat src;
 int threshold = 200;
 
 void rollingGuidanceLevels() {
-	cv::RNG rng(12345);
-
 	cv::Mat beethoven = cv::imread("../res/beethoven.png");
 	cv::imshow("Original", beethoven);
 
@@ -345,7 +392,7 @@ void rollingGuidanceLevels() {
 
 		cv::Mat guidanceCanny;
 		cv::Canny(guidance, guidanceCanny, 50, 150, 3);
-		guidanceCanny.convertTo(guidanceCanny, CV_32FC1, 1.0 / (i+1.0));
+		guidanceCanny.convertTo(guidanceCanny, CV_32FC1, 1.0 / (i + 1.0));
 
 		//canny += guidanceCanny;
 		cv::max(canny, guidanceCanny, canny);
@@ -442,7 +489,7 @@ void rollingGuidance() {
 	//guidanceCanny = Sobel(guidance, SobelType::MAGNITUDE, 1, 3).sobel;
 	cv::Canny(guidance, guidanceCanny, 50, 150, 3);
 	cv::imshow("guidanceCanny", guidanceCanny);
-	
+
 	cv::Mat guidanceTotal = guidance.clone();
 	guidanceTotal.setTo(255, guidanceCanny);
 	cv::imshow("GuidanceTotal", guidanceTotal);
@@ -455,7 +502,7 @@ void rollingGuidance() {
 	//bilateralCanny = Sobel(bilateral, SobelType::MAGNITUDE, 1, 3).sobel;
 	cv::Canny(bilateral, bilateralCanny, 50, 150, 3);
 	cv::imshow("bilateralCanny", bilateralCanny);
-	
+
 	cv::Mat b = bilateral.clone();
 	b.setTo(255, bilateralCanny);
 	cv::imshow("bilateralTotal", b);
@@ -517,7 +564,7 @@ void rollingGuidance() {
 	double max = *std::ranges::max_element(values);
 	for (int x = 0; x < values.size(); x++) {
 		int y = static_cast<int>(values[x] / max * height);
-		cv::line(graph, cv::Point(x, height), cv::Point(x, height-y), cv::Scalar(0, 0, 255));
+		cv::line(graph, cv::Point(x, height), cv::Point(x, height - y), cv::Scalar(0, 0, 255));
 	}
 
 	cv::imshow("Graph", graph);
@@ -711,10 +758,11 @@ void testColor() {
 	bool color = false;
 
 	cv::Mat target = cv::imread("../res/eye_2.png");
-	//cv::resize(target, target, cv::Size(target.cols / 2, target.rows / 2));
+	cv::resize(target, target, cv::Size(target.cols / 2, target.rows / 2));
 	cv::resize(target, target, cv::Size(target.cols / 2, target.rows / 2));
 	cv::Mat targetGrayscale = color ? target : Grayscale(target).grayscale;
 	cv::Mat source = cv::imread("../res/wood_3.png");
+	cv::resize(source, source, cv::Size(source.cols / 2, source.rows / 2));
 	cv::Mat sourceGrayscale = color ? source : Grayscale(source).grayscale;
 
 	// Calculate equalization
@@ -782,7 +830,8 @@ void testColor() {
 
 int main(int, char**) {
 	startApplication();
-
+	//rollingGuidanceLevels();
+	//rollingGuidance();
 	//testColor();
 
 	return 0;

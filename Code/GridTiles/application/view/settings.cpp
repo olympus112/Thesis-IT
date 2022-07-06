@@ -58,17 +58,18 @@ void Settings::reloadPrescaledTextures() {
 		cv::Mat resizedSource;
 		Vec2i newSourceDimension = actualSourceDimension_mm / targetMillimeterToPixelRatio;
 		cv::resize(originalSource.data, resizedSource, newSourceDimension.cv());
-		source = ExtendedFeatureTexture("Source", resizedSource, false);
-		validateTextureSettings(SettingValidation_SourceMillimeterToPixelRatio);
 
 		// Load prescaled source and recalculate ratio
 		sourcer = SourceTexture(resizedSource, rotations);
+		validateTextureSettings(SettingValidation_SourceMillimeterToPixelRatio);
 	} else {
 		// Load source and recalculate ratio
 		cv::Mat resizedSource;
 		Vec2i newSourceDimension = originalSource.dimension() * postscale;
 		cv::resize(originalSource.data, resizedSource, newSourceDimension.cv());
-		source = ExtendedFeatureTexture("Source", resizedSource, false);
+
+		// Load prescaled source and recalculate ratio
+		sourcer = SourceTexture(resizedSource, rotations);
 		validateTextureSettings(SettingValidation_SourceMillimeterToPixelRatio);
 
 		// Load prescaled target and recalculate ratio
@@ -77,13 +78,10 @@ void Settings::reloadPrescaledTextures() {
 		cv::resize(originalTarget.data, resizedTarget, newTargetDimension.cv());
 		target = ExtendedFeatureTexture("Target", resizedTarget, false);
 		validateTextureSettings(SettingValidation_TargetMillimeterToPixelRatio);
-
-		// Load prescaled source and recalculate ratio
-		sourcer = SourceTexture(resizedSource, rotations);
 	}
 	
 	// Reset mask
-	mask.data = cv::Mat(source->rows(), source->cols(), CV_8UC1, cv::Scalar(255));
+	mask.data = cv::Mat(sourcer->rows(), sourcer->cols(), CV_8UC1, cv::Scalar(255));
 	mask.reloadGL();
 
 	// Recalculate source to target ratio, this should be 1
@@ -114,7 +112,7 @@ void Settings::validateTextureSettings(SettingValidation settingValidation) {
 	}
 
 	if (settingValidation & SettingValidation_SourceMillimeterToPixelRatio) {
-		this->sourceMillimeterToPixelRatio = actualSourceDimension_mm.x / static_cast<float>(source->dimension().x);
+		this->sourceMillimeterToPixelRatio = actualSourceDimension_mm.x / static_cast<float>(sourcer->dimension().x);
 	}
 
 	if (settingValidation & SettingValidation_TargetMillimeterToPixelRatio) {

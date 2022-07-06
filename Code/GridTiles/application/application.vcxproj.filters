@@ -380,7 +380,7 @@
     <ClInclude Include="graphics\textures\extendedTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\regularGrid.h">
+    <ClInclude Include="util\RegularTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="util\sat.h">
@@ -444,6 +444,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphics\opencv\gabor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math\btree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

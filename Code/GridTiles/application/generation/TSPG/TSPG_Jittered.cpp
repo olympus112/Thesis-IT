@@ -63,10 +63,10 @@ std::vector<MondriaanPatch> TSPG_Jittered::generate() {
 			}
 
 			Vec2 targetPosition = Vec2(xMin + relativePoint.x, yMin + relativePoint.y);
-			Vec2 sourcePosition = Utils::transform(targetPosition, settings.target->dimension(), settings.source->dimension());
-			MondriaanPatch patch(sourcePosition, targetPosition, settings.minimumPatchDimension_mm, 0);
-			patch.computeTransformationMatrix();
-			patch.computeMask();
+			Vec2 sourcePosition = Utils::transform(targetPosition, settings.target->dimension(), settings.sourcer->dimension());
+			MondriaanPatch patch(sourcePosition, targetPosition, settings.minimumPatchDimension_mm);
+			/*patch.computeTransformationMatrix();
+			patch.computeMask();*/
 
 			patches.insert(std::make_pair(value, patch));
 		}

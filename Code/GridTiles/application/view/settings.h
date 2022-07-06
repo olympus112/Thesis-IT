@@ -29,7 +29,7 @@ struct Settings {
 
 	// Array of `rotations` rotated source material textures
 	SourceTexture sourcer;
-	ExtendedFeatureTexture source;
+	//ExtendedFeatureTexture source;
 	// The target texture
 	ExtendedFeatureTexture target;
 	// The puzzle

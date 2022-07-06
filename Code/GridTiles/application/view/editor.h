@@ -7,7 +7,7 @@
 #include "graphics/canvas.h"
 #include "graphics/mondriaanPatch.h"
 #include "thread_pool/thread_pool.hpp"
-#include "util/regularGrid.h"
+#include "util/RegularTree.h"
 
 class EditorView {
 private:
@@ -19,17 +19,17 @@ private:
 	bool showConnections = false;
 	bool showRegularGrid = false;
 
-	int nMutations;
-	int nMutatedPatches;
 	int nSplits;
 	int metric;
+
+	bool stop;
 
 	std::mt19937 generator;
 public:
 	Canvas source;
 	Canvas target;
 
-	RegularGrid<10, 10> grid;
+	RegularTree<10, 10> grid;
 
 	int intersectedIndex = -1;
 	int selectedIndex = -1;
@@ -60,6 +60,7 @@ public:
 	void mutatePatches();
 	void mutatePatchesRandom();
 	void splitPatches();
+	void splitPatchesRollingGuidance();
 	void generateRegularPatches();
 
 	void spawnNewPatch();
