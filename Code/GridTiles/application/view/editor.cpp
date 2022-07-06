@@ -427,7 +427,7 @@ void EditorView::renderSettings() {
 	if (ImGui::ButtonEx("Mutate", ImVec2(source.dimension.x, height), ImGuiButtonFlags_Repeat))
 		mutatePatches();
 	if (ImGui::ButtonEx("Split", ImVec2(source.dimension.x, height), ImGuiButtonFlags_Repeat))
-		splitPatches();
+		splitPatchesRollingGuidance();
 
 	// Show settings
 	ImGui::Checkbox("Show connections", &showConnections);
@@ -719,12 +719,12 @@ void EditorView::splitPatchesRollingGuidance() {
 		MondriaanPatch& patch = grid[patchIndex].patch;
 
 		// Biggest area
-		//double value = grid.patches[patchIndex].patch.dimension_mm.x * grid.patches[patchIndex].patch.dimension_mm.y;
+		double value = patch.dimension_mm.x * patch.dimension_mm.y;
 
 		// Largest salience
-		cv::Mat saliencyPatch = screen.pipeline.saliencyMap.data(patch.targetBounds().cv());
+		/*cv::Mat saliencyPatch = screen.pipeline.saliencyMap.data(patch.targetBounds().cv());
 		cv::Scalar sum = cv::sum(saliencyPatch) / (patch.targetBounds().width() * patch.targetBounds().height());
-		double value = sum(0);
+		double value = sum(0);*/
 
 		// Largest sobel edge weight
 		/*cv::Mat edgePatch = screen.pipeline.targetSobel.data(patch.targetBounds().cv());
@@ -735,92 +735,101 @@ void EditorView::splitPatchesRollingGuidance() {
 	}
 
 	// Sort on score
-	/*auto customLess = [] (const PatchCharacteristics& a, const PatchCharacteristics& b) {
+	auto customLess = [](const PatchCharacteristics& a, const PatchCharacteristics& b) {
 		return a.patchSelectionScore > b.patchSelectionScore;
 	};
-	std::ranges::sort(patchCharacteristics.begin(), patchCharacteristics.end(), customLess);*/
+	std::ranges::sort(patchCharacteristics.begin(), patchCharacteristics.end(), customLess);
 
 	// Probability density function for selecting patches to split
-	//auto pdf = [] (float x) {
+	//auto pdf = [](float x) { 
 	//	return std::cbrt(x - 1) + 1;
 	//}; // 3(x - 1)^2
+	auto pdf = [](float x) {
+		return x;
+	};
 	// Random indices for selecting patches to split, according to the probability density function
-	//std::vector<std::size_t> patchIndices = Utils::nUniqueSampledSizeTypesInRange(generator, nSplits, 0, patchCharacteristics.size(), pdf);
-	std::vector<std::size_t> patchIndices = { 0 };
+	std::vector<std::size_t> patchIndices = Utils::nUniqueSampledSizeTypesInRange(generator,
+	                                                                              std::min(nSplits, static_cast<int>(patchCharacteristics.size())),
+	                                                                              0,
+	                                                                              patchCharacteristics.size(),
+	                                                                              pdf);
+	//std::set<std::size_t> patchIndicesSet(patchIndices.begin(), patchIndices.end());
+	std::set<std::size_t> patchIndicesSet = {0};
 
-	for (std::size_t patchIndex : patchIndices) {
+	for (std::size_t patchIndex : patchIndicesSet) {
 		PatchCharacteristics characteristics = patchCharacteristics[patchIndex];
 		MondriaanPatch& currentPatch = grid[characteristics.patchIndex].patch;
 
-		cv::Mat cannyLevels = screen.pipeline.cannyLevels.data(currentPatch.targetBounds().cv());
-		int maskOffsetX = static_cast<int>(settings.tmm2px(settings.minimumPatchDimension_mm.x));
-		int maskOffsetY = static_cast<int>(settings.tmm2px(settings.minimumPatchDimension_mm.y));
-		int maskCols = cannyLevels.cols - 2 * maskOffsetX;
-		int maskRows = cannyLevels.rows - 2 * maskOffsetY;
-		
-		// Ignore too small regions
-		if (maskCols < 1 || maskRows < 1)
-			return;
+		cv::Rect patchBounds = currentPatch.targetBounds().cv();
+		cv::Mat cannyLevels = screen.pipeline.cannyLevels.data(patchBounds);
+		int convolutionOffsetX = static_cast<int>(settings.tmm2px(settings.minimumPatchDimension_mm.x));
+		int convolutionOffsetY = static_cast<int>(settings.tmm2px(settings.minimumPatchDimension_mm.y));
+		int convolutionWidth = cannyLevels.cols - 2 * convolutionOffsetX;
+		int convolutionHeight = cannyLevels.rows - 2 * convolutionOffsetY;
 
-		cv::Mat mask(cannyLevels.rows, cannyLevels.cols, CV_8UC1, cv::Scalar(0));
-		mask(cv::Rect(maskOffsetX, maskOffsetY, maskCols, maskRows)) = cv::Scalar(255);
 
-		// Horizontal match
-		double horizontalValue;
-		cv::Mat horizontalMatch;
-		cv::Point horizontalPoint;
-		cv::Mat horizontalLine(1, cannyLevels.cols, CV_8UC1, cv::Scalar(255));
-		cv::matchTemplate(cannyLevels, horizontalLine, horizontalMatch, cv::TemplateMatchModes::TM_CCORR_NORMED);
-		cv::minMaxLoc(horizontalMatch, nullptr, &horizontalValue, nullptr, &horizontalPoint, mask);
+		// Horizontal line, vertical split
+		double horizontalValue = 0;
+		cv::Point horizontalPoint = cv::Point(-1, -1);
+		if (convolutionHeight > 0) {
+			cv::Mat horizontalMatch;
+			cv::Mat horizontalPatch = cannyLevels(cv::Range(convolutionOffsetY, cannyLevels.rows - convolutionOffsetY),
+			                                      cv::Range(0, cannyLevels.cols));
+			cv::Mat horizontalLine(1, horizontalPatch.cols, CV_8UC1, cv::Scalar(255));
+			cv::matchTemplate(horizontalPatch, horizontalLine, horizontalMatch, cv::TemplateMatchModes::TM_CCORR_NORMED);
+			cv::minMaxLoc(horizontalMatch, nullptr, &horizontalValue, nullptr, &horizontalPoint);
+		}
 
-		// Vertical match
-		double verticalValue;
-		cv::Mat verticalMatch;
-		cv::Point verticalPoint;
-		cv::Mat verticalLine(cannyLevels.rows, 1, CV_8UC1, cv::Scalar(255));
-		cv::matchTemplate(cannyLevels, verticalLine, verticalMatch, cv::TemplateMatchModes::TM_CCORR_NORMED);
-		cv::minMaxLoc(verticalMatch, nullptr, &verticalValue, nullptr, &verticalPoint, mask);
+		// Vertical line, horizontal split
+		double verticalValue = 0;
+		cv::Point verticalPoint = cv::Point(-1, -1);
+		if (convolutionWidth > 0) {
+			cv::Mat verticalMatch;
+			cv::Mat verticalPatch = cannyLevels(cv::Range(0, cannyLevels.rows), cv::Range(convolutionOffsetX, cannyLevels.cols - convolutionOffsetY));
+			cv::Mat verticalLine(verticalPatch.rows, 1, CV_8UC1, cv::Scalar(255));
+			cv::matchTemplate(verticalPatch, verticalLine, verticalMatch, cv::TemplateMatchModes::TM_CCORR_NORMED);
+			cv::minMaxLoc(verticalMatch, nullptr, &verticalValue, nullptr, &verticalPoint);
+		}
 
-/*
-		//// Vertical or horizontal split
-		if (horizontalValue >= verticalValue && horizontalPoint.y != -1) {
-			//MondriaanPatch top(currentPatch.sourceOffset, currentPatch.targetOffset, currentPatch.)
-			int originalWidthPx = settings.tmm2px(currentPatch.dimension_mm.x);
-			int newWidthAPx = originalWidthPx * fraction;
-			int newWidthBPx = originalWidthPx - newWidthAPx;
-			double newWidthA = settings.tpx2mm(newWidthAPx);
-			double newWidthB = settings.tpx2mm(newWidthBPx);
-
-			if (newWidthA < settings.minimumPatchDimension_mm.x || newWidthB < settings.minimumPatchDimension_mm.x) {
-				if (!checkPatch(newPatchA, currentPatch)) {
-					//Log::error("rejected width");
-					continue;
-				}
-			}
+		// Horizontal split
+		if (verticalValue >= horizontalValue && verticalPoint.x != -1) {
+			int originalWidth_px = cannyLevels.cols;
+			int newWidthA_px = convolutionOffsetX + verticalPoint.x;
+			int newWidthB_px = originalWidth_px - newWidthA_px;
+			double newWidthA_mm = settings.tpx2mm(newWidthA_px);
+			double newWidthB_mm = settings.tpx2mm(newWidthB_px);
 
 			Vec2 newTargetOffsetA = currentPatch.targetOffset;
-			Vec2 newTargetOffsetB = currentPatch.targetOffset + Vec2(settings.tmm2px(newWidthA), 0);
+			Vec2 newTargetOffsetB = currentPatch.targetOffset + Vec2(newWidthA_px, 0);
 
-			newPatchA = MondriaanPatch(currentPatch.sourceOffset,
-				newTargetOffsetA,
-				Vec2(newWidthA, currentPatch.dimension_mm.y),
-				currentPatch.sourceRotation);
-			if (!checkPatch(newPatchA, currentPatch)) {
-				//Log::error("rejected A");
+			MondriaanPatch newPatchA = MondriaanPatch(currentPatch.sourceOffset, newTargetOffsetA, Vec2(newWidthA_mm, currentPatch.dimension_mm.y));
+			MondriaanPatch newPatchB = MondriaanPatch(currentPatch.sourceOffset, newTargetOffsetB, Vec2(newWidthB_mm, currentPatch.dimension_mm.y));
+
+
+			if (checkPatch(newPatchB, currentPatch) && checkPatch(newPatchA, currentPatch)) {
+				grid.add(characteristics.patchIndex, newPatchA, newPatchB);
 				continue;
 			}
+		}
 
-			newPatchB = MondriaanPatch(currentPatch.sourceOffset,
-				newTargetOffsetB,
-				Vec2(newWidthB, currentPatch.dimension_mm.y),
-				currentPatch.sourceRotation);
-			if (!checkPatch(newPatchB, currentPatch)) {
-				//Log::error("rejected B");
+		// Vertical split
+		if (horizontalValue >= verticalValue && horizontalPoint.y != -1) {
+			int originalHeightPx = cannyLevels.rows;
+			int newHeightA_px = convolutionOffsetY + horizontalPoint.y;
+			int newHeightB_px = originalHeightPx - newHeightA_px;
+			double newHeightA_mm = settings.tpx2mm(newHeightA_px);
+			double newHeightB_mm = settings.tpx2mm(newHeightB_px);
+
+			Vec2 newTargetOffsetA = currentPatch.targetOffset;
+			Vec2 newTargetOffsetB = currentPatch.targetOffset + Vec2(0, newHeightA_px);
+
+			MondriaanPatch newPatchA = MondriaanPatch(currentPatch.sourceOffset, newTargetOffsetA, Vec2(currentPatch.dimension_mm.x, newHeightA_mm));
+			MondriaanPatch newPatchB = MondriaanPatch(currentPatch.sourceOffset, newTargetOffsetB, Vec2(currentPatch.dimension_mm.x, newHeightB_mm));
+			if (checkPatch(newPatchB, currentPatch) && checkPatch(newPatchA, currentPatch)) {
+				grid.add(characteristics.patchIndex, newPatchA, newPatchB);
 				continue;
 			}
-		} else if (verticalValue >= horizontalValue && verticalPoint.x != -1) {
-			axis = Split
-		}*/
+		}
 	}
 }
 
@@ -901,17 +910,13 @@ void EditorView::splitPatches() {
 				Vec2 newTargetOffsetA = currentPatch.targetOffset;
 				Vec2 newTargetOffsetB = currentPatch.targetOffset + Vec2(settings.tmm2px(newWidthA), 0);
 
-				newPatchA = MondriaanPatch(currentPatch.sourceOffset,
-				                           newTargetOffsetA,
-				                           Vec2(newWidthA, currentPatch.dimension_mm.y));
+				newPatchA = MondriaanPatch(currentPatch.sourceOffset, newTargetOffsetA, Vec2(newWidthA, currentPatch.dimension_mm.y));
 				if (!checkPatch(newPatchA, currentPatch)) {
 					//Log::error("rejected A");
 					continue;
 				}
 
-				newPatchB = MondriaanPatch(currentPatch.sourceOffset,
-				                           newTargetOffsetB,
-				                           Vec2(newWidthB, currentPatch.dimension_mm.y));
+				newPatchB = MondriaanPatch(currentPatch.sourceOffset, newTargetOffsetB, Vec2(newWidthB, currentPatch.dimension_mm.y));
 				if (!checkPatch(newPatchB, currentPatch)) {
 					//Log::error("rejected B");
 					continue;
@@ -934,17 +939,13 @@ void EditorView::splitPatches() {
 				Vec2 newTargetOffsetA = currentPatch.targetOffset;
 				Vec2 newTargetOffsetB = currentPatch.targetOffset + Vec2(0, settings.tmm2px(newHeightA));
 
-				newPatchA = MondriaanPatch(currentPatch.sourceOffset,
-				                           newTargetOffsetA,
-				                           Vec2(currentPatch.dimension_mm.x, newHeightA));
+				newPatchA = MondriaanPatch(currentPatch.sourceOffset, newTargetOffsetA, Vec2(currentPatch.dimension_mm.x, newHeightA));
 				if (!checkPatch(newPatchA, currentPatch)) {
 					//Log::error("rejected A");
 					continue;
 				}
 
-				newPatchB = MondriaanPatch(currentPatch.sourceOffset,
-				                           newTargetOffsetB,
-				                           Vec2(currentPatch.dimension_mm.x, newHeightB));
+				newPatchB = MondriaanPatch(currentPatch.sourceOffset, newTargetOffsetB, Vec2(currentPatch.dimension_mm.x, newHeightB));
 				if (!checkPatch(newPatchB, currentPatch)) {
 					//Log::error("rejected B");
 					continue;

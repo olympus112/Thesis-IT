@@ -10,9 +10,7 @@ public:
 	// Patch offset in the target texture, this is the topleft point of the circumscribing axis aligned bounding box
 	Vec2f targetOffset;
 	// Dimension of the patch in millimeters
-	Vec2f dimension_mm_;
-	// Dimension of the patch in pixels
-	Vec2i dimension_px;
+	Vec2f dimension_mm;
 	// Rotation index
 	int rotationIndex;
 
