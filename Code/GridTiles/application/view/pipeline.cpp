@@ -192,9 +192,9 @@ void PipelineView::reload() {
 
 	// Canny levels
 	cv::Mat cannyLevels(targetGrayscale.grayscale.rows, targetGrayscale.grayscale.cols, CV_32FC1, cv::Scalar(0));
-	for (int i = 0; i < 5; i++) {
-		double sigma = 9.0 - i * 2.0;
-		cv::Mat guidance = RollingGuidanceFilter::filter(settings.target->data, sigma, 25.5, 4);
+	for (int i = 0; i < 10; i++) {
+		double sigma = 11.0 - i * 1.0;
+		cv::Mat guidance = RollingGuidanceFilter::filter(settings.target->data, sigma, 10, 4);
 
 		cv::Mat guidanceCanny;
 		cv::Canny(guidance, guidanceCanny, 50, 150, 3);

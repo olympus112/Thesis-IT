@@ -385,9 +385,9 @@ void rollingGuidanceLevels() {
 	cv::imshow("grayscaleCanny", grayscaleCanny);
 
 	cv::Mat canny(grayscale.rows, grayscale.cols, CV_32FC1, cv::Scalar(0));
-	for (int i = 0; i < 5; i++) {
-		double sigma = 9.0 - i * 2.0;
-		cv::Mat guidance = RollingGuidanceFilter::filter(beethoven, sigma, 25.5, 4);
+	for (int i = 0; i < 10; i++) {
+		double sigma = 11.0 - i * 1.0;
+		cv::Mat guidance = RollingGuidanceFilter::filter(beethoven, sigma, 10, 4);
 		cv::imshow("guidance", guidance);
 
 		cv::Mat guidanceCanny;

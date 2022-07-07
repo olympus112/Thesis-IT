@@ -78,7 +78,7 @@ std::vector<std::size_t> Utils::nUniqueSampledSizeTypesInRange(std::mt19937& gen
                                                                std::size_t start,
                                                                std::size_t end,
                                                                float (* pdf)(float)) {
-	assert(n <= end - start);
+	assert(n <= end - start); 
 
 	std::vector<std::size_t> result(n);
 	for (std::size_t i = 0; i < n; i++) {

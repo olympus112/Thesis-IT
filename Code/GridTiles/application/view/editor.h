@@ -62,6 +62,7 @@ public:
 	void splitPatches();
 	void splitPatchesRollingGuidance();
 	void generateRegularPatches();
+	void matchPatches();
 
 	void spawnNewPatch();
 	bool checkPatch(const MondriaanPatch& oldPatch, const MondriaanPatch& newPatch);

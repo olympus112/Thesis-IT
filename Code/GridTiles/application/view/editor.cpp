@@ -24,7 +24,7 @@ void EditorView::init() {
 	reload();
 
 
-	grid.addRoot(MondriaanPatch(Vec2(100, 100), Vec2(200, 200), Vec2(25, 25)));
+	grid.addRoot(MondriaanPatch(Vec2(0, 0), Vec2(0, 0), settings.tpx2mm(settings.target->dimension())));
 
 	metric = 0;
 	nSplits = 4;
@@ -440,6 +440,9 @@ void EditorView::renderSettings() {
 	if (ImGui::Button("Generate regular matching")) {
 		generateRegularPatches();
 	}
+	if (ImGui::Button("Match existing patches")) {
+		matchPatches();
+	}
 	stop = ImGui::ButtonEx("Stop generation", ImVec2(0, 0), ImGuiButtonFlags_Repeat);
 
 
@@ -719,7 +722,7 @@ void EditorView::splitPatchesRollingGuidance() {
 		MondriaanPatch& patch = grid[patchIndex].patch;
 
 		// Biggest area
-		double value = patch.dimension_mm.x * patch.dimension_mm.y;
+		//double value = patch.dimension_mm.x * patch.dimension_mm.y;
 
 		// Largest salience
 		/*cv::Mat saliencyPatch = screen.pipeline.saliencyMap.data(patch.targetBounds().cv());
@@ -730,6 +733,12 @@ void EditorView::splitPatchesRollingGuidance() {
 		/*cv::Mat edgePatch = screen.pipeline.targetSobel.data(patch.targetBounds().cv());
 		cv::Scalar sum = cv::sum(edgePatch) / (patch.targetBounds().width() * patch.targetBounds().height());
 		double value = sum(0);*/
+
+		// Largest canny levels weight
+		cv::Mat cannyPatch = screen.pipeline.cannyLevels.data(patch.targetBounds().cv());
+		cv::Scalar sum = cv::sum(cannyPatch);
+		//cv::Scalar average = cv::mean(cannyPatch);
+		double value = sum(0);
 
 		patchCharacteristics.push_back(PatchCharacteristics(patchIndex, value));
 	}
@@ -766,7 +775,6 @@ void EditorView::splitPatchesRollingGuidance() {
 		int convolutionOffsetY = static_cast<int>(settings.tmm2px(settings.minimumPatchDimension_mm.y));
 		int convolutionWidth = cannyLevels.cols - 2 * convolutionOffsetX;
 		int convolutionHeight = cannyLevels.rows - 2 * convolutionOffsetY;
-
 
 		// Horizontal line, vertical split
 		double horizontalValue = 0;
@@ -994,8 +1002,27 @@ void EditorView::generateRegularPatches() {
 				auto [rotationIndex, sourcePosition] = Utils::computeBestMatch(patch, cv::TM_SQDIFF_NORMED);
 				cv::Rect sourcePatch(sourcePosition.x, sourcePosition.y, patch.width, patch.height);
 
+
 				settings.sourcer.textures[rotationIndex].data(sourcePatch).copyTo(settings.puzzle.data(patch));
 			}
+		}
+	});
+}
+
+void EditorView::matchPatches() {
+	settings.puzzle = Texture(settings.target->data);
+	pool.push_task([this]() {
+		for (auto node : grid.patches) {
+			if (!node.leaf())
+				continue;
+
+			MondriaanPatch& patch = node.patch;
+			cv::Rect patchBounds = patch.targetBounds().cv();
+
+			auto [rotationIndex, sourcePosition] = Utils::computeBestMatch(patchBounds, cv::TM_SQDIFF_NORMED);
+			cv::Rect sourcePatch(sourcePosition.x, sourcePosition.y, patchBounds.width, patchBounds.height);
+			patch.sourceOffset = sourcePosition;
+			settings.sourcer.textures[rotationIndex].data(sourcePatch).copyTo(settings.puzzle.data(patchBounds));
 		}
 	});
 }
