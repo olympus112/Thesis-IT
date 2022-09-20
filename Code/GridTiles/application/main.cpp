@@ -12,7 +12,9 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+#include "opencv2/saliency/saliencyBaseClasses.hpp"
 #include "rolling_guidance/RollingGuidanceFilter.h"
+#include "util/imageUtils.h"
 
 std::mutex MUTEX_RENDER;
 Vec2i dimension;
@@ -402,7 +404,24 @@ void rollingGuidanceLevels() {
 	cv::imshow("canny", canny);
 	//cv::waitKey();
 
-	cv::Mat image = canny.clone();
+	cv::Mat dilated1;
+	cv::Mat dilated2;
+	double dilation_size_1 = 5;
+	double dilation_size_2 = 6;
+	cv::Mat element1 = cv::getStructuringElement(
+		cv::MORPH_RECT,
+		cv::Size(2 * dilation_size_1 + 1, 2 * dilation_size_1 + 1),
+		cv::Point(dilation_size_1, dilation_size_1));
+	cv::Mat element2 = cv::getStructuringElement(
+		cv::MORPH_RECT,
+		cv::Size(2 * dilation_size_2 + 1, 2 * dilation_size_2 + 1),
+		cv::Point(dilation_size_2, dilation_size_2));
+	cv::dilate(canny, dilated1, element1);
+	cv::dilate(canny, dilated2, element2);
+	cv::Mat dilated = dilated2 - dilated1;
+	cv::imshow("dilated", dilated);
+
+	cv::Mat image = dilated.clone();
 	cv::Mat result = beethoven.clone();
 	int n = 300;
 	int thickness = 3;
@@ -466,6 +485,80 @@ void rollingGuidanceLevels() {
 	cv::imshow("Graph", graph);
 
 	cv::waitKey();
+}
+
+void rg() {
+	cv::Mat img = cv::imread("../res/eye_2.png");
+	cv::Mat cannyLevels(img.rows, img.cols, CV_32FC1, cv::Scalar(0));
+	for (int i = 0; i < 10; i++) {
+		double sigma = 11.0 - i * 1.0;
+		cv::Mat guidance = RollingGuidanceFilter::filter(img, sigma, 10, 4);
+
+		cv::Mat guidanceCanny;
+		cv::Canny(guidance, guidanceCanny, 50, 150, 3);
+
+		/*if (i == 0 || i == 3 || i == 6 | i == 9) {
+			cv::Mat c;
+			cv::convertScaleAbs(guidanceCanny, c);
+
+			cv::imwrite(std::string("../res/rg/guidance_") + std::to_string(i) + ".png", guidance);
+			cv::imwrite(std::string("../res/rg/canny_") + std::to_string(i) + ".png", c*2);
+
+		}*/
+
+		guidanceCanny.convertTo(guidanceCanny, CV_32FC1, 1.0 / (i + 1.0));
+
+		//canny += guidanceCanny;
+		cv::max(cannyLevels, guidanceCanny, cannyLevels);
+	}
+	cv::convertScaleAbs(cannyLevels, cannyLevels);
+
+	cv::Mat dilated1;
+	cv::Mat dilated2;
+	int dil = 5;
+	cv::Mat element1 = cv::getStructuringElement(
+		cv::MORPH_RECT,
+		cv::Size(2 * (dil - 1) + 1, 2 * (dil - 1) + 1),
+		cv::Point(dil, dil));
+	cv::Mat element2 = cv::getStructuringElement(
+		cv::MORPH_RECT,
+		cv::Size(2 * dil + 1, 2 * dil + 1),
+		cv::Point(dil, dil));
+	cv::dilate(cannyLevels, dilated1, element1);
+	cv::dilate(cannyLevels, dilated2, element2);
+	cv::Mat dilated = dilated2 - dilated1;
+	cv::imwrite("../res/rg/dilate1.png", dilated1);
+	cv::imwrite("../res/rg/dilate2.png", dilated2);
+	cv::imwrite("../res/rg/dilated.png", dilated);
+
+	cv::imwrite("../res/rg/result.png", cannyLevels*2);
+}
+
+void eq() {
+	cv::Mat source = cv::imread("../res/wood_3.png");
+	cv::Mat target = cv::imread("../res/snow.jpg");
+
+	// Target grayscale
+	Grayscale targetGrayscale(target);
+	Grayscale sourceGrayscale(source);
+
+	// Calculate equalization
+	Equalization equalization(targetGrayscale.grayscale, sourceGrayscale.grayscale);
+
+	// Weighted equalization
+	cv::Mat wequalized1;
+	cv::Mat wequalized2;
+	cv::Mat wequalized3;
+	double w1 = 1.0;
+	double w2 = 0.5;
+	double w3 = 0.0;
+	cv::addWeighted(targetGrayscale.grayscale, 1.0f - w1, equalization.equalization, w1, 0.0, wequalized1);
+	cv::addWeighted(targetGrayscale.grayscale, 1.0f - w2, equalization.equalization, w2, 0.0, wequalized2);
+	cv::addWeighted(targetGrayscale.grayscale, 1.0f - w3, equalization.equalization, w3, 0.0, wequalized3);
+	
+	cv::imwrite("../res/rg/eq_100.png", wequalized1);
+	cv::imwrite("../res/rg/eq_50.png", wequalized2);
+	cv::imwrite("../res/rg/eq_0.png", wequalized3);
 }
 
 void rollingGuidance() {
@@ -828,11 +921,165 @@ void testColor() {
 	cv::waitKey();
 }
 
+void testInt() {
+	bool color = false;
+	cv::Mat target = cv::imread("../res/earth.jpg");
+	cv::Mat source = cv::imread("../res/wood_3.png");
+	cv::Mat targetGrayscale = color ? target : Grayscale(target).grayscale;
+	cv::Mat sourceGrayscale = color ? source : Grayscale(source).grayscale;
+
+	// Calculate equalization
+	Equalization equalization(targetGrayscale, sourceGrayscale);
+	cv::Mat equalized = equalization.equalization;
+
+	// Weighted equalization
+	cv::Mat wequalized;
+	double weight = 1;
+	cv::addWeighted(targetGrayscale, 1.0f - weight, equalized, weight, 0.0, wequalized);
+
+	int x = 60;
+	int y = 450;
+	int size = 60;
+	cv::Rect patch(cv::Point(x, y), cv::Point(x + size, y + size));
+	cv::Mat troi = wequalized(patch);
+
+	cv::Mat res;
+	double minVal;
+	cv::Point minLoc;
+	cv::matchTemplate(sourceGrayscale, wequalized(patch), res, cv::TemplateMatchModes::TM_SQDIFF_NORMED);
+	cv::minMaxLoc(res, &minVal, nullptr, &minLoc, nullptr);
+
+	cv::Rect match(minLoc, cv::Point(minLoc.x + size, minLoc.y + size));
+	cv::Mat sroi = source(match);
+
+	cv::rectangle(target, patch, cv::Scalar(0, 0, 255), 3);
+	cv::rectangle(source, match, cv::Scalar(0, 255, 0), 3);
+	cv::imshow("target", target);
+	cv::imshow("source", source);
+	cv::imshow("troi", target(patch));
+	cv::imwrite("../res/output/source.png", source);
+	cv::imwrite("../res/output/target.png", target);
+	cv::imwrite("../res/output/patch.png", target(patch));
+	cv::imwrite("../res/output/match.png", source(match));
+	//cv::imshow("res", res);
+	cv::imshow("sroi", source(match));
+	cv::waitKey();
+}
+
+void testSaliency() {
+	auto saliency = cv::saliency::StaticSaliencyFineGrained::create();
+	cv::Mat res;
+	cv::Mat img = cv::imread("../res/bike.jpg");
+	cv::resize(img, img, cv::Size(1000, 1000 / img.cols * img.rows));
+	saliency->computeSaliency(img, res);
+	cv::cvtColor(res, res, cv::COLOR_GRAY2RGB);
+
+	cv::imwrite("../res/output/saliency.png", res);
+	cv::imshow("res", res);
+	cv::waitKey();
+}
+
+void testRollingGuidance() {
+	cv::Mat img = cv::imread("../res/eye.jpg");
+	// Canny levels
+	cv::Mat cannyLevels(img.rows, img.cols, CV_32FC1, cv::Scalar(0));
+	for (int i = 0; i < 10; i++) {
+		double sigma = 11.0 - i * 1.0;
+		cv::Mat guidance = RollingGuidanceFilter::filter(img, sigma, 25, 4);
+
+		cv::Mat guidanceCanny;
+		cv::Canny(guidance, guidanceCanny, 50, 150, 3);
+
+		if (i == 0 || i == 4 || i == 8) {
+			cv::imwrite("../res/output/rg_" + std::to_string(i) + ".png", guidance);
+			cv::imwrite("../res/output/cn_" + std::to_string(i) + ".png", guidanceCanny);
+			Log::debug("i=%d, s=%f, w=%f", i, sigma, 1.0 / (i + 1.0));
+		}
+
+		guidanceCanny.convertTo(guidanceCanny, CV_32FC1, 1.0 / (i + 1.0));
+		cv::max(cannyLevels, guidanceCanny, cannyLevels);
+	}
+	cv::convertScaleAbs(cannyLevels, cannyLevels);
+	cv::imwrite("../res/output/hierarchical.png", cannyLevels);
+
+	cv::imshow("re", cannyLevels);
+	cv::waitKey();
+}
+
+void testEdge() {
+	cv::Mat img = cv::imread("../res/jonas.jpg");
+	cv::Mat source = cv::imread("../res/wood_3.png");
+	cv::Mat gray, sgray;
+	cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
+	cv::cvtColor(source, sgray, cv::COLOR_BGR2GRAY);
+	cv::Mat eq = Equalization(gray, sgray).equalization;
+
+	cv::imshow("sgray", sgray);
+	cv::imshow("gray", gray);
+	cv::imshow("eq", eq);
+
+	cv::Mat blurEq = Blur(eq).blur;
+	cv::Mat edgeBlurEq = Sobel(blurEq, SobelType::MAGNITUDE).sobel;
+	cv::imshow("SobelBlurEq", edgeBlurEq);
+
+	std::vector bgr { cv::Mat(), cv::Mat(), cv::Mat() };
+	cv::split(img, bgr);
+	/*cv::imshow("b", bgr[0]);
+	cv::imshow("g", bgr[1]);
+	cv::imshow("r", bgr[2]);*/
+
+	cv::Mat be = Sobel(bgr[0], SobelType::MAGNITUDE).sobel;
+	cv::Mat ge = Sobel(bgr[1], SobelType::MAGNITUDE).sobel;
+	cv::Mat re = Sobel(bgr[2], SobelType::MAGNITUDE).sobel;
+	cv::Mat graye = Sobel(gray, SobelType::MAGNITUDE).sobel;
+	cv::Mat result = re / 3 + ge / 3 + be / 3;
+
+	/*cv::imshow("re", re);
+	cv::imshow("ge", ge);
+	cv::imshow("be", be);*/
+
+	cv::imshow("graye", graye);
+	cv::imshow("result", result);
+
+	cv::waitKey();
+}
+
+void testMask() {
+	cv::Mat mask(400, 600, CV_8UC1, cv::Scalar(255));
+	cv::Rect rect(300, 200, 50, 50);
+	mask(rect) = cv::Scalar(0);
+	cv::Mat maskinv;
+	cv::bitwise_not(mask, maskinv);
+	cv::Mat res1;
+	cv::Mat res2;
+	cv::Mat res3;
+	cv::boxFilter(maskinv,
+	              res1,
+	              -1,
+	              cv::Size(rect.width, rect.height),
+	              cv::Point(0, 0),
+	              false,
+	              cv::BORDER_ISOLATED);
+	cv::threshold(res1, res2, 0, 255, cv::THRESH_BINARY);
+	cv::bitwise_not(res2, res3);
+	cv::imshow("mask", mask);
+	cv::imshow("res1", res1);
+	cv::imshow("res2", res2);
+	cv::imshow("res3", res3);
+	cv::waitKey();
+}
+
 int main(int, char**) {
-	startApplication();
+	//startApplication();
+	eq();
+	//testMask();
+	//testEdge();
 	//rollingGuidanceLevels();
 	//rollingGuidance();
 	//testColor();
+	//testInt();
+	//testSaliency();
+	//testRollingGuidance();
 
 	return 0;
 

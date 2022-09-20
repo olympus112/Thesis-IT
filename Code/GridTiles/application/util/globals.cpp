@@ -3,6 +3,6 @@
 
 namespace Globals {
 	float arrowWidth = 35;
-	float imageWidth = 200;
+	float imageWidth = 250;
 	ImVec2 imageSize = ImVec2(imageWidth, imageWidth);
 }

@@ -19,11 +19,11 @@ cv::Rect computeRotatedRect(const cv::Size& originalSize, double degrees);
 cv::Rect2f computeRotatedRect2f(const cv::Size& originalSize, double degrees);
 
 std::vector<std::size_t> nUniqueRandomSizeTypesInRange(std::mt19937& generator, std::size_t n, std::size_t start, std::size_t end);
-std::vector<std::size_t> nUniqueSampledSizeTypesInRange(std::mt19937& generator, std::size_t n, std::size_t start, std::size_t end, float (*pdf)(float));
+std::vector<std::size_t> nUniqueSampledSizeTypesInRange(std::mt19937& generator, std::size_t n, std::size_t start, std::size_t end, const std::function<float(float)>& pdf);
 std::vector<int> nUniqueRandomIntegersInRange(std::mt19937& generator, int n, int start, int end);
 std::vector<int> nUniqueSampledIntegersInRange(std::mt19937& generator, int n, int start, int end, float (*pdf)(float));
 
-
+int randomIntInRange(std::mt19937& generator, int start, int end);
 bool randomBool(std::mt19937& generator);
 float randomUnsignedFloatInRange(std::mt19937& generator, float start, float end);
 float randomSignedFloatInRange(std::mt19937& generator, float start, float end, float sign);

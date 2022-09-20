@@ -8,7 +8,7 @@
 
 MondriaanPatch::MondriaanPatch()
 	: rotationIndex(0)
-	, match(0) {
+	, sortingScore(0) {
 }
 
 MondriaanPatch::MondriaanPatch(const Vec2f& sourceOffset, const Vec2f& targetOffset, const Vec2f& dimension) {
@@ -24,7 +24,8 @@ void MondriaanPatch::render(const Canvas& source,
                             bool selected,
                             bool showConnections,
                             const Color& sourceColor,
-                            const Color& targetColor) const {
+                            const Color& targetColor,
+							bool invert) const {
 	Bounds sourceBounds = this->sourceBounds();
 	Bounds sourceRotatedBounds = this->sourceRotatedBounds();
 	Bounds targetBounds = this->targetBounds();
@@ -33,10 +34,15 @@ void MondriaanPatch::render(const Canvas& source,
 	Vec2 sourceBoundsCenter = sourceBounds.center();
 	Vec2 sourceRotatedBoundsCenter = sourceRotatedBounds.center();
 
-	float rotation = 360.0f / settings.rotations * rotationIndex;
+	float rotation = (invert ? -1 : 1) * 360.0f / settings.rotations * rotationIndex;
 	auto rotated = [&](const Vec2& point) -> ImVec2 {
-		return source.toAbsoluteScreenSpace(sourceRotatedBoundsCenter - sourceBoundsCenter + point.rotated(rotation, sourceBoundsCenter)).iv();
+		cv::Point transformedPoint = Utils::warp(point.cv(), settings.source.inverseTransformations[this->rotationIndex]);
+
+		//return source.toAbsoluteScreenSpace(sourceRotatedBoundsCenter - sourceBoundsCenter + point.rotated(rotation, sourceBoundsCenter)).iv();
+		return source.toAbsoluteScreenSpace(Vec2(transformedPoint.x, transformedPoint.y)).iv();
 	};
+
+
 
 	ImVec2 tl = rotated(sourceBounds.tl());
 	ImVec2 bl = rotated(sourceBounds.ebl());
@@ -90,11 +96,11 @@ Vec2 MondriaanPatch::targetDimension() const {
 }
 
 Bounds MondriaanPatch::sourceUV() const {
-	return settings.sourcer.textures[rotationIndex].bounds().subBoundsUV(sourceBounds());
+	return settings.source.textures[rotationIndex].bounds().subBoundsUV(sourceBounds());
 }
 
 Bounds MondriaanPatch::sourceRotatedUV() const {
-	return settings.sourcer.textures[rotationIndex].bounds().subBoundsUV(sourceRotatedBounds());
+	return settings.source.textures[rotationIndex].bounds().subBoundsUV(sourceRotatedBounds());
 }
 
 Bounds MondriaanPatch::targetUV() const {
@@ -253,15 +259,15 @@ std::vector<Vec2> MondriaanPatch::sourcePoints() const {
 	return sourceBounds().ipoints();
 }
 
-Vec2 MondriaanPatch::sourceRotatedDimension() const {
-	float rotation = 360.0 / settings.rotations * rotationIndex;
+Vec2 MondriaanPatch::sourceRotatedDimension(bool invert) const {
+	float rotation = (invert ? -1 : 1) * 360.0 / settings.rotations * rotationIndex;
 	cv::Size size = RotatedTexture::computeRotatedRect(sourceDimension().cv(), rotation).size();
 
 	return Vec2(size.width, size.height);
 }
 
-Vec2 MondriaanPatch::sourceRotatedDimension2f() const {
-	float rotation = 360.0 / settings.rotations * rotationIndex;
+Vec2 MondriaanPatch::sourceRotatedDimension2f(bool invert) const {
+	float rotation = (invert? -1 : 1) * 360.0 / settings.rotations * rotationIndex;
 
 	cv::Size2f size = RotatedTexture::computeRotatedRect2f(sourceDimension().cv(), rotation).size();
 
@@ -269,15 +275,15 @@ Vec2 MondriaanPatch::sourceRotatedDimension2f() const {
 }
 
 
-Bounds MondriaanPatch::sourceRotatedBounds() const {
-	return Bounds(sourceOffset, sourceRotatedDimension());
+Bounds MondriaanPatch::sourceRotatedBounds(bool invert) const {
+	return Bounds(sourceOffset, sourceRotatedDimension(invert));
 }
 
-std::vector<Vec2> MondriaanPatch::sourceRotatedPoints() const {
+std::vector<Vec2> MondriaanPatch::sourceRotatedPoints(bool invert) const {
 	Bounds sourceBounds = this->sourceBounds();
 	Vec2 sourceBoundsCenter = sourceBounds.center();
 	Vec2 sourceRotatedBoundsCenter = this->sourceRotatedBounds().center();
-	float rotation = 360.0f / settings.rotations * rotationIndex;
+	float rotation =  (invert ? -1 : 1) * 360.0f / settings.rotations * rotationIndex;
 
 	auto rotated = [&](const Vec2& point) {
 		return sourceRotatedBoundsCenter - sourceBoundsCenter + point.rotated(rotation, sourceBoundsCenter);
@@ -286,11 +292,11 @@ std::vector<Vec2> MondriaanPatch::sourceRotatedPoints() const {
 	return std::vector{rotated(sourceBounds[0]), rotated(sourceBounds[1]), rotated(sourceBounds[2]), rotated(sourceBounds[3])};
 }
 
-std::vector<Vec2> MondriaanPatch::sourceRotatedPointsRelative2f() const {
+std::vector<Vec2> MondriaanPatch::sourceRotatedPointsRelative2f(bool invert) const {
 	Bounds sourceBounds = this->sourceBoundsRelative();
 	Vec2 sourceBoundsCenter = sourceBounds.center();
 	Vec2 sourceRotatedBoundsCenter = this->sourceRotatedDimension2f() / 2;
-	float rotation = 360.0f / settings.rotations * rotationIndex;
+	float rotation = (invert ? -1 : 1) * 360.0f / settings.rotations * rotationIndex;
 
 	auto rotated = [&] (const Vec2& point) {
 		return sourceRotatedBoundsCenter - sourceBoundsCenter + point.rotated(rotation, sourceBoundsCenter);

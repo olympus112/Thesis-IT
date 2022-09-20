@@ -11,29 +11,31 @@ public:
 	Vec2f targetOffset;
 	// Dimension of the patch in millimeters
 	Vec2f dimension_mm;
+	// Dimension of the patch in pixels
+	Vec2i dimension_px;
 	// Rotation index
 	int rotationIndex;
 
 
 	// Last computed match
-	double match;
+	double sortingScore;
 
 public:
 	MondriaanPatch();
 	MondriaanPatch(const Vec2f& sourceOffset, const Vec2f& targetOffset, const Vec2f& dimension);
 
-	void render(const Canvas& source, const Canvas& target, bool intersected, bool selected, bool showConnections, const Color& sourceColor, const Color& targetColor) const;
+	void render(const Canvas& source, const Canvas& target, bool intersected, bool selected, bool showConnections, const Color& sourceColor, const Color& targetColor, bool invert = false) const;
 
 	Bounds sourceBounds() const;
 	Bounds sourceBoundsRelative() const;
 	Bounds targetBounds() const;
 	Bounds targetBoundsRelative() const;
-	Bounds sourceRotatedBounds() const;
+	Bounds sourceRotatedBounds(bool invert = false) const;
 
 	Vec2 sourceDimension() const;
 	Vec2 targetDimension() const;
-	Vec2 sourceRotatedDimension() const;
-	Vec2 sourceRotatedDimension2f() const;
+	Vec2 sourceRotatedDimension(bool invert = false) const;
+	Vec2 sourceRotatedDimension2f(bool invert = false) const;
 
 	Bounds sourceUV() const;
 	Bounds sourceRotatedUV() const;
@@ -46,7 +48,7 @@ public:
 	void addToGlobalMask() const;
 
 	std::vector<Vec2> sourcePoints() const;
-	std::vector<Vec2> sourceRotatedPoints() const;
-	std::vector<Vec2> sourceRotatedPointsRelative2f() const;
+	std::vector<Vec2> sourceRotatedPoints(bool invert = false) const;
+	std::vector<Vec2> sourceRotatedPointsRelative2f(bool invert = false) const;
 	std::vector<Vec2> targetPoints() const;
 };

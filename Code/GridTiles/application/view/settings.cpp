@@ -11,26 +11,31 @@ void Settings::init() {
 	actualTargetDimension_mm = Vec2i(500, 500);
 	preferredPatchCountRange = Vec2(4, 100);
 	minimumPatchDimension_mm = Vec2i(10, 10);
+	minimumPatchDimension_px = Vec2i(1, 1);
 
-	postscale = 1.0;
+	postscale = 0.8;
 
-	rotations = 5;
+	rotations = 30;
 
 	sobelDerivative = 1;
 	sobelSize = 3;
 	sobelType = 3;
+	dilation = 6;
 
 	cannyThreshold1 = 100;
 	cannyThreshold2 = 200;
 	cannyAperture = 3;
 	cannyL2gradient = false;
 
-	edgeWeight = 0.5f;
-	intensityWeight = 0.5f;
-	equalizationWeight = 0.5f;
+	edgeWeight = 0.1f;
+	intensityWeight = 0.9f;
+	equalizationWeight = 1.0f;
+
+	useRGB = false;
+	equalize = true;
 
 	std::string sourcePath = "../res/wood_3.png";
-	std::string targetPath = "../res/eye_2.png";
+	std::string targetPath = "../res/beethoven-drawing.jpeg";
 
 	originalSource = Texture(sourcePath);
 	originalTarget = Texture(targetPath);
@@ -60,7 +65,7 @@ void Settings::reloadPrescaledTextures() {
 		cv::resize(originalSource.data, resizedSource, newSourceDimension.cv());
 
 		// Load prescaled source and recalculate ratio
-		sourcer = SourceTexture(resizedSource, rotations);
+		source = SourceTexture(resizedSource, rotations);
 		validateTextureSettings(SettingValidation_SourceMillimeterToPixelRatio);
 	} else {
 		// Load source and recalculate ratio
@@ -69,7 +74,7 @@ void Settings::reloadPrescaledTextures() {
 		cv::resize(originalSource.data, resizedSource, newSourceDimension.cv());
 
 		// Load prescaled source and recalculate ratio
-		sourcer = SourceTexture(resizedSource, rotations);
+		source = SourceTexture(resizedSource, rotations);
 		validateTextureSettings(SettingValidation_SourceMillimeterToPixelRatio);
 
 		// Load prescaled target and recalculate ratio
@@ -81,8 +86,10 @@ void Settings::reloadPrescaledTextures() {
 	}
 	
 	// Reset mask
-	mask.data = cv::Mat(sourcer->rows(), sourcer->cols(), CV_8UC1, cv::Scalar(255));
+	mask.data = cv::Mat(source->rows(), source->cols(), CV_8UC1, cv::Scalar(255));
 	mask.reloadGL();
+
+	minimumPatchDimension_px = Vec2i(std::ceil(tmm2px(minimumPatchDimension_mm.x)), std::ceil(tmm2px(minimumPatchDimension_mm.y)));
 
 	// Recalculate source to target ratio, this should be 1
 	validateTextureSettings(SettingValidation_SourceToTargetPixelRatio);
@@ -112,7 +119,7 @@ void Settings::validateTextureSettings(SettingValidation settingValidation) {
 	}
 
 	if (settingValidation & SettingValidation_SourceMillimeterToPixelRatio) {
-		this->sourceMillimeterToPixelRatio = actualSourceDimension_mm.x / static_cast<float>(sourcer->dimension().x);
+		this->sourceMillimeterToPixelRatio = actualSourceDimension_mm.x / static_cast<float>(source->dimension().x);
 	}
 
 	if (settingValidation & SettingValidation_TargetMillimeterToPixelRatio) {

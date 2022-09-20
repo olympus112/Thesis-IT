@@ -28,6 +28,10 @@ void SettingsView::render() {
 		screen.editor.reload();
 	}
 
+	if (ImGui::Button("Reload levels" , ImVec2(ImGui::GetContentRegionAvail().x, 40))) {
+		screen.pipeline.reloadLevels();
+	}
+
 	if (ImGui::CollapsingHeader("Global variables")) {
 		ImGui::Text("Source hover: %s", screen.editor.source.hover ? "Yes" : "No");
 		ImGui::Text("Source drag: %s", screen.editor.source.drag ? "Yes" : "No");
@@ -56,6 +60,7 @@ void SettingsView::render() {
 
 		// Equalization weight
 		ImGui::SliderFloat("Equalization weight", &settings.equalizationWeight, 0.0f, 1.0f);
+		ImGui::Checkbox("Use RGB", &settings.useRGB);
 
 		ImGui::Spacing();
 		ImGui::Separator();
@@ -101,6 +106,10 @@ void SettingsView::render() {
 		ImGui::SameLine();
 		ImGui::Text("Canny aperture");
 		ImGui::Checkbox("Canny L2 gradient", &settings.cannyL2gradient);
+
+		ImGui::Separator();
+		ImGui::TextColored(Colors::BLUE.iv4(), "Dilation");
+		ImGui::SliderInt("Dilation", &settings.dilation, 1, 20);
 	}
 
 	if (ImGui::CollapsingHeader("Texture settings")) {
@@ -112,8 +121,13 @@ void SettingsView::render() {
 
 		// Source to target pixel ratio
 		ImGui::Text("Source to target pixel ratio: %.2f", settings.sourceToTargetPixelRatio);
+		// Source mm2px ration
+		ImGui::Text("Source px to mm ratio: %.2f", settings.sourceMillimeterToPixelRatio);
+		// Target mm2px ratio
+		ImGui::Text("Target px to mm ratio: %.2f", settings.targetMillimeterToPixelRatio);
 
 		// Preferred patch range
+		ImGui::NewLine();
 		ImGui::Text("Preferred patch range");
 		if (ImGui::DragIntRange2("##ppr", &settings.preferredPatchCountRange.x, &settings.preferredPatchCountRange.y, 1, 1, 1000)) {
 			settings.validateTextureSettings(Settings::SettingValidation_ActualTargetDimension);
@@ -121,16 +135,18 @@ void SettingsView::render() {
 
 		// Minimum patch dimension
 		ImGui::Text("Minimum patch dimension");
-		if (ImGui::DragFloat2("##mps", settings.minimumPatchDimension_mm.data)) {
+		if (ImGui::DragFloat2("##mps", settings.minimumPatchDimension_mm.data, 1, 1, 1000)) {
 			settings.validateTextureSettings(Settings::SettingValidation_ActualTargetDimension);
+			settings.minimumPatchDimension_px = Vec2i(std::ceil(settings.tmm2px(settings.minimumPatchDimension_mm.x)), std::ceil(settings.tmm2px(settings.minimumPatchDimension_mm.y)));
 		}
+		ImGui::Text("Patch size = %d x %d px", settings.minimumPatchDimension_px.x, settings.minimumPatchDimension_px.y);
 
 		ImGui::Spacing();
 		ImGui::Separator();
 		ImGui::Spacing();
 
 		// Source texture
-		if (sourceTexture.render(*settings.sourcer)) {
+		if (sourceTexture.render(*settings.source)) {
 			// Load new source and validate actual source dimension
 			settings.originalSource = Texture(sourceTexture.path);
 			settings.validateTextureSettings(Settings::SettingValidation_ActualSourceDimension);
@@ -147,7 +163,7 @@ void SettingsView::render() {
 		ImGui::Text("Actual dimension");
 		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
 		if (ImGui::DragFloat("##asdx", &settings.actualSourceDimension_mm.x, 1.0, 1.0, 10000.0, "%.0f mm")) {
-			settings.actualSourceDimension_mm.y = settings.validateTextureAspect(&settings.actualSourceDimension_mm.x, nullptr, settings.sourcer->aspect());
+			settings.actualSourceDimension_mm.y = settings.validateTextureAspect(&settings.actualSourceDimension_mm.x, nullptr, settings.source->aspect());
 			settings.validateTextureSettings(Settings::SettingValidation_ActualSourceDimension);
 		}
 		ImGui::PopItemWidth();
@@ -155,13 +171,10 @@ void SettingsView::render() {
 		ImGui::Text("X");
 		ImGui::SameLine();
 		if (ImGui::DragFloat("##asdy", &settings.actualSourceDimension_mm.y, 1.0, 1.0f, 10000.0f, "%.0f mm")) {
-			settings.actualSourceDimension_mm.x = settings.validateTextureAspect(nullptr, &settings.actualSourceDimension_mm.y, settings.sourcer->aspect());
+			settings.actualSourceDimension_mm.x = settings.validateTextureAspect(nullptr, &settings.actualSourceDimension_mm.y, settings.source->aspect());
 			settings.validateTextureSettings(Settings::SettingValidation_ActualSourceDimension);
 		}
 		ImGui::PopItemWidth();
-
-		// Source mm2px ration
-		ImGui::Text("Source px to mm ratio: %.2f", settings.sourceMillimeterToPixelRatio);
 
 		ImGui::Spacing();
 		ImGui::Separator();
@@ -198,9 +211,6 @@ void SettingsView::render() {
 		}
 		ImGui::PopItemWidth();
 
-		// Target mm2px ratio
-		ImGui::Text("Target px to mm ratio: %.2f", settings.targetMillimeterToPixelRatio);
-
 		// Source tooltip
 		if (sourceTexture.hovered) {
 			ImGui::BeginTooltip();
@@ -212,31 +222,31 @@ void SettingsView::render() {
 					ImGui::image(Feature::get[i]->name().c_str(), settings.source[i].it());
 			}*/
 
-			for (int i = 0; i < settings.sourcer.textures.size(); i++) {
-				ImVec2 size(Globals::imageWidth, Globals::imageWidth / settings.sourcer.textures[i].aspect());
-				ImGui::image(std::to_string(settings.sourcer.textures[i].id).c_str(), settings.sourcer.textures[i].it(), size);
+			for (int i = 0; i < settings.source.textures.size(); i++) {
+				ImVec2 size(Globals::imageWidth, Globals::imageWidth / settings.source.textures[i].aspect());
+				ImGui::image(std::to_string(settings.source.textures[i].id).c_str(), settings.source.textures[i].it(), size);
 
-				if (i != settings.sourcer.textures.size() - 1)
+				if (i != settings.source.textures.size() - 1)
 					ImGui::SameLine();
 			}
 
-			if (!settings.sourcer.features.empty()) {
+			if (!settings.source.features.empty()) {
 				for (int f = 0; f < Feature::get.size(); f++) {
-					for (int r = 0; r < settings.sourcer.rotations; r++) {
-						ImVec2 size(Globals::imageWidth, Globals::imageWidth / settings.sourcer.features[r][f].aspect());
-						ImGui::image(std::to_string(settings.sourcer.features[r][f].id).c_str(), settings.sourcer.features[r][f].it(), size);
+					for (int r = 0; r < settings.source.rotations; r++) {
+						ImVec2 size(Globals::imageWidth, Globals::imageWidth / settings.source.features[r][f].aspect());
+						ImGui::image(std::to_string(settings.source.features[r][f].id).c_str(), settings.source.features[r][f].it(), size);
 
-						if (r != settings.sourcer.textures.size() - 1)
+						if (r != settings.source.textures.size() - 1)
 							ImGui::SameLine();
 					}
 				}
 			}
 
-			for (int i = 0; i < settings.sourcer.masks.size(); i++) {
-				ImVec2 size(Globals::imageWidth, Globals::imageWidth / settings.sourcer.masks[i].aspect());
-				ImGui::image(std::to_string(360.0 / settings.sourcer.rotations * i).c_str(), settings.sourcer.masks[i].it(), size);
+			for (int i = 0; i < settings.source.masks.size(); i++) {
+				ImVec2 size(Globals::imageWidth, Globals::imageWidth / settings.source.masks[i].aspect());
+				ImGui::image(std::to_string(360.0 / settings.source.rotations * i).c_str(), settings.source.masks[i].it(), size);
 
-				if (i != settings.sourcer.masks.size() - 1)
+				if (i != settings.source.masks.size() - 1)
 					ImGui::SameLine();
 
 			}

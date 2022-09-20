@@ -24,6 +24,7 @@ public:
 	Texture saliencyMap;
 	Texture rollingGuidance;
 	Texture cannyLevels;
+	Texture dilatedLevels;
 
 	PipelineView();
 
@@ -32,4 +33,5 @@ public:
 	void render();
 
 	void reload();
+	void reloadLevels();
 };

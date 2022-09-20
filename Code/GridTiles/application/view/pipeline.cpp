@@ -14,6 +14,7 @@ PipelineView::PipelineView() = default;
 
 void PipelineView::init() {
 	reload();
+	reloadLevels();
 }
 
 void PipelineView::update() {
@@ -28,7 +29,7 @@ void PipelineView::render() {
 
 	ImGui::Separator();
 
-	ImVec2 sourceSize = ImVec2(Globals::imageWidth, Globals::imageWidth / settings.sourcer->aspect());
+	ImVec2 sourceSize = ImVec2(Globals::imageWidth, Globals::imageWidth / settings.source->aspect());
 	ImVec2 targetSize = ImVec2(Globals::imageWidth, Globals::imageWidth / settings.target->aspect());
 
 	// Default
@@ -47,7 +48,7 @@ void PipelineView::render() {
 		ImGui::SameLine();
 		ImGui::image("Weighted equalization", wequalized->it(), targetSize);
 		ImGui::NewLine();
-		ImGui::image("Source", settings.sourcer->it(), sourceSize);
+		ImGui::image("Source", settings.source->it(), sourceSize);
 		ImGui::SameLine();
 		ImGui::arrow();
 		ImGui::SameLine();
@@ -146,19 +147,61 @@ void PipelineView::render() {
 		ImGui::arrow();
 		ImGui::SameLine();
 		ImGui::image("Canny levels", cannyLevels.it(), targetSize);
+		ImGui::SameLine();
+		ImGui::arrow();
+		ImGui::SameLine();
+		ImGui::image("Dilated levels", dilatedLevels.it(), targetSize);
 	}
 
 	ImGui::End();
 
 }
 
+void PipelineView::reloadLevels() {
+	// Rolling guidance
+	this->rollingGuidance = Texture(RollingGuidanceFilter::filter(settings.target->data, 9, 25.5, 1));
+
+	// Canny levels
+	cv::Mat cannyLevels(targetGrayscale->data.rows, targetGrayscale->data.cols, CV_32FC1, cv::Scalar(0));
+	for (int i = 0; i < 10; i++) {
+		double sigma = 11.0 - i * 1.0;
+		cv::Mat guidance = RollingGuidanceFilter::filter(settings.target->data, sigma, 10, 4);
+
+		cv::Mat guidanceCanny;
+		cv::Canny(guidance, guidanceCanny, 50, 150, 3);
+		guidanceCanny.convertTo(guidanceCanny, CV_32FC1, 1.0 / (i + 1.0));
+
+		//canny += guidanceCanny;
+		cv::max(cannyLevels, guidanceCanny, cannyLevels);
+	}
+	cv::convertScaleAbs(cannyLevels, cannyLevels);
+	this->cannyLevels = Texture(cannyLevels);
+
+	cv::Mat dilated1;
+	cv::Mat dilated2;
+	cv::Mat element1 = cv::getStructuringElement(
+		cv::MORPH_RECT,
+		cv::Size(2 * (settings.dilation - 1) + 1, 2 * (settings.dilation - 1) + 1),
+		cv::Point(settings.dilation, settings.dilation));
+	cv::Mat element2 = cv::getStructuringElement(
+		cv::MORPH_RECT,
+		cv::Size(2 * settings.dilation + 1, 2 * settings.dilation + 1),
+		cv::Point(settings.dilation, settings.dilation));
+	cv::dilate(cannyLevels, dilated1, element1);
+	cv::dilate(cannyLevels, dilated2, element2);
+	cv::Mat dilated = dilated2 - dilated1;
+	this->dilatedLevels = Texture(dilated);
+}
+
 void PipelineView::reload() {
 	// Source histogram and cdf
-	ImageUtils::renderHistogram(*settings.sourcer, &sourceHistogram);
-	ImageUtils::renderCDF(*settings.sourcer, &sourceCDF);
+	ImageUtils::renderHistogram(*settings.source, &sourceHistogram);
+	ImageUtils::renderCDF(*settings.source, &sourceCDF);
 
 	// Source grayscale
-	Grayscale sourceGrayscale(*settings.sourcer);
+	Grayscale sourceGrayscale(*settings.source);
+	if (settings.equalize)
+		cv::normalize(sourceGrayscale.grayscale, sourceGrayscale.grayscale, 0, 255, cv::NORM_MINMAX);
 	this->sourceGrayscale = ExtendedTexture("Source grayscale", sourceGrayscale.grayscale.clone());
 
 	// Target grayscale
@@ -175,52 +218,56 @@ void PipelineView::reload() {
 	// Weighted equalization
 	cv::Mat wequalized;
 	cv::addWeighted(this->targetGrayscale->data, 1.0f - settings.equalizationWeight, this->equalized->data, settings.equalizationWeight, 0.0, wequalized);
+	if (settings.equalize)
+		cv::normalize(wequalized, wequalized, 0, 255, cv::NORM_MINMAX);
+
 	this->wequalized = ExtendedTexture("Weight Equalized", wequalized.clone());
 
 	// Target Blur, Sobel and Canny
-	ImageUtils::renderBlur(*this->wequalized, &this->targetBlur);
+	ImageUtils::renderBlur(*this->targetGrayscale, &this->targetBlur);
+	//ImageUtils::renderBlur(*this->wequalized, &this->targetBlur);
 	ImageUtils::renderSobel(&this->targetBlur, &this->targetSobel);
+	if (settings.equalize) {
+		cv::normalize(targetSobel.data, targetSobel.data, 0, 255, cv::NORM_MINMAX);
+		targetSobel.reloadGL();
+	}
 	ImageUtils::renderCanny(&this->targetBlur, &this->targetCanny);
 
 	// Source Blur, Sobel and Canny
 	ImageUtils::renderBlur(*this->sourceGrayscale, &this->sourceBlur);
+	//ImageUtils::renderBlur(*this->sourceGrayscale, &this->sourceBlur);
 	ImageUtils::renderSobel(&this->sourceBlur, &this->sourceSobel);
-	ImageUtils::renderCanny(&this->sourceBlur, &this->sourceCanny);
-
-	// Rolling guidance
-	this->rollingGuidance = Texture(RollingGuidanceFilter::filter(settings.target->data, 9, 25.5, 1));
-
-	// Canny levels
-	cv::Mat cannyLevels(targetGrayscale.grayscale.rows, targetGrayscale.grayscale.cols, CV_32FC1, cv::Scalar(0));
-	for (int i = 0; i < 10; i++) {
-		double sigma = 11.0 - i * 1.0;
-		cv::Mat guidance = RollingGuidanceFilter::filter(settings.target->data, sigma, 10, 4);
-
-		cv::Mat guidanceCanny;
-		cv::Canny(guidance, guidanceCanny, 50, 150, 3);
-		guidanceCanny.convertTo(guidanceCanny, CV_32FC1, 1.0 / (i + 1.0));
-
-		//canny += guidanceCanny;
-		cv::max(cannyLevels, guidanceCanny, cannyLevels);
+	if (settings.equalize) {
+		cv::normalize(sourceSobel.data, sourceSobel.data, 0, 255, cv::NORM_MINMAX);
+		sourceSobel.reloadGL();
 	}
-	cv::convertScaleAbs(cannyLevels, cannyLevels);
-	this->cannyLevels = Texture(cannyLevels);
+	ImageUtils::renderCanny(&this->sourceBlur, &this->sourceCanny);
 
 	// Set source features
 	FeatureVector sourceFeatures;
-	sourceFeatures.add(this->sourceGrayscale->data.clone());
+	if (settings.useRGB)
+		sourceFeatures.add(settings.source->data.clone());
+	else
+		sourceFeatures.add(this->sourceGrayscale->data.clone());
 	sourceFeatures.add(settings.edgeMethod == Settings::EdgeMethod_Sobel ? this->sourceSobel.data.clone() : this->sourceCanny.data.clone());
-	settings.sourcer.setFeatures(sourceFeatures);
+	settings.source.setFeatures(sourceFeatures);
 
 	// Set target features
 	if (settings.target.features.size() == 0) {
-		settings.target.features.add(this->wequalized->data.clone());
+		if (settings.useRGB)
+			settings.target.features.add(settings.target->data.clone());
+		else
+			settings.target.features.add(this->wequalized->data.clone());
 		if (settings.edgeMethod == Settings::EdgeMethod_Sobel)
 			settings.target.features.add(this->targetSobel.data.clone());
 		else if (settings.edgeMethod == Settings::EdgeMethod_Canny)
 			settings.target.features.add(this->targetCanny.data.clone());
 	} else {
-		settings.target.features[FeatureIndex_Intensity].data = this->wequalized->data.clone();
+		if (settings.useRGB)
+			settings.target.features[FeatureIndex_Intensity].data = settings.target->data.clone();
+		else
+			settings.target.features[FeatureIndex_Intensity].data = this->wequalized->data.clone();
+
 		if (settings.edgeMethod == Settings::EdgeMethod_Sobel)
 			settings.target.features[FeatureIndex_Edge].data = targetCanny.data.clone();
 		else if (settings.edgeMethod == Settings::EdgeMethod_Canny)
@@ -228,7 +275,7 @@ void PipelineView::reload() {
 	}
 
 	// Reload target and source features
-	settings.sourcer.reloadTextures();
+	settings.source.reloadTextures();
 	settings.target.features[FeatureIndex_Intensity].reloadGL();
 	settings.target.features[FeatureIndex_Edge].reloadGL();
 }

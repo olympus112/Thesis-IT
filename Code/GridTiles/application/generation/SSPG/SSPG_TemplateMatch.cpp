@@ -27,7 +27,7 @@ void SSPG_TemplateMatch::mutate(std::vector<MondriaanPatch>& patches) {
 	distribution[FeatureIndex_Edge] = settings.edgeWeight;
 
 	// Reset global mask
-	settings.mask.data = cv::Mat(settings.sourcer->rows(), settings.sourcer->cols(), CV_8UC1, cv::Scalar(255));
+	settings.mask.data = cv::Mat(settings.source->rows(), settings.source->cols(), CV_8UC1, cv::Scalar(255));
 
 	// Target feature mask array
 	cv::Mat* rotatedTargetFeatureMasks = new cv::Mat[rotations];
@@ -69,13 +69,13 @@ void SSPG_TemplateMatch::mutate(std::vector<MondriaanPatch>& patches) {
 				}
 
 				// Collect feature responses
-				int featureCols = settings.sourcer->cols() - rotatedBounds.width + 1;
-				int featureRows = settings.sourcer->rows() - rotatedBounds.height + 1;
+				int featureCols = settings.source->cols() - rotatedBounds.width + 1;
+				int featureRows = settings.source->rows() - rotatedBounds.height + 1;
 				cv::Mat weightedResponse(featureRows, featureCols, CV_32F, cv::Scalar(0.0));
 
 				#pragma omp parallel for
 				for (int featureIndex = 0; featureIndex < featureCount; featureIndex++) {
-					cv::Mat sourceFeature = settings.sourcer.features[rotationIndex][featureIndex].data;
+					cv::Mat sourceFeature = settings.source.features[rotationIndex][featureIndex].data;
 					//assert(sourceFeature.cols == settings.source->cols());
 					//assert(sourceFeature.rows == settings.source->rows());
 					
@@ -153,7 +153,7 @@ void SSPG_TemplateMatch::mutate(std::vector<MondriaanPatch>& patches) {
 		patch.sourceOffset = Vec2(bestPoint.x, bestPoint.y);
 		//patch.sourceRotation = 360.0f * static_cast<float>(bestRotationIndex) / static_cast<float>(rotations);
 		//patch.mask = rotatedTargetFeatureMasks[bestRotationIndex].clone();
-		patch.match = bestValue;
+		//patch.importance = bestValue;
 		//patch.computeTransformationMatrix();
 	}
 

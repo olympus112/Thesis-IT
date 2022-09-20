@@ -66,8 +66,10 @@ namespace ImageUtils {
 
 	inline auto saliency = cv::saliency::StaticSaliencyFineGrained::create();
 	inline void renderSalience(Texture* source, Texture* destination) {
-		saliency->computeSaliency(source->data.clone(), destination->data);
-		destination->reloadGL(false, GL_RGB32F, GL_LUMINANCE, GL_FLOAT);
+		cv::Mat result;
+		saliency->computeSaliency(source->data.clone(), result);
+		result.convertTo(destination->data, CV_8UC1, 255.0);
+		destination->reloadGL(false, GL_UNSIGNED_BYTE, GL_LUMINANCE, GL_FLOAT);
 	}
 
 }

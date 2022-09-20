@@ -100,6 +100,9 @@ void Texture::reloadGL(bool linear, int internalFormat, int extenalFormat, int d
 	auto dataType_ = dataType != 0 ? dataType : GL_UNSIGNED_BYTE;
 	auto target = GL_TEXTURE_2D;
 
+	glDeleteTextures(1, &id);
+	this->id = 0;
+
 	setData(data.size[1], data.size[0], data.data, internalFormat_, externalFormat_, dataType_, target, linear);
 }
 

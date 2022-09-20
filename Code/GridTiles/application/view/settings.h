@@ -28,8 +28,7 @@ struct Settings {
 	Texture originalTarget;
 
 	// Array of `rotations` rotated source material textures
-	SourceTexture sourcer;
-	//ExtendedFeatureTexture source;
+	SourceTexture source;
 	// The target texture
 	ExtendedFeatureTexture target;
 	// The puzzle
@@ -48,6 +47,8 @@ struct Settings {
 	float targetMillimeterToPixelRatio;
 	// Minimum dimension of a puzzle patch in millimeters
 	Vec2f minimumPatchDimension_mm;
+	// Minimum dimension of a puzzle patch in pixels
+	Vec2i minimumPatchDimension_px;
 	// Preferred number of patches in the target puzzle
 	Vec2i preferredPatchCountRange;
 	// Scale ratio between source and target pixels
@@ -65,13 +66,15 @@ struct Settings {
 	float cannyThreshold2;
 	int cannyAperture;
 	bool cannyL2gradient;
+	int dilation;
 
 	EdgeMethod edgeMethod;
 
 	float intensityWeight;
 	float edgeWeight;
 	float equalizationWeight;
-
+	bool useRGB;
+	bool equalize;
 	Settings();
 
 	void init();

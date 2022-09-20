@@ -44,7 +44,7 @@ std::vector<MondriaanPatch> TSPG_Greedy::generate() {
 		cv::circle(mask, point, interdistance, cv::Scalar(0), -1);
 
 		Vec2 targetPosition = Vec2(point.x, point.y);
-		Vec2 sourcePosition = Utils::transform(targetPosition, settings.target->dimension(), settings.sourcer->dimension());
+		Vec2 sourcePosition = Utils::transform(targetPosition, settings.target->dimension(), settings.source->dimension());
 
 		result.emplace_back(sourcePosition, targetPosition, settings.minimumPatchDimension_mm);
 	}

@@ -2,6 +2,7 @@
 
 #include "utils.h"
 
+#include <unordered_set>
 #include <opencv2/highgui.hpp>
 
 #include "omp.h"
@@ -77,14 +78,22 @@ std::vector<std::size_t> Utils::nUniqueSampledSizeTypesInRange(std::mt19937& gen
                                                                std::size_t n,
                                                                std::size_t start,
                                                                std::size_t end,
-                                                               float (* pdf)(float)) {
-	assert(n <= end - start); 
+	const std::function<float(float)>& pdf) {
+	n = min(n, end - start);
+
+	std::vector<std::size_t> range(end - start);
+	for (std::size_t i = start; i < end; i++) 
+		range[i] = i;
 
 	std::vector<std::size_t> result(n);
 	for (std::size_t i = 0; i < n; i++) {
-		std::size_t value = static_cast<float>(start) + pdf(
-			Utils::randomUnsignedFloatInRange(generator, 0.0f, 1.0f) * static_cast<float>(end - start));
-		result[i] = value;
+		float uniformFloat = Utils::randomUnsignedFloatInRange(generator, 0.0f, 1.0f);
+		float pdfFloat = pdf(uniformFloat);
+		std::size_t pdfIndex = pdfFloat * range.size();
+		auto iterator = range.begin() + pdfIndex;
+
+		result[i] = *iterator;
+		range.erase(iterator);
 	}
 
 	return result;
@@ -122,6 +131,12 @@ bool Utils::randomBool(std::mt19937& generator) {
 	return distribution(generator) == 0;
 }
 
+int Utils::randomIntInRange(std::mt19937& generator, int start, int end) {
+	std::uniform_int_distribution distribution(start, end - 1);
+
+	return distribution(generator);
+}
+
 float Utils::randomUnsignedFloatInRange(std::mt19937& generator, float start, float end) {
 	std::uniform_real_distribution distribution(start, end);
 
@@ -135,25 +150,25 @@ float Utils::randomSignedFloatInRange(std::mt19937& generator, float start, floa
 	return negative ? -number : number;
 }
 
-std::pair<int, Vec2> Utils::computeBestMatch(const cv::Rect& patch, cv::TemplateMatchModes metric) {
+std::pair<int, Vec2> Utils::computeBestMatch(const cv::Rect& targetPatch, cv::TemplateMatchModes metric) {
 	float distribution[2];
 	distribution[FeatureIndex_Intensity] = settings.intensityWeight;
 	distribution[FeatureIndex_Edge] = settings.edgeWeight;
 
-	std::vector responses(settings.sourcer.rotations, cv::Mat());
+	std::vector responses(settings.source.rotations, cv::Mat());
 
 #pragma omp parallel for
-	for (int rotationIndex = 0; rotationIndex < settings.sourcer.rotations; rotationIndex++) {
+	for (int rotationIndex = 0; rotationIndex < settings.source.rotations; rotationIndex++) {
 
 		// Collect feature responses
-		int featureCols = settings.sourcer.textures[rotationIndex].cols() - patch.width + 1;
-		int featureRows = settings.sourcer.textures[rotationIndex].rows() - patch.height + 1;
-		cv::Mat weightedResponse(featureRows, featureCols, CV_32F, cv::Scalar(0.0));
+		int featureCols = settings.source.textures[rotationIndex].cols() - targetPatch.width + 1;
+		int featureRows = settings.source.textures[rotationIndex].rows() - targetPatch.height + 1;
+		cv::Mat weightedResponse(featureRows, featureCols, CV_32FC1, cv::Scalar(0.0));
 #pragma omp parallel for
-		for (FeatureIndex featureIndex = 0; featureIndex < settings.sourcer.features[rotationIndex].size(); featureIndex++) {
+		for (FeatureIndex featureIndex = 0; featureIndex < settings.source.features[rotationIndex].size(); featureIndex++) {
 			// Get source and target feature patches
-			cv::Mat sourceFeature = settings.sourcer.features[rotationIndex][featureIndex].data;
-			cv::Mat targetFeaturePatch = settings.target[featureIndex].data(patch);
+			cv::Mat sourceFeature = settings.source.features[rotationIndex][featureIndex].data;
+			cv::Mat targetFeaturePatch = settings.target[featureIndex].data(targetPatch);
 
 			// Find best match
 			cv::Mat response;
@@ -167,29 +182,53 @@ std::pair<int, Vec2> Utils::computeBestMatch(const cv::Rect& patch, cv::Template
 		responses[rotationIndex] = weightedResponse;
 	}
 
+	/*cv::imshow("patch", settings.target->data(targetPatch));
+	for (auto& r : responses) {
+		cv::imshow("Response", r);
+		cv::waitKey();
+	}*/
+
+	bool masking = true;
 	double bestValue;
 	cv::Point bestPoint;
 	int bestRotationIndex = 0;
-	for (int rotationIndex = 0; rotationIndex < settings.sourcer.rotations; rotationIndex++) {
+	for (int rotationIndex = 0; rotationIndex < settings.source.rotations; rotationIndex++) {
 		cv::Mat mask;
-		cv::boxFilter(settings.sourcer.masks[rotationIndex].data,
-		              mask,
-		              -1,
-		              cv::Size(patch.width, patch.height),
-		              cv::Point(0, 0),
-		              true,
-		              cv::BORDER_ISOLATED);
-		cv::threshold(mask, mask, 254, 255, cv::THRESH_BINARY);
-		//cv::imshow("Mask", mask); cv::waitKey();
+		if (masking) {
+			cv::boxFilter(settings.source.masks[rotationIndex].data,
+				mask,
+				-1,
+				cv::Size(targetPatch.width, targetPatch.height),
+				cv::Point(0, 0),
+				true,
+				cv::BORDER_ISOLATED);
+			cv::threshold(mask, mask, 254, 255, cv::THRESH_BINARY);
+		}
 		double value;
 		cv::Point point;
 		if (metric == cv::TM_SQDIFF || metric == cv::TM_SQDIFF_NORMED) {
 			cv::minMaxLoc(responses[rotationIndex],
-			              &value,
-			              nullptr,
-			              &point,
-			              nullptr,
-			              mask(cv::Rect(0, 0, responses[rotationIndex].cols, responses[rotationIndex].rows)));
+				&value,
+				nullptr,
+				&point,
+				nullptr, 
+				masking ? mask(cv::Rect(0, 0, responses[rotationIndex].cols, responses[rotationIndex].rows)) : cv::noArray()
+			);
+
+			/*cv::Mat r, s, m;
+
+			if (masking) {
+				cv::copyTo(mask(cv::Rect(0, 0, responses[rotationIndex].cols, responses[rotationIndex].rows)), m, cv::noArray());
+				cv::rectangle(m, point, cv::Point(point.x + targetPatch.width, point.y + targetPatch.height), cv::Scalar(0, 0, 255), 2);
+				cv::imshow("m", m);
+			}
+			cv::copyTo(settings.source.textures[rotationIndex].data, s, cv::noArray());
+			cv::copyTo(responses[rotationIndex], r, cv::noArray());
+			cv::rectangle(r, point, cv::Point(point.x + targetPatch.width, point.y + targetPatch.height), cv::Scalar(0, 0, 255), 2);
+			cv::rectangle(s, point, cv::Point(point.x + targetPatch.width, point.y + targetPatch.height), cv::Scalar(0, 0, 255), 2);
+			cv::imshow("r", r);
+			cv::imshow("s", s);
+			cv::waitKey();*/
 
 			if (rotationIndex == 0 || value < bestValue) {
 				bestValue = value;
@@ -202,7 +241,8 @@ std::pair<int, Vec2> Utils::computeBestMatch(const cv::Rect& patch, cv::Template
 			              &value,
 			              nullptr,
 			              &point,
-			              mask(cv::Rect(0, 0, responses[rotationIndex].cols, responses[rotationIndex].rows)));
+			              masking ? mask(cv::Rect(0, 0, responses[rotationIndex].cols, responses[rotationIndex].rows)) : cv::noArray()
+			);
 
 			if (rotationIndex == 0 || value > bestValue) {
 				bestValue = value;
@@ -218,17 +258,17 @@ std::pair<int, Vec2> Utils::computeBestMatch(const cv::Rect& patch, cv::Template
 		return std::make_pair(0, Vec2(0, 0));
 	}
 
-	cv::Point transformedPoint = Utils::warp(bestPoint, settings.sourcer.inverseTransformations[bestRotationIndex]);
+	/*cv::Point transformedPoint = Utils::warp(bestPoint, settings.source.inverseTransformations[bestRotationIndex]);
 
-	if (transformedPoint.x > settings.sourcer->data.cols - patch.width - 1) {
+	if (transformedPoint.x > settings.source->data.cols - patch.width - 1) {
 		Log::debug("Too large x");
-		transformedPoint.x = settings.sourcer->data.cols - patch.width - 1;
+		transformedPoint.x = settings.source->data.cols - patch.width - 1;
 	}
 
-	if (transformedPoint.y > settings.sourcer->data.rows - patch.height - 1) {
+	if (transformedPoint.y > settings.source->data.rows - patch.height - 1) {
 		Log::debug("Too large y");
-		transformedPoint.y = settings.sourcer->data.rows - patch.height - 1;
-	}
+		transformedPoint.y = settings.source->data.rows - patch.height - 1;
+	}*/
 
 	// Move seedpoint
 	return std::make_pair(bestRotationIndex, Vec2(bestPoint.x, bestPoint.y));
